@@ -1,0 +1,149 @@
+<html>
+    <head>
+        <style>
+            .table {
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            .table2 {
+                width: 100%;
+                background-color: transparent;
+                border-collapse: collapse;
+                word-wrap: break-word;
+                margin-bottom: 20px;
+            }
+            .page {
+                page-break-after: always !important;
+            }
+            .align-text-center {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            td, th, tr {
+                padding: .25rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+            .table2 td, .table2 tr, .table2 th{
+                border: none !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .head{
+                text-align: center;
+                font-size: 10px;
+            }
+            .head h4{
+                font-size: 10px;
+                margin-bottom: 0px;
+            }
+            .no-marge{
+                margin-top: 0px;
+            }
+            .devise{
+                font-size: 8px;
+            }
+            .text-right{
+                text-align: right;
+            }
+            .file-title{
+                font-size: 1.7em;
+            }
+            .page{
+                page-break-after: always !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <header>
+                <table class="table2">
+                    <tr class="text-center head">
+                        <td>
+                            <h4>REPUBLIQUE DU CAMEROUN</h4>
+                            <strong class="devise">PAIX - TRAVAIL - PATRIE</strong> <br>
+                            <strong>*********</strong>
+                            <h4 class="no-marge">MINISTERE DE L'ENSEIGNEMENT SUPERIEUR</h4>
+                            <strong>MINESUP</strong> <br>
+                            <strong>*********</strong>
+                            <h4 class="text-center no-marge">{{ annee.configuration.nomEcole }}</h4>
+                            <strong>{{ annee.configuration.initiale }}</strong><br>
+                            <strong>*********</strong>
+                        </td>
+                        <td>
+                            <h4>REPUBLIC OF CAMEROON</h4>
+                            <strong class="devise">PEACE - WORK - FATHERLAND</strong><br>
+                            <strong>*********</strong>
+                            <h4  class="no-marge">MINISTRY OF HIGHER EDUCATION</h4>
+                            <strong>MINESUP</strong> <br>
+                            <strong>*********</strong>
+                            <h4 class="text-center no-marge">{{ annee.configuration.nomEcoleEn }}</h4>
+                            <strong>{{ annee.configuration.initiale }}</strong><br>
+                            <strong>*********</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h4 class="text-center file-title">
+                                {% if fileTitle is defined %}
+                                    {{ fileTitle }}
+                                {% elseif hasPaied is defined  %}
+                                    {% if hasPaied %}
+                                        Liste des etudiant ayant déjà payé
+                                    {% else %}
+                                        Liste des insolvables
+                                    {% endif %}
+                                {% else %}
+                                    LISTE DES ETUDIANTS
+                                {% endif %}
+                                {% if app.session.get('subTitle') and ( noSessionTitle is not defined or not noSessionTitle ) %}
+                                    <br>
+                                    (<small style="font-size: 10px;text-transform: capitalize;">{{ app.session.get('subTitle') }}</small>)
+                                {% endif %}
+                            </h4>
+                        </td>
+                    </tr>
+                    {% if tp is defined and tp is not null %}
+                        <tr>
+                            <td>
+                                <h4>Type de paiement : {{ tp.denomination }}</h4>
+                            </td>
+                            {% if tranche is defined and tranche is not null %}
+                                <td><h4 class="text-right">Tranche : {{ tranche.denomination }}</h4></td>
+                            {% endif %}
+                        </tr>
+                    
+                    {% endif %}
+                    <tr>
+                        <td>
+                            {% if classe is defined and classe is not null %}
+                            <strong>CLASSE</strong> : {{ classe.nom ~ ' (' ~ classe.code ~ ')' }} <br>
+                            {% endif %}
+                            <b>Année académique : <i>{{ annee.denominationSlash }}</i></b>
+                        </td>
+                        <td class="text-right">
+                            {% if classe is defined and classe is not null %}
+                                <strong>SPECIALITE</strong> : {{ classe.specialite.name ~ ' (' ~ classe.specialite.code ~ ')' }}
+                            {% endif %}
+                            {% if isForNote is defined and isForNote %}
+                                {% if examen is defined and examen is not null %}
+                                    <b>SESSION : <i>{{ examen.intitule }}</i></b>
+                                {% else %}
+                                    <b>SESSION : <i>................................................................</i></b>
+                                {% endif %}
+                            {% endif %}
+                            
+                        </td>
+                    </tr>
+                    
+                    
+                </table>
+            </header>

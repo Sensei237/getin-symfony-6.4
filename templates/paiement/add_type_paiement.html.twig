@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "PAIEMENTS " }}{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DES PAIEMENTS" }}
+{% endblock %}
+
+{% block contentTitle %}
+    {{ "Liste des paiements" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item">
+        <a href="{{ path("paiement") }}">{{ "paiements" }}</a>
+    </li>
+    <li class="breadcrumb-item active">{{ "ajouter" }}</li>
+{% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block page_content %}
+    {{ form_start(form) }}
+
+    {{ form_row(form.denomination) }}
+
+    <div class="paiements_classe row" data-prototype="{{ form_widget(form.paiementClasses.vars.prototype)|e('html_attr') }}">
+        {% if editionMode is defined and editionMode  %}
+        <div class="col-md-6">
+            {{ form_rest(form) }}
+        </div>
+        {% endif %}
+        
+    </div>
+
+    {% if editionMode is not defined or not editionMode  %}
+        {{ form_rest(form) }}
+    {% endif %}
+    
+    <button type="submit" class="btn btn-outline-success">Creer le type de paiement</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        var $collectionHolderPC;
+
+        var $addPCButton = $('<button type="button" class="btn btn-outline-dark add_pc_link">ajouter classe</button>');
+        var $newLinkLi = $('<div class="" style="width:100%;text-align:right"></div>').append($addPCButton);
+
+        var nbPaiementClasse = 1;
+        $(document).ready(function(){
+            $collectionHolderPC = $('div.paiements_classe');
+
+            $collectionHolderPC.data('index', $collectionHolderPC.find('input').length);
+            $collectionHolderPC.append($newLinkLi);
+
+
+            $addPCButton.on('click', function(e) {
+                addPCForm($collectionHolderPC, $newLinkLi);
+            });
+            {% if editionMode is not defined or not editionMode  %}
+                $addPCButton.trigger('click');
+            {% endif %}
+            
+        });
+
+        function addPCForm($collectionHolder, $newLinkLi)
+        {
+            var prototype = $collectionHolder.data('prototype');
+            var index = $collectionHolder.data('index');
+            var newForm = prototype;
+            newForm = newForm.replace(/__name__/g, index);
+            $collectionHolder.data('index', index + 1)
+            var $newFormLi = $('<div id="classe'+index+'" class="col-6"></div>').append(newForm);
+            $newLinkLi.before($newFormLi);
+            $('.select2').select2()
+            var $addTrancheButton = $('<button type="button" class="btn float-right btn-outline-danger add_transche'+index+'_link"><i class="fa fa-plus"> Ajouter une tranche</i></button>');
+            var $removeClasseButton = $('<button type="button" class="btn float-left btn-outline-danger remove_transche_classe'+index+'_link"><i class="fa fa-minus"> Supprimer la classe</i></button>');
+            var $newLinkDiv = $('<div></div>').append([$addTrancheButton, $removeClasseButton])
+            var $collectionHolderT = $('#type_paiement_paiementClasses_'+index+'_tranches');
+
+            $removeClasseButton.on('click', function(){
+                if (confirm("Etes-vous certains de vouloir poursuivre cette action ?")){
+                    $('#classe'+index).remove();
+                }
+            });
+
+
+            
+            $collectionHolderT.data('index', $collectionHolderT.find('input').length);
+            $collectionHolderT.append($newLinkDiv);
+
+            $addTrancheButton.on('click', function(e) {
+                addTrancheForm($collectionHolderT, $newLinkDiv, index);
+            });
+
+            $addTrancheButton.trigger('click');
+
+        }
+
+        function addTrancheForm($collectionHolder, $newLinkLi, indexP)
+        {
+            var prototype = $collectionHolder.data('prototype');
+            var index = $collectionHolder.data('index');
+            
+            var newForm = prototype;
+            var search = '[tranches]['+index-1+']';
+            newForm = newForm.replace(search, '[tranches]['+index+']');
+            $collectionHolder.data('index', index + 1);
+            var $removeTrancheBtn = $('<div style="margin-top:-50px;text-align:right;margin-bottom:15px;"><a href="#"><i class="fa fa-trash text-danger"></i></a></div>')
+            var $newFormLi = $('<div id="type_paiementClasse'+indexP+'_tranches_'+index+'_contenair"></div>').append([newForm, $removeTrancheBtn]);
+            
+
+            $newLinkLi.before($newFormLi);
+            var lastTrancheForm = $('#type_paiement_paiementClasses_'+indexP+'_tranches').last().prev();
+
+            $removeTrancheBtn.on('click', function(e){
+                e.preventDefault();
+                if (confirm("Etes-vous certain ce vouloir supprimer cette tranche !")){
+                    $('#type_paiementClasse'+indexP+'_tranches_'+index+'_contenair').remove();
+                }
+            })
+
+            $('#type_paiementClasse'+indexP+'_tranches_'+index+'_contenair #type_paiement_paiementClasses_'+indexP+'_tranches_'+indexP+'_montant').attr('name', 'type_paiement[paiementClasses]['+indexP+'][tranches]['+index+'][montant]')
+            $('#type_paiementClasse'+indexP+'_tranches_'+index+'_contenair #type_paiement_paiementClasses_'+indexP+'_tranches_'+indexP+'_denomination').attr('name', 'type_paiement[paiementClasses]['+indexP+'][tranches]['+index+'][denomination]')
+            $('#type_paiementClasse'+indexP+'_tranches_'+index+'_contenair #type_paiement_paiementClasses_'+indexP+'_tranches_'+indexP+'_denomination').attr('value', "Tranche "+(Number(index)+1))
+            $('#type_paiementClasse'+indexP+'_tranches_'+index+'_contenair #type_paiement_paiementClasses_'+indexP+'_tranches_'+indexP+'_denomination').attr('readonly', true);
+        }
+    </script>
+
+    {% if editionMode is defined and editionMode  %}
+        <script>
+            $('select.paiement_de_classe option').each(function(e){
+                var $elt = $(this);
+                {% for pc in tp.paiementClasses %}
+                    {% if pc.classe.id is defined %}
+                        var cl = '{{ pc.classe.id }}';
+                        if ($elt.val() == cl) {
+                            $elt.attr('selected', true);
+                        }
+                    {% endif %}
+                {% endfor %}
+                
+            })
+        </script>
+    {% endif %}
+{% endblock %}

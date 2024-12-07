@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} 
+    {% if examen is defined and examen is not null %}
+        {{ ("NOTES DE " ~ examen.intitule ~ " ANNEE ACADEMIQUE " ~ annee.denomination)|upper }}
+    {% else %}
+        {{ ("NOTES DE " ~ ec.intitule ~ " ANNEE ACADEMIQUE " ~ annee.denomination)|upper }}
+    {% endif %} 
+{% endblock %}
+
+{% block pageTitle %} 
+    {% if examen is defined and examen is not null %}
+    {{ ("NOTES DE " ~ examen.intitule ~ " ANNEE ACADEMIQUE " ~ annee.denomination)|upper }}
+    {% else %}
+    {{ ("NOTES DE " ~ ec.intitule ~ " ANNEE ACADEMIQUE " ~ annee.denomination)|upper }}
+{% endif %} 
+{% endblock %}
+
+{% block contentTitle %}
+    {% if examen is defined and examen is not null %}
+        {{ ("NOTES DE " ~ examen.intitule ~ " > " ~ ec.intitule ~" > ANNEE ACADEMIQUE " ~ annee.denomination)|lower }}
+    {% else %}
+        {{ ("NOTES DE " ~ ec.intitule ~" > ANNEE ACADEMIQUE " ~ annee.denomination)|lower }}
+    {% endif %}
+{% endblock %}
+
+{% block footerContent %}
+    <a href="{{ downloadUrl }}" target="_blank" class="btn btn-outline-secondary btn-download">{{ "Télécharger le pdf" }}</a>
+    {% if examen is defined and examen is not null %}
+        {% set route = classe is defined and classe is not null ? 'note_saisie_note_ec_classe' : 'note_saisie_note_ec' %}
+        {% set parameters = {'slugAnnee': annee.slug, 'slugEC': ec.slug, 'slugExamen': examen.slug} %}
+        {% if classe is defined and classe is not null %}
+            {% set parameters = parameters|merge({'slugClasse': classe.slug}) %}
+        {% endif %}
+        <a href="{{ path(route, parameters) }}" class="btn btn-outline-warning">{{ "Modifier les notes" }}</a>
+    {% else %}
+        {% set route = classe is defined and classe is not null ? 'request_manage_classe' : 'request_manage' %}
+        {% set parameter = {'slugAnnee': annee.slug, 'slugEC': ec.slug} %}
+        {% if classe is defined and classe is not null %}
+            {% set parameter = parameter|merge({'slugClasse': classe.slug}) %}
+        {% endif %}
+        <a href="{{ path(route, parameter) }}" class="btn btn-flat btn-outline-primary">Modifier les notes en requete</a>
+    {% endif %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="">{{"notes"}}</a></li>
+    <li class="breadcrumb-item active">{{"afficher"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-8">
+            <div class="scrollBar list-group-item" style="height: 800px;overflow:auto;">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-head-fixed">
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">{{ "Matricule" }}</th>
+                            <th>{{ "Nom et prenom" }}</th>
+                            <th class="text-center">{{ "Classe" }}</th>
+                            {% if examen is defined and examen is not null %}
+                                <th class="text-center">{{ "Note (sur 20)" }}</th>
+                            {% else %}
+                                <th class="text-center">TPE</th>
+                                <th class="text-center">TP</th>
+                                <th class="text-center">CC</th>
+                                <th class="text-center">EX</th>
+                                <th class="text-center">Rat</th>
+                            {% endif %}
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set params = {'slugEC': ec.slug, 'slugAnnee': annee.slug, 'page': 1} %}
+                        {% set route = 'note_show_notes_ec' %}
+                        {% if examen is defined and examen is not null %}
+                            {% set params = params|merge({'slugExamen': examen.slug}) %}
+                            {% set route = 'note_show_notes_ec_examen' %}
+                        {% endif %}
+                        {% for c in contrats %}
+                            <tr>
+                                <td class="text-center">{{ i }}</td>
+                                <td class="text-center">{{ c.etudiantInscris.etudiant.matricule|upper }}</td>
+                                <td>{{ (c.etudiantInscris.etudiant.nom ~ " " ~ c.etudiantInscris.etudiant.prenom)|upper }}</td>
+                                <td class="text-center">
+                                    {% set params = params|merge({'classe': c.etudiantInscris.classe.slug}) %}
+                                    <a href="{{ path(route, params) }}">
+                                        {{ c.etudiantInscris.classe.code }}
+                                    </a>
+                                </td>
+                                {% if examen is defined and examen is not null %}
+                                    <td class="text-center">
+                                        {% set oldNote = examen.type|upper == 'E' ? c.noteSN : (examen.type|upper == 'C' ? c.noteCC : c.noteSR) %}
+                                        {% if examen.type|upper == 'E' %}
+                                            {% set oldNote = c.noteSN %}
+                                        {% elseif examen.type|upper == 'C' %}
+                                            {% set oldNote = c.noteCC %}
+                                        {% elseif examen.type|upper == 'R' %}
+                                            {% set oldNote = c.noteSR %}
+                                        {% elseif examen.type|upper == 'TP' %}
+                                            {% set oldNote = c.noteTP %}
+                                        {% else %}
+                                            {% set oldNote = c.noteTPE %}
+                                        {% endif %}
+                                        {{ oldNote }}
+                                    </td>
+                                {% else %}
+                                    <td class="text-center">{{ c.noteTPE }}</td>
+                                    <td class="text-center">{{ c.noteTP }}</td>
+                                    <td class="text-center">{{ c.noteCC }}</td>
+                                    <td class="text-center">{{ c.noteSN }}</td>
+                                    <td class="text-center">{{ c.noteSR }}</td>
+                                {% endif %}
+                                    
+                            </tr>
+                            {% set i = i+1 %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="list-group-item">
+                <h5 class="text-center"><small>Autres matières</small></h5>
+                <hr style="width: 50%;height: 5px;background-color: rgb(73, 11, 243)">
+                <div class="scrollBar" style="max-height: 650px;">
+                    <ul class=" list-unstyled">
+                        {% for ecm in ecms %}
+                            {% if ecm.ec.id != ec.id %}
+                                {% set params = {'slugEC': ecm.ec.slug, 'slugAnnee': annee.slug, 'page': 1} %}
+                                {% set route = 'note_show_notes_ec' %}
+                                {% if examen is defined and examen is not null %}
+                                    {% set params = params|merge({'slugExamen': examen.slug}) %}
+                                    {% set route = 'note_show_notes_ec_examen' %}
+                                {% endif %}
+                                {% if classe is defined and classe is not null %}
+                                    {% set params = params|merge({'classe': classe.slug}) %}
+                                {% endif %}
+                                <li class=" list-link">
+                                    <a href="{{ path(route, params) }}">
+                                        {{ ecm.ec.code ~ " (" ~ ecm.ec.intitule|slice(0, 30) ~ ")" }}
+                                    </a>
+                                </li>
+                                <li class="list-seperator"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>      
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+    </script>
+{% endblock %}

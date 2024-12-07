@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <style>
+            table {
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            .page {
+                page-break-after: always !important;
+            }
+            .align-text-center {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            td, th, tr {
+                padding: .75rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        {% for d in data %}
+            {% if d['etudiants'] is defined and d['etudiants'] is not empty %}
+                <div class="page">
+                    <h1 style="text-align: center;">{{ "Liste des étudiants"|upper }}</h1>
+                    <h4>{{ "CLASSE : " ~ d["classe"].nom ~ " (" ~ d["classe"].code ~ ")" }}</h4>
+                    <h4>{{ "SPECIALITE : " ~ d["classe"].specialite.name ~ " (" ~ d["classe"].specialite.code ~ ")" }}</h4>
+                    <h4>{{ "FILIERE : " ~ d["classe"].specialite.filiere.name ~ " (" ~ d["classe"].specialite.filiere.code ~ ")" }}</h4>
+                    <h4>{{ "FORMATION : " ~ d["classe"].formation.name ~ " (" ~ d["classe"].formation.code ~ ")" }}</h4>
+                    <h4>{{ "ANNEE ACADEMIQUE : " ~ annee.denomination }}</h4>
+                    <br>
+                    <table>
+                        <thead class="align-text-center">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ "Matricule" }}</th>
+                                <th>{{ "Nom et prenom" }}</th>
+                                <th>{{ "Sexe" }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set i = 0 %}
+                            {% for e in d["etudiants"] %}
+                            {% set i = i+1 %}
+                                <tr>
+                                    <td class="align-text-center">{{ i }}</td class="align-text-center">
+                                    <td class="align-text-center">{{ e.etudiant.matricule }}</td class="align-text-center">
+                                    <td>{{ e.etudiant.nom ~ " " ~ e.etudiant.prenom }}</td>
+                                    <td  class="align-text-center">{{ e.etudiant.sexe }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </body>
+</html>

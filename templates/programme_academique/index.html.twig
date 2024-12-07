@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "PROGRAMMES ACADEMIQUES LISTE DES CLASSES ANNEE "~ annee.denomination }} {% endblock %}
+
+{% block pageTitle %} {{ "PROGRAMMES ACADEMIQUES " ~ annee.denomination }} {% endblock %}
+
+{% block contentTitle %} {{ "Liste des salles de classe ayant déjà un programme académique pour l'année académique " ~ annee.denomination }} {% endblock %}
+
+{% block footerContent %}
+    <a href="{{ path("import_program", {'slug': annee.slug}) }}" class="btn btn-default"><i class="fa fa-upload"></i> {{ "Importer à partir d'un fichier excel" }}</a>
+    {% if classes is not empty %}
+        <a href="{{ path("export_pdf_programs", {'slug': annee.slug}) }}" class="btn btn-info"><i class="fa fa-file-pdf"></i> {{ "Télécharger pdf" }}</a>
+        <a href="{{ path("export_programs_excel", {'slug': annee.slug}) }}" class="btn btn-info"><i class="fa fa-file-excel"></i> {{ "Télécharger Excel" }}</a>
+    {% else %}
+        <a href="{{ path('all_classes') }}" class="btn btn-primary">{{ "Créer un programme" }}</a>
+    {% endif %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{"programmes academiques"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div>
+        <a href="{{ path('pa_liste_matieres', {'slug': annee.slug, 'page': 1}) }}" class="btn btn-outline-primary">{{ "Liste des matières" }}</a>
+    </div>
+    <br><br>
+    {% if classes is not empty %}
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>{{ "#" }}</th>
+                    <th>{{ "Nom classe" }}</th>
+                    <th>{{ "Code classe" }}</th>
+                    <th>{{ "Specialité" }}</th>
+                    <th>{{ "Filière" }}</th>
+                    <th>{{ "Actions" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set i = 1 %}
+                {% for classe in classes %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>
+                            <a title="{{ "Afficher le programme" }}" href="{{ path('PA_classe', {'annee_slug': annee.slug, 'slug': classe.slug}) }}">{{ classe.nom  }}</a>
+                        </td>
+                        <td>{{ classe.code }}</td>
+                        <td><a title="{{ classe.specialite.name }}" href="">{{ classe.specialite.code }}</a></td>
+                        <td><a title="{{ classe.specialite.filiere.name }}" href="">{{ classe.specialite.filiere.code }}</a></td>
+                        <td>
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                    Action
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item"><a href="{{ path('edit_classe', {'filiere_slug': classe.specialite.filiere.slug, 'specialite_slug': classe.specialite.slug, 'slug': classe.slug}) }}">{{"Modifier"}}</a></li>
+                                    <li class="dropdown-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ classe.formation.slug ~ "&filiere=" ~ classe.specialite.filiere.slug ~ "&specialite=" ~ classe.specialite.slug ~ "&classe=" ~ classe.slug }}">{{"Liste des étudiants"}}</a></li>
+                                    <li class="dropdown-divider"></li>
+                                    <li class="dropdown-item"><a href="{{ path('PA_classe', {'annee_slug': annee.slug, 'slug': classe.slug}) }}">{{"Programme academique"}}</a></li>
+                                    
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% set i = i+1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+       <div class="alert alert-warning">
+           <h1>{{ "aucun programme académique trouvé !"|upper }}  <i class="fa "></i> </h1>
+       </div> 
+    {% endif %}
+{% endblock %}

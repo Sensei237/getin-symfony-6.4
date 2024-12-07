@@ -1,0 +1,135 @@
+{% extends "base.html.twig" %}
+
+{% block title %}GESTION DES EXAMENS{% endblock %}
+
+{% block pageTitle %}GESTION DES EXAMENS{% endblock %}
+
+{% block contentTitle %}
+    
+{% endblock %}
+
+{% block footerContent %}
+    {% set params = {'slugAnnee': annee.slug, 'slugExam': examen.slug} %}
+    {% set route = 'examen_liste_etudiant' %}
+    {% if classe is defined and classe is not null %}
+        {% set params = params|merge({'slugClasse': classe.slug}) %}
+        {% set route = 'examen_liste_etudiant_classe' %}
+    {% endif %}
+    {% set params = params|merge({'download': true}) %}
+    {% if semestre is defined and semestre is not null %}
+        {% set params = params|merge({'semestre': semestre}) %}
+    {% endif %}
+    <a target="_blank" href="{{ path(route, params) }}" class="btn btn-outline-success">Télécharger en pdf</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('examen') }}">examen</a></li>
+    <li class="breadcrumb-item active">{{ "etudiants" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    {% if examenSN is defined and examenSR is defined and examenSN is not null and examenSR is not null %}
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group">
+                    <select id="filter-students-type" class="form-control select2">
+                        <option data-type="{{ examenSR.slug }}" {{ selectedOption == 1 ? 'selected' : '' }} data-semestre="1" value="1">
+                            Liste des etudiants attendus au rattrapage semestre 1
+                        </option>
+                        <option data-type="{{ examenSN.slug }}" {{ selectedOption == 2 ? 'selected' : '' }} data-semestre="1" value="2">
+                            Liste des etudiants ayant tout validé en session normale semestre 1
+                        </option>
+                        <option data-type="{{ examenSR.slug }}" {{ selectedOption == 3 ? 'selected' : '' }} data-semestre="2" value="3">
+                            Liste des etudiants attendus au rattrapage semestre 2
+                        </option>
+                        <option data-type="{{ examenSN.slug }}" {{ selectedOption == 4 ? 'selected' : '' }} data-semestre="2" value="4">
+                            Liste des etudiants ayant tout validé en session normale semestre 2
+                        </option>
+                        <option data-type="{{ examenSR.slug }}" {{ selectedOption == 5 ? 'selected' : '' }} data-semestre="" value="5">
+                            Liste des etudiants attendus au rattrapage
+                        </option>
+                        <option data-type="{{ examenSN.slug }}" {{ selectedOption == 6 ? 'selected' : '' }} data-semestre="" value="6">
+                            Liste des etudiants ayant tout validé en session normale
+                        </option>
+                        
+                    </select>
+                    
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <select name="" id="filter-classes" class="select2 form-control">
+                    <option value="">Toutes les classes</option>
+                    {% for cl in classes %}
+                        <option {{ classe is defined and classe is not null and classe.id == cl.id ? 'selected' : '' }} value="{{ cl.slug }}">{{ cl.nom|upper }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button id="appliquer-filtre" type="button" class="btn btn-outline-primary btn-flat">Appliquer</button>
+            </div>
+                
+        </div>
+    {% endif %}
+        
+    <table class="table table-bordered table-hover" id="example1">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Matricule</th>
+                <th>Noms & Prenoms</th>
+                <th class="text-center">Sexe</th>
+                <th class="text-center">Classe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for d in data %}
+                {% set etudiant = d['etudiant'] %}
+                {% set title = '' %}
+                {% if d['contrats'] is defined and d['contrats'] is not empty %}
+                {% set title = "Matières à rattraper : " %}
+                    {% for c in d['contrats'] %}
+                        {% set title = title ~ ' //>> ' ~ c.ecModule.ec.intitule|upper ~ ' (' ~ c.ecModule.ec.code|upper ~ ') ' %}
+                    {% endfor %}
+                {% endif %}
+                <tr data-toggle="tooltip" data-placement="top" title="{{ title|upper }}">
+                    {% set i = i + 1 %}
+                    <td class="text-center">{{ i }}</td>
+                    <td class="text-center">{{ etudiant.etudiant.matricule }}</td>
+                    <td class="">
+                        <strong>{{ etudiant.etudiant.nomComplet }}</strong>
+                        {% if title != '' %}
+                            <small style="font-size: 8px;"><strong>( {{ title|upper }} )</strong></small>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">{{ etudiant.etudiant.sexe }}</td>
+                    <td class="text-center">
+                        <a href="{{ path('examen_liste_etudiant_classe', {'slugAnnee': annee.slug, 'slugExam': examen.slug, 'slugClasse': etudiant.classe.slug}) }}">{{ etudiant.classe.code }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('button#appliquer-filtre').on('click', function(){
+            var $option = $('select#filter-students-type option:selected');
+            var slug = $option.data('type');
+            var semestre = $option.data('semestre');
+            var selectedOption = $option.prop('value');
+            var $classe = $('select#filter-classes').val();
+            var location = "{{ path('examen_liste_etudiant0', {'slugAnnee': annee.slug}) }}"+slug;
+            if ($classe != "") {
+                location = location + "/"+$classe;
+            }
+            location = location + "?selectedOption="+selectedOption;
+            if (semestre !== "" && semestre !== 'undefined') {
+                location = location +"&semestre="+semestre;
+            }
+
+            window.location.href = location;
+        });
+    </script>
+{% endblock %}

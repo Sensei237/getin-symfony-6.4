@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <style>
+            table {
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            .page {
+                page-break-after: always !important;
+            }
+            .align-text-center {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            td, th, tr {
+                padding: .75rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        {% for p in programmes %}
+            <div class="page">
+                <div>
+                    <img src="{{ absolute_url(asset('dist/img/banniere.png')) }}" alt="">
+                </div>
+                <h1 style="text-align: center;">{{ "PROGRAMME ACADEMIQUE" }}</h1>
+                <h4>{{ "CLASSE : " ~ p["classe"].nom ~ " (" ~ p["classe"].code ~ ")" }}</h4>
+                <h4>{{ "SPECIALITE : " ~ p["classe"].specialite.name ~ " (" ~ p["classe"].specialite.code ~ ")" }}</h4>
+                <h4>{{ "FILIERE : " ~ p["classe"].specialite.filiere.name ~ " (" ~ p["classe"].specialite.filiere.code ~ ")" }}</h4>
+                <h4>{{ "ANNEE ACADEMIQUE : " ~ annee.denomination }}</h4>
+                <br>
+                <table class="align-text-center">
+                    <thead class="">
+                        <tr>
+                            <th>{{ "Unité d'Enseignement (UE)" }}</th>
+                            <th>{{ "Eléments Constitutifs (EC)" }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for module in p["modules"] %}
+                            <tr>
+                                <td class="align-text-center">
+                                    <h3>{{ module.intitule }}</h3>
+                                    <h4><i>{{ module.code }}</i></h4>
+                                </td>
+                                <td>
+                                    <table class="table">
+                                        <tr>
+                                            <th>{{ "Intitulé" }}</th>
+                                            <th>{{ "Code" }}</th>
+                                            <th>{{ "Crédit" }}</th>
+                                            <th>{{ "Semestre" }}</th>
+                                        </tr>
+                                        {% for ecm in module.ecModules %}
+                                            <tr>
+                                                <td>{{ ecm.ec.intitule }}</td>
+                                                <td>{{ ecm.ec.code }}</td>
+                                                <td>{{ ecm.credit }}</td>
+                                                <td>{{ ecm.semestre }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </body>
+</html>
+
+    

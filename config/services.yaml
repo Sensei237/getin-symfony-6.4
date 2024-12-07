@@ -1,0 +1,65 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    locale: 'en'
+    sample_directory: '%kernel.project_dir%/public/dist/sample'
+    etudiant_profil_directory: '%kernel.project_dir%/public/dist/img/etudiants'
+    public_dist_img: '%kernel.project_dir%/public/dist/img'
+    images_directory: '%kernel.project_dir%/public/images'
+    server_upload_default_path: '%kernel.project_dir%/public/uploads'
+    server_upload_image_path: '%kernel.project_dir%/public/uploads/images'
+    asset_url: '%kernel.project_dir%/public'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $uploadPath: '%server_upload_default_path%'
+            $imagesDirectory: '%images_directory%'
+            $etudiantProfilDirectory: '%etudiant_profil_directory%'
+            $publicDistImg: '%public_dist_img%'
+            # $imageUploadPath: '%server_upload_image_path%'
+            # $assetsHelper: '@assets.packages'
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    app.file_uploader:
+        class: App\Service\FileUploader
+
+    contrat_listener:
+        class: App\EntityListener\ContratListener
+        tags:
+            - { name: doctrine.orm.entity_listener }
+    tranche_listener:
+        class: App\EntityListener\TrancheListener
+        tags:
+            - { name: doctrine.orm.entity_listener }
+    typePaiement_listener:
+        class: App\EntityListener\TypePaiementListener
+        tags:
+            - { name: doctrine.orm.entity_listener }
+    configuration_listener:
+        class: App\EntityListener\ConfigurationListener
+        tags:
+            - { name: doctrine.orm.entity_listener }
+    Etudiant_listener:
+        class: App\EntityListener\EtudiantListener
+        tags:
+            - { name: doctrine.orm.entity_listener }
+
+    # Autowiring
+    App\Service\FileUploader: '@app.file_uploader'

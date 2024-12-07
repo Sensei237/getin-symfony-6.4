@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <style>
+            table {
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            .page {
+                page-break-after: always !important;
+            }
+            .align-text-center, .text-center {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            thead th, thead tr {
+                padding: .75rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            tbody td, tbody tr {
+                padding: .5rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: normal;
+            }
+            tr td, tr th {
+                font-size: 12px;
+            }
+            .table th.vertical-alignement {
+                writing-mode: vertical-lr !important;
+                text-orientation:sideways !important; 
+                min-width: 50px !important;
+                text-align: center !important;
+            }
+            .th-matricule {
+                width: 12%;
+                vertical-align: middle !important;
+            }
+            .nom-complet {
+                width: 40%;
+                vertical-align: middle !important;
+            }
+            .th-date {
+                width: 12% !important;
+            }
+            .alert {
+                width: 100%;
+            }
+            .alert p {
+               margin: 0;
+               padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        {% for contrats in data %}
+            {% if contrats is not empty %}
+                {% set ecm = contrats[0].ecModule %}
+                {% set ec = ecm.ec %}
+                {% set classe = ecm.module.classe %}
+                <div class="page">
+                    <div class="alert">
+                        <p>
+                            Intitulé de l'EC: {{ ec.intitule }}
+                        </p>
+                        <p>
+                            Code de l'EC : {{ ec.code }}
+                        </p>
+                        <p>
+                            Examen : {{ exam is defined and exam is not null ? exam.intitule : "Synthèse finale" }}
+                        </p>
+                        <p>
+                            Année académique : {{ annee.denomination }}
+                        </p>
+                        <p>
+                            Classe : {{ classe.nom }} - {{ classe.code }}
+                        </p>
+                        {% if ecm is defined and ecm is not null %}
+                            <p>
+                                Crédit : {{ ecm.credit }}
+                            </p>
+                            <p>
+                                Semestre : {{ ecm.semestre }}
+                            </p>
+                        {% endif %}
+                        
+                    </div>
+                    <table class="table table-hover table-bordered">
+                        {% include "pv/pv_header.html.twig" %}
+                        
+                        {% include "pv/pv_body.html.twig" %}
+                    </table>
+                </div>
+            {% endif %}
+                
+        {% endfor %}
+    </body>
+</html>

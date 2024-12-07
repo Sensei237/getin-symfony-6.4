@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "RELEVES DE NOTES DES ETUDIANTS DE " ~ classe.code }} {% endblock %}
+
+{% block pageTitle %} {{ "RELEVES DE NOTES DES ETUDIANTS DE " ~ classe.code }} {% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path("note") }}">{{"notes"}}</a></li>
+    <li class="breadcrumb-item"><a href="">{{"classes"}}</a></li>
+    <li class="breadcrumb-item active">{{"releve"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    {% if not isEmpty %}
+        {% set params = {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'file': 'pdf', 'page': currentPage} %}
+        {% if semestre is defined and semestre is not null %}
+            {% set params = params|merge({'semestre': semestre}) %}
+        {% endif %}
+        <div class="btn-group">
+            <a target="_blank" href="{{ path('note_releves_note_classe', params) }}" class="btn btn-outline-secondary">Télécharger en pdf</a>
+            {% set semester = semestre == 1 ? 2 : 1 %}
+            <a class="btn btn-outline-success" href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': semester}) }}">Afficher les releves semestre {{ semester }}</a>
+            <a class="btn btn-outline-success" href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug}) }}">Afficher les releves annuel</a>
+        </div>
+        
+        <br><br>
+    {% endif %}
+        
+    <div style="overflow: auto;width:100%;height:1200px" class="scrollBar">
+        {{ releves|raw }}
+    </div>
+
+    {% if not isEmpty %}
+        <div class="btn-group">
+            <a target="_blank" href="{{ path('note_releves_note_classe', params) }}" class="btn btn-outline-secondary">Télécharger en pdf</a>
+        </div>
+
+        {% if pages is defined and pages is not empty  %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': semestre, 'page': (currentPage - 1)}) }}" tabindex="-1">{{"Prev"}}</a>
+                    </li>
+                    {% for p in pages %}
+                        <li class="page-item {{ currentPage == p ? 'active' : '' }}">
+                            <a class="page-link" href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': semestre, 'page': p}) }}">{{ p }}</a class="page-link">
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ nbPages == currentPage ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': semestre, 'page': (currentPage + 1)}) }}">{{"Next"}}</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "base.html.twig" %}
+
+{% block title %}GESTION DES MIGRATIONS{% endblock %}
+
+{% block pageTitle %}MIGRATIONS{% endblock %}
+
+{% block contentTitle %}
+    gestion des migrations
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{ "migrations" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-12">
+            <fieldset>
+                <legend>Importer les programmes académiques</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                <div class="alert alert-primary">
+                    Pour importer les programmes académiques, 
+                    <a href="{{ path('import_program', {'slug': annee.slug}) }}">
+                        cliquez ici <i class="fa fa-hand-point-left" style="font-size: 2em;"></i>
+                    </a>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <hr style="background-color: #223a55;margin-top:30px;height: 1px;">
+    <div class="row">
+        <div class="col-12">
+            <fieldset>
+                <legend>Importer les étudiants</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                <div class="alert alert-error">
+                    Pour importer les étudiants via un fichier excel, 
+                    <a href="{{ path('importer_etudiants', {'slug': annee.slug}) }}">
+                        cliquez ici <i class="fa fa-hand-point-left" style="font-size: 2em;"></i>
+                    </a>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <hr style="background-color: #223a55;margin-top:30px;height: 1px;">
+    <div class="row">
+        <div class="col-12">
+                
+            <fieldset class="">
+                <legend>Importation des notes</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                
+                <div class="alert alert-info alert-dismissible">
+                    <button class="close" type="button" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-info"></i>{{ "Info : Formatage du fichier" }}</h5>
+                    <p>
+                        Le fichier doit etre formaté tel que : <br>
+                        <ul>
+                            <li><b>B1</b> porte le code de l'UE, <b>D1</b> porte le code de l'EC</li>
+                            <li><b>B2</b> porte le code de la classe</li>
+                            <li><b>B3</b> porte l'année académique</li>
+                            <li><b>La ligne 4 </b> porte l'entête du tableau (<i>A4 = Matricule, B4 = Nom & Prenom, C4 = Note de CC, D4 = note de SN, E4 = note de Rat</i>)</li>
+                            <li><strong>Les données commencent à la ligne 5 du fichier</strong></li>
+                        </ul>
+                        <b>NB : <i>Votre fichier peut avoir plusieurs feuilles et chaque feuille doit etre formatée comme ci-dessus</i></b>
+                    </p>
+                </div>
+
+                {{ form_start(form) }}
+                    {{ form_row(form) }}
+                    <button type="submit" class="btn btn-outline-primary btn-flat float-right">importer le fichier</button>
+                {{ form_end(form) }}
+            </fieldset>
+        </div>
+    </div>
+
+    <hr style="background-color: #223a55;margin-top:30px;height: 1px;">
+    <div class="row">
+        <div class="col-12">   
+            <fieldset class="">
+                <legend>Importation des services, Filières, Spécialités et Classes</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                
+                <div class="alert alert-info alert-dismissible">
+                    <button class="close" type="button" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-info"></i>{{ "Info : Formatage du fichier" }}</h5>
+                    <p>Dans un premier temps vous devrez selectionner le type de données se trouvant dans votre fichier. Dans tous les cas l'entête est portée sur la première ligne (ligne 1)</p>
+                    <p>
+                        Le fichier doit etre formaté tel que : <br>
+                        <ol>
+                            <li>
+                                Dans le cas des services
+                                <ul>
+                                    <li>la ligne A porte l'entête du fichier (Nom du service, Code du service)</li>
+                                    <li>Les données à enregistrer commencent à la ligne 2</li>
+                                </ul>
+                                <b>NB : <i>Le code du service doit être unique, les deux colonnes sont obligatoires</i></b>
+                            </li>
+                            <li>
+                                Dans le cas des Filières
+                                <ul>
+                                    <li>la ligne A porte l'entête du fichier (Nom de la filiere (A), Code de la filiere (B)) et la lettre pour la génération des matricules (D)</li>
+                                    <li>Les données à enregistrer commencent à la ligne 2</li>
+                                </ul>
+                                <b>NB : <i>Le code de la filiere doit être unique, les trois colonnes sont obligatoires</i></b>
+                            </li>
+                            <li>
+                                Dans le cas des Spécialités
+                                <ul>
+                                    <li>
+                                        la ligne 1 porte l'entête du fichier (Code de la filière (A), Nom de la Spécialités (B), Code de la Spécialités (C) et la lettre pour la génération des matricules (D)). <br>
+                                        Si vous souhaitez automatiquement créer les classes de cette spécialité alors vous devrez rajouter les colonnes suivantes (E = niveau min, F = niveau max, G = code de la formation)
+                                    </li>
+                                    
+                                    <li>Les données à enregistrer commencent à la ligne 2</li>
+                                </ul>
+                                <b>NB : <i>Le code de la filiere doit être unique, tous les champs de A à D sont obligatoires, les filières doivent déjà exister</i></b>
+                            </li>
+                            <li>
+                                Dans le cas des classes
+                                <ul>
+                                    <li>la ligne A porte l'entête du fichier (Code de la spécialité (A), code de la formation (B), Nom de la classe (C), Code de la classe (D) et le niveau (E))</li>
+                                    <li>Les données à enregistrer commencent à la ligne 2</li>
+                                </ul>
+                                <b>NB : <i>Le code de la filiere doit être unique, tous les champs sont obligatoires, les spécialités et les formations doivent déjà exister</i></b>
+                            
+                            </li>
+                        </ol>
+                    </p>
+                </div>
+
+                {{ form_start(formService) }}
+                    {{ form_row(formService.type) }}
+                    {{ form_row(formService.fichier) }}
+                    {{ form_rest(formService) }}
+                    <button type="submit" class="btn btn-outline-primary btn-flat float-right">importer le fichier</button>
+                {{ form_end(formService) }}
+            </fieldset>
+        </div>
+    </div>
+
+    <hr style="background-color: #223a55;margin-top:30px;height: 1px;">
+    <div class="row">
+        <div class="col-12">
+                
+            <fieldset class="">
+                <legend>Importation du personnel</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                
+                <div class="alert alert-info alert-dismissible">
+                    <button class="close" type="button" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-info"></i>{{ "Info : Formatage du fichier" }}</h5>
+                    <p>
+                        Le fichier doit etre formaté tel que : <br>
+                        <ul>
+                            <li>
+                                La ligne 1 porte l'entête du fichier (nom (A), prenom (B), date de naissance (C), lieu de naissance (D), 
+                                sexe (E), Téléphone (F), Téléphone 2 (G), Adresse Email (H), Grade (I), situation Matrimoniale (J), 
+                                Nombre d'enfants(K), Nom du conjoint (L), Téléphone du conjoint (M), code du service (N))
+                            </li>
+                        </ul>
+
+                    </p>
+                </div>
+
+                {{ form_start(formPersonnel) }}
+                    {{ form_row(formPersonnel) }}
+                    <button type="submit" class="btn btn-outline-primary btn-flat float-right">importer le fichier</button>
+                {{ form_end(formPersonnel) }}
+            </fieldset>
+        </div>
+    </div>
+
+
+
+    <hr style="background-color: #223a55;margin-top:30px;height: 1px;">
+    <div class="row">
+        <div class="col-12">
+                
+            <fieldset>
+                <legend>Importation des anonymats</legend>
+                <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;margin-left:0px;">
+                
+                <div class="alert alert-info alert-dismissible">
+                    <button class="close" type="button" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-info"></i>{{ "Info : Formatage du fichier" }}</h5>
+                    <p>
+                        Le fichier doit etre formaté telque : <br>
+                        <ul>
+                            <li><b>B1</b> porte le code de l'UE, <b>D1</b> porte le code de l'EC</li>
+                            <li><b>B2</b> porte le code de la classe</li>
+                            <li><b>B3</b> porte l'année académique</li>
+                            <li><b>La ligne 4 </b> porte l'entête du tableau</li>
+                            <li><strong>Les données commencent à la ligne 5 du fichier</strong></li>
+                        </ul>
+                        <b>NB : <i>Votre fichier peut avoir plusieurs feuilles et chaque feuille doit etre formatée comme ci-dessus</i></b>
+                    </p>
+                </div>
+
+                {{ form_start(formAnonymat) }}
+                    {{ form_row(formAnonymat) }}
+                    <button type="submit" class="btn btn-outline-primary btn-flat float-right">importer le fichier</button>
+                {{ form_end(formAnonymat) }}
+            </fieldset>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    
+{% endblock %}

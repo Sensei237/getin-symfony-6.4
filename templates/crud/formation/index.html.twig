@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "TOUTES LES FORMATIONS" }} {% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES FORMATIONS" }} {% endblock %}
+
+{% block contentTitle %} {{ "Toutes les formations" }} {% endblock %}
+
+{% block footerContent %}
+    <a class="btn btn-sm btn-primary" href="{{ path('creer_formation') }}">{{ "Ajouter une nouvelle formation" }}</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="active breadcrumb-item">{{ "formations" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ "Intitulé de la formation" }}</th>
+                <th>{{ "Code de la formation" }}</th>
+                <th>{{ "Action" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set i = 1 %}
+            {% for formation in formations %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ formation.name }}</td>
+                    <td>{{ formation.code }}</td>
+                    <td>
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                {{"Action"}}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item"><a href="{{ path('edit_formation', {'slug': formation.slug}) }}">{{"Modifier"}}</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li class="dropdown-item"><a href="">{{"Liste des étudiants"}}</a></li>
+                                                                                                
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% set i = i+1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

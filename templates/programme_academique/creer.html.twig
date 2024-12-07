@@ -1,0 +1,272 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "CREATION PROGRAMME ACADEMIQUE" }}{% endblock %}
+
+{% block pageTitle %} {{ "PROGRAMME ACADEMIQUE" }} {% endblock %}
+
+{% block contentTitle %} 
+    {% if isByUpload is not defined %}
+    {{ modeCreation ? "Création du programme" : "Modifier le programme" }} {{ " academique classe de " ~ classe.code ~ " annee academique " ~ annee.denomination }}
+    {% else %}
+        {{ "Importation des programmes académiques via un fichier excel" }}
+    {% endif %} 
+{% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('programme_academique', {'slug': annee.slug}) }}">{{"programmes academiques"}}</a></li>
+    {% if isByUpload is not defined %}
+    <li class="breadcrumb-item"><a href="{{ path('PA_classe', {'annee_slug': annee.slug, 'slug': classe.slug}) }}">{{ classe.code }}</a></li>
+    <li class="breadcrumb-item active">{{ modeCreation ? "créer" : "modifier" }}</li>
+    {% else %}
+    <li class="breadcrumb-item active">{{ "importation" }}</li>
+    {% endif %}
+    
+{% endblock %}
+
+{% block page_content %}
+    {% if isByUpload is defined and isByUpload %}
+        <div>
+            <div class="alert alert-info">
+                <h4>{{ "Consignes !" }}</h4>
+                <ol>
+                    <li>{{ "Votre fichier doit être un fichier de données Excel avec l'extension xlsx" }}</li>
+                    <li>{{ "Votre fichier peut avoir plusieurs feuilles" }}</li>
+                    <li>{{ "Chaque feuille de votre fichier doit avoir porter le code de la classe concernée dans la cellule B2" }}</li>
+                    <li>{{ "Les données liées au programme académique doivent commencer à la cellule A4" }}</li>
+                    <li>{{ "Les cellules de A4 à F4 portent les intitulés des colonnes à savoir: <b>Intitulé de l'UE</b>, <b>Code de l'UE</b>, <b>Intitulé de l'EC</b>, <b>Cde de l'EC</b>, <b>Crédit</b> et <b>Semestre</b>"|raw }}</li>
+                </ol>
+            </div>
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+
+                <button class="btn btn-info" type="submit">{{ "Importer" }} <i class="fa fa-paper-plane"></i></button>
+            {{ form_end(form) }}
+        </div>
+    {% elseif modeCreation %}
+        <form method="POST">
+            <table class="table table-bordered">
+                <thead class="table-head-fixed align-self-center">
+                    <tr>
+                        <th>{{ "Unité d'Enseignement (UE)" }}</th>
+                        <th>{{ "Eléments Constitutifs (EC)" }}</th>
+                    </tr>
+                </thead>
+                <tbody id="modules-contenair">
+                    <tr id="line_module1" indb="0">
+                        <td>
+                            <label for="module_1_name">{{ "Intutulé du module" }}</label>
+                            <input id="module_1_name" type="text" name="modules[1][name]" placeholder="{{ "Intitulé du module'" }}" required maxlength="250" class="form-control">
+                            <br>
+                            <label for="module_2_code">{{ "Code du module" }}</label>
+                            <input id="module_2_code" type="text" name="modules[1][code]" placeholder="{{ "Entrer le code du module'" }}" required maxlength="50" class="form-control">
+                        </td>
+                        <td>
+                            <table id="ec-module-1-content">
+                                <tr>
+                                    <th>{{ "Intitulé" }}</th>
+                                    <th>{{ "Code" }}</th>
+                                    <th>{{ "Crédit" }}</th>
+                                    <th>{{ "Semestre" }}</th>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="modules[1][ecs][1][name]" required maxlength="250" class="form-control" placeholder="{{ "Intutulé de EC" }}"></td>
+                                    <td><input type="text" name="modules[1][ecs][1][code]" required maxlength="20" class="form-control" placeholder="{{ "Code de EC" }}"></td>
+                                    <td><input type="number" min="0.5" name="modules[1][ecs][1][credit]" required class="form-control" step="0.25" placeholder="{{ "Credit" }}"></td>
+                                    <td><input type="number" name="modules[1][ecs][1][semestre]" min="1" max="2" required class="form-control" placeholder="{{ "Semestre" }}"></td>
+                                </tr>
+                            </table>
+                            <a href="" getin-ue="1" getin-indice="2" class="btn btn-xs btn-success add-ec no-loader" title="{{ "Ajouter un EC à ce module" }}"><i class="fa fa-plus"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <a id="add-module" getin-modules="2" href="" class="btn btn-xs btn-success no-loader" title="{{ "Insérer un nouveau module" }}"><i class="fa fa-plus"></i></a>
+                            <a id="remove-module" href="{{ path('deleteUE1', {'annee_slug': annee.slug, 'classe_slug': classe.slug}) }}" class="btn btn-xs btn-danger no-loader" title="{{ "Supprime le dernier module" }}"><i class="fa fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary float-md-right">{{ "Enregistrer le programme" }}</button>
+            </div>
+        </form>
+    {% else %}
+        <form method="POST">
+            <table class="table table-bordered">
+                <thead class="table-head-fixed align-self-center">
+                    <tr>
+                        <th>{{ "Unité d'Enseignement (UE)" }}</th>
+                        <th>{{ "Eléments Constitutifs (EC)" }}</th>
+                    </tr>
+                </thead>
+                <tbody id="modules-contenair">
+                    {% set i = 1 %}
+                    {% for module in classe.modules %}
+                        <tr id="line_module{{ i }}" indb="1" datadb="{{ module.id }}">
+                            <td>
+                                <input type="hidden" value="{{ module.id }}" name="modules[{{ i }}][id]" required>
+                                <label for="module_{{ i }}_name">{{ "Intutulé du module" }}</label>
+                                <input id="module_{{ i }}_name" type="text" name="modules[{{ i}}][name]" placeholder="{{ "Intitulé du module'" }}" required maxlength="250" class="form-control" value="{{ module.intitule }}">
+                                <br>
+                                <label for="module_{{ i }}_code">{{ "Code du module" }}</label>
+                                <input id="module_{{ i }}_code" type="text" name="modules[{{ i }}][code]" placeholder="{{ "Entrer le code du module'" }}" required maxlength="20" class="form-control" value="{{ module.code }}">
+                            </td>
+                            <td>
+                                <table id="ec-module-{{ i }}-content">
+                                    <tr>
+                                        <th>{{ "Intitulé" }}</th>
+                                        <th>{{ "Code" }}</th>
+                                        <th>{{ "Crédit" }}</th>
+                                        <th>{{ "Semestre" }}</th>
+                                    </tr>
+                                {% set j = 1 %}
+                                    {% for ecm in module.eCModules %}
+                                        <tr>
+                                            <input name="modules[{{ i }}][ecs][{{ j }}][id_ec]" required value="{{ ecm.ec.id }}" type="hidden">
+                                            <input name="modules[{{ i }}][ecs][{{ j }}][id_ecm]" required value="{{ ecm.id }}" type="hidden">
+                                            <td><input type="text" name="modules[{{ i }}][ecs][{{ j }}][name]" required maxlength="250" class="form-control" placeholder="{{ "Intutulé EC" }}" value="{{ ecm.ec.intitule }}"></td>
+                                            <td><input type="text" name="modules[{{ i }}][ecs][{{ j }}][code]" required maxlength="20" class="form-control" placeholder="{{ "Code EC" }}" value="{{ ecm.ec.code }}"></td>
+                                            <td><input type="number" min="0.5" name="modules[{{ i }}][ecs][{{ j }}][credit]" required class="form-control" step="0.25"  placeholder="{{ "Credit" }}" value="{{ ecm.credit }}"></td>
+                                            <td style="position: relative;">
+                                                <input type="number" min="1" name="modules[{{ i }}][ecs][{{ j }}][semestre]" required class="form-control" placeholder="{{ "Semestre" }}" value="{{ ecm.semestre }}">
+                                                <a module="{{ i }}" indb="1" datadb="{{ ecm.id }}" title="{{ "Supprimer l'EC de ce module" }}" href="{{ path('deleteECM', {'classe_slug': classe.slug, 'id': ecm.id, 'annee_slug': annee.slug}) }}" class="btn btn-xs btn-danger float-right btn-remove-ec no-loader"><i class="fa fa-trash-alt"></i></a>
+                                            </td>
+                                            
+                                        </tr>
+                                        {% set j = j+1 %}
+                                    {% endfor %}
+                                </table>
+                                <a href="" getin-ue="{{ i }}" getin-indice="{{ j }}" class="btn btn-xs btn-success add-ec no-loader" title="{{ "Ajouter un EC à ce module" }}"><i class="fa fa-plus"></i></a>
+                            </td>
+                        </tr>
+                        {% set i = i+1 %}
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <a id="add-module" getin-modules="{{ i }}" href="" class="btn btn-xs btn-success no-loader" title="{{ "Insérer un nouveau module" }}"><i class="fa fa-plus"></i></a>
+                            <a id="remove-module" href="{{ path('deleteUE1', {'annee_slug': annee.slug, 'classe_slug': classe.slug}) }}" class="btn btn-xs btn-danger no-loader" title="{{ "Supprime le dernier module" }}"><i class="fa fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary float-md-right">{{ "Enregistrer les modifications" }}</button>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        function buildECLine(ue, ec) {
+            var ecLine = "<tr><td><input type='text' maxlength='250' class='form-control' placeholder='{{ 'Intitulé EC' }}' required name='modules["+ue+"][ecs]["+ec+"][name]'></td><td><input type='text' maxlength='20' class='form-control' placeholder='{{ 'Code EC' }}' required name='modules["+ue+"][ecs]["+ec+"][code]'></td><td><input type='number' min='0.5' step='0.25' class='form-control' placeholder='{{ 'Credit' }}' required name='modules["+ue+"][ecs]["+ec+"][credit]'></td><td style='position:relative;'><input type='number' min='1' class='form-control' placeholder='{{ 'Semestre' }}' required name='modules["+ue+"][ecs]["+ec+"][semestre]'><a href='' class='btn btn-xs btn-danger btn-remove-ec no-loader float-right' title='{{ 'Supprimer EC de ce module' }}' module='"+ue+"' indb='0'><i class='fa fa-trash-alt'></i></a></td></tr>";
+            return ecLine;
+        }
+
+        function buildModuleContent(nbue) {
+            var moduleContainer = "<tr id='line_module"+nbue+"' indb='0'>";
+            moduleContainer += "<td><label for='module_"+nbue+"_name'>{{ 'Intitulé du module' }}</label><input type='text' placeholder='{{ 'Inditulé du module' }}' required maxlength='250' class='form-control' name='modules["+nbue+"][name]' id='module_"+nbue+"_name'>";
+            moduleContainer += "<br><label for='module_"+nbue+"_code'>{{ 'Code du module' }}</label><input type='text' placeholder='{{ 'Entrer le code du module' }}' required maxlength='20' class='form-control' id='module_"+nbue+"_code' name='modules["+nbue+"][code]'></td>";
+            moduleContainer += "<td><table id='ec-module-"+nbue+"-content'><tr><th>{{ 'Intitulé' }}</th><th>{{ 'Code' }}</th><th>{{ 'Crédit' }}</th><th>{{ 'Semestre' }}</th></tr>";
+            moduleContainer += buildECLine(nbue, 1)+"</table><a href='' title='{{ 'Ajouter un EC à ce module' }}' class='btn btn-xs btn-success add-ec no-loader' getin-ue='"+Number(nbue)+"' getin-indice='2'><i class='fa fa-plus'></i></a></td></tr>";
+            return moduleContainer;
+        }
+        
+        // ON SOUHAITE AJOUTER UN NOUVEL EC DANS UN MODULE DONNE
+        $('#modules-contenair').on("click", '.add-ec', function(e){
+            e.preventDefault();
+            var ue = $(this).attr('getin-ue');
+            var ec = $(this).attr('getin-indice');
+            var $ecLine = buildECLine(ue, ec);
+            $('#ec-module-'+ue+'-content').append($ecLine);
+
+            $(this).attr('getin-indice', Number(ec)+1);
+        });
+        
+        // ON CLIQUE SUR LE BOUTON PERMETTANT D'AJOUTER UN NOUVEAU MODULE
+        $('#add-module').click(function(e) {
+            e.preventDefault();
+            var nbue = Number($(this).attr('getin-modules'));
+            $('#modules-contenair').append(buildModuleContent(nbue));
+
+            $(this).attr('getin-modules', nbue+1);
+        });
+
+        // CET EVENEMENT SE DECLENCHE LORSQU'ON SOUHAITE SUPPRIMER UN MODULE 
+        $('#remove-module').click(function(e){
+            e.preventDefault();
+            var nbue = Number($('#add-module').attr('getin-modules'))-1;
+            var $elt = $(this);
+            if (nbue >= 2){
+                $('#line_module'+nbue).css('border', 'red solid 2px');
+                setTimeout(function(){
+                    if (confirm("{{ 'Cette opération supprimera tous les EC liés à ce module ! Etes vous sûre de vouloir poursuivre ?' }}")){
+                        if (Number($('#line_module'+nbue).attr('indb')) == 1) {
+                            var ue = Number($('#line_module'+nbue).attr('datadb'));
+                            $.ajax({
+                                url: $($elt).attr('href')+"/"+ue,
+                                dataType: "JSON",
+                                success: function(response) {
+                                    $('#line_module'+nbue).remove();
+                                    $('#add-module').attr('getin-modules', nbue);
+                                }
+                            })
+                        }else {
+                            $('#line_module'+nbue).remove();
+                            $('#add-module').attr('getin-modules', nbue);
+                        }
+                    }
+                    else{
+                        $('#line_module'+nbue).css('border', '#eed2e6 solid 1px');
+                    }
+                }, 100);
+            }else {
+                alert("Action impossible ! il faut au moins une UE dans un programme Academique");
+            }
+        });
+
+        // ICI ON SUPPRIME UN EC DANS UN MODULE
+        $('#modules-contenair').on("click", '.btn-remove-ec', function(e){
+            e.preventDefault();
+            var mod = Number($(this).attr('module'));
+            var nbec = Number($('#ec-module-'+mod+'-content').next().attr('getin-indice')) - 1;
+            var indb = Number($(this).attr('indb'));
+            var $elt = $(this);
+            if(nbec >= 2) {
+                $($elt).parent().parent().css('border', 'solid red 2px');
+                if(confirm("Etes-vous sur de vouloir supprimer definitivement cet EC ?")) {
+                    if(indb == 1) {
+                        // Il faut supprimer la matiere dans la base de donnee
+                        $.ajax({
+                            url: $($elt).attr('href'),
+                            dataType: "JSON",
+                            success : function(response) {
+                                $($elt).parent().parent().remove();
+                            },
+                            error: function(jqxhr, statut, error) {
+                                alert("{{ 'Une erreur est survenue' }}");
+                            }
+                        });
+                    }else {
+                        $($elt).parent().parent().remove();
+                    }
+                    
+                }else{
+                    $($elt).parent().parent().css('border', 'solid #eed2e6 1px');
+                }
+            }else {
+                alert("Action impossible ! Il faut au moins un EC dans une UE");
+            }
+        });
+        
+    </script>
+{% endblock %}

@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <style>
+            .table {
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+            }
+            .table2 {
+                width: 100%;
+                background-color: transparent;
+                border-collapse: collapse;
+                word-wrap: break-word;
+                margin-bottom: 20px;
+            }
+            .page {
+                page-break-after: always !important;
+            }
+            .align-text-center {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            td, th, tr {
+                padding: .25rem;
+                vertical-align: top;
+                border: 1px solid #dee2e6;
+                border-collapse: collapse;
+                word-wrap: break-word;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+            .table2 td, .table2 tr, .table2 th{
+                border: none !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .head{
+                text-align: center;
+                font-size: 10px;
+            }
+            .head h4{
+                font-size: 10px;
+                margin-bottom: 0px;
+            }
+            .no-marge{
+                margin-top: 0px;
+            }
+            .devise{
+                font-size: 8px;
+            }
+            .text-right{
+                text-align: right;
+            }
+            .file-title{
+                font-size: 1.7em;
+            }
+            .page{
+                page-break-after: always !important;
+            }
+        </style>
+    </head>
+    <body>
+        {% block pdfBody %}
+            
+        {% endblock %}
+    </body>
+</html>

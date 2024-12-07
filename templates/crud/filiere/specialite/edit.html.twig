@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}{{"GESTION DES SPECIALITES"}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES SPECIALITES" }} {% endblock %}
+
+{% block contentTitle %} {{ not editMode ? "Création d'une nouvelle spécialité dans la filière " ~ filiere.name : "Modifier la spécialité" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('filieres_home') }}">{{ "filières" }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('show_all_specialites') }}">{{ "spécialités" }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('show_specialites', {'slug': filiere.slug}) }}">{{ filiere.code }}</a></li>
+    <li class="breadcrumb-item active">{{ editMode ? "modifier" : "créer" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-6">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-6">
+            <h4>{{ "Autres spécialités de cette filière" }}</h4>
+            <ul>
+                {% for s in specialites %}
+                    
+                        {% if editMode and s.id != specialite.id %}
+                            <li><a href="{{ path('edit_specialite', {'slug': s.slug}) }}" title="{{ 'Modifier' }}">{{ s.name }}</a>
+                        {% elseif not editMode %}
+                        <li><a href="{{ path('edit_specialite', {'slug': s.slug}) }}" title="{{ 'Modifier' }}">{{ s.name }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

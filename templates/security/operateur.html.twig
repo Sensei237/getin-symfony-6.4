@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES UTILISATEURS " }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES UTILISATEURS / Opérateurs de saisie" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('security_home') }}">{{"utilisateurs"}}</a></li>
+    <li class="breadcrumb-item active">{{"opérateur de saisie"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    {% if addMode is defined %}
+        {{ form_start(form) }}
+            {{ form_row(form) }}
+            {{ form_rest(form) }}
+            <button type="submit" class="btn btn-outline-primary">{{ "Enregistrer" }}</button>
+        {{ form_end(form) }}
+    {% elseif showMatiereMode is defined %}
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    {% if not annee.isArchived and is_granted('ROLE_SUPER_USER') %}
+                        <th>
+                            <input style="z-index:20" type="checkbox" class="check-all">
+                        </th>
+                    {% endif %}
+                    <th>#</th>
+                    <th>Intitule EC</th>
+                    <th>Code EC</th>
+                    <th>Code UE</th>
+                    <th>Classe</th>
+                    <th>Examen</th>
+                    <th>Credit</th>
+                    <th>Statut</th>
+                    {% if not annee.isArchived and is_granted('ROLE_SUPER_USER') %}
+                        <th>#</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% set i = 0 %}
+                {% for ms in user.matiereASaisirs %}
+                    {% if ms.anneeAcademique.id == annee.id %}
+                        {% if is_granted('ROLE_SUPER_USER') or not ms.expired %}
+                            <tr class="{{ ms.expired ? 'text-danger' : '' }}">
+                                {% set i = i + 1 %}
+                                {% if not annee.isArchived and is_granted('ROLE_SUPER_USER') %}
+                                <td>
+                                    <input value="{{ path('security_delete_ms', {'idMS': ms.id, 'idUser': user.id, 'slugAnnee': annee.slug}) }}" type="checkbox" class="delete-cheched">
+                                </td>
+                                {% endif %}
+                                
+                                <td>{{ i }}</td>
+                                <td>
+                                    {% set urlSaisie = path('note_saisie_note_ec_classe', {'slugAnnee': annee.slug, 'slugEC': ms.ecModule.ec.slug, 'slugExamen': ms.examen.slug, 'slugClasse': ms.ecModule.module.classe.slug}) %}
+                                    {% if ms.isSaisiAnonym %}
+                                        {% set urlSaisie = path('note_saisie_note_ec_classe_anonymat', {'slugAnnee': annee.slug, 'slugEC': ms.ecModule.ec.slug, 'slugExamen': ms.examen.slug, 'slugClasse': ms.ecModule.module.classe.slug, 'withAnonymat': true}) %}
+                                    {% endif %}
+                                    <a href="{{ urlSaisie }}" class="{{ ms.expired ? 'text-danger' : '' }}">
+                                        {{ ms.ecModule.ec.intitule }}
+                                    </a>
+                                </td>
+                                <td>{{ ms.ecModule.ec.code }}</td>
+                                <td>{{ ms.ecModule.module.code }}</td>
+                                <td>{{ ms.ecModule.module.classe.code }}</td>
+                                <td>{{ ms.examen.intitule }}</td>
+                                <td>{{ ms.ecModule.credit }}</td>
+                                <td>
+                                    {% if ms.isSaisie %}
+                                        <i class="fa fa-check-double text-success"> saisie</i>
+                                    {% else %}
+                                        <i class="fa fa-times-circle text-danger">
+                                            pas saisie                                            
+                                        </i> <br>
+                                        {{ ms.expired ? '<i class="badge badge-danger">date a expiré</i>' : '' }}
+                                    {% endif %}
+                                </td>
+                                {% if not annee.isArchived and is_granted('ROLE_SUPER_USER') %}
+                                    <td>
+                                        <a href="{{ path('security_delete_ms', {'idMS': ms.id, 'idUser': user.id, 'slugAnnee': annee.slug}) }}" class="btn btn-outline-danger btn-xs btn-confirm-ajax-action" title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                {% endif %}
+                                
+                            </tr>
+                        {% endif %}
+                            
+                    {% endif %}
+                        
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not annee.isArchived and is_granted('ROLE_SUPER_USER') %}
+            <a href="#" title="supprimer les cases chochées" class="btn btn-flat btn-outline-danger btn-xs delete-checked-case"><i class="fa fa-trash-alt"></i></a>
+        {% endif %}
+    {% endif %}
+        
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('.delete-checked-case').on('click', function(e){
+            e.preventDefault();
+            if (confirm("Attention vous etes sur le point d'exécuter une action irreversible ! êtes-vous sure de vouloir poursuivre ?")) {
+                $("table td .delete-cheched").each(function(){
+                    let elt = $(this);
+                    if ($(elt).is(':checked')) {
+                        var href = $(elt).attr("value");
+                        $.ajax({
+                            url: href,
+                            dataType: "JSON",
+                            beforeSend: function(){
+                                showLoader();
+                            }, 
+                            success: function(response) {
+                                setTimeout(function(){
+                                    showLoader(false);
+                                    window.location.reload();
+                                }, 3000)
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        $('select.matieresASaisirs').html('');
+        
+        $('select.formations').on('change', function(){
+            var value = $(this).val();
+            if (value == ''){
+                $('select.classes, select.specialites, select.filieres').prop('disabled', true);
+                $('select.matieresASaisirs').html('');
+            }else {
+                $('select.filieres').prop('disabled', false);
+                $('select.matieresASaisirs').html('');
+            }
+        });
+        
+        $('select.filieres').on('change', function(){
+            var value = $(this).val();
+            if (value == '') {
+                $('select.classes, select.specialites').prop('disabled', true).html('');
+                $('select.matieresASaisirs').html('');
+            }else{
+                var url = "{{ path('home_find_optionsaid') }}/"+value;
+                $.ajax({
+                    url: url,
+                    success: function(response){
+                        $('select.specialites').html(response).prop('disabled', false);
+                    }
+                })
+            }
+        });
+        
+        $('select.specialites').on('change', function(){
+            var value = $(this).val();
+            if (value == ''){
+                $('select.classes').html('').prop('disabled', true);
+                $('select.matieresASaisirs').html('');
+            }else {
+                var url = "{{ path('home_find_classesaid') }}/"+value;
+                $.ajax({
+                    url: url,
+                    success: function(response){
+                        $('select.classes').html(response).prop('disabled', false);
+                    }
+                })
+            }
+        });
+        
+        $('select.classes').on('change', function(){
+            var value = $(this).val();
+            if (value == ''){
+                $('select.matieresASaisirs').html('');
+            }else{
+                var url = "{{ path('home_find_matiere_id_a') }}/"+value;
+                $.ajax({
+                    url: url,
+                    success: function(response){
+                        $('select.matieresASaisirs').html(response);
+                    }
+                })
+            }
+        })
+        
+        $('.check-all').on("click", function(){
+            var $elt = $(this);
+            $("table td .delete-cheched").each(function(){
+                var checked = false;
+                if ($($elt).is(':checked')) {
+                    checked = true;
+                }
+                $(this).prop('checked', checked)
+            });
+        });
+    </script>
+{% endblock %}

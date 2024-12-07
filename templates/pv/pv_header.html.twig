@@ -1,0 +1,15 @@
+<thead>
+    <tr>
+        <th class="th-matricule">Matricule</th>
+        <th class="nom-complet">Nom et Prenom</th>
+        <th class="th-date text-center">date nais.</th>
+        {% if exam is defined and exam is not null %}
+            <th class="vertical-alignement text-center">CC</th>
+            <th class="vertical-alignement text-center">ex</th>
+        {% endif %}
+        <th class="vertical-alignement text-center">Moy</th>
+        <th class="vertical-alignement text-center">Note/4</th>
+        <th class="vertical-alignement text-center">Grade</th>
+        <th class="vertical-alignement text-center">Déc</th>
+    </tr>
+</thead>

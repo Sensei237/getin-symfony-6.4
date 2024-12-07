@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block page_content %}
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ include('pourcentage_ec_module/_form.html.twig', {'button_label': 'Enregistrer les modifications'}) }}
+
+            <a href="{{ path('pourcentage_e_c_module_index') }}">Liste des pourcentages</a>
+
+            {{ include('pourcentage_ec_module/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

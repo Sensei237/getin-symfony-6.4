@@ -1,0 +1,28 @@
+<tbody>
+    {% set nbChar = nbCharForStudentName is defined ? nbCharForStudentName : 50 %}
+    {% for c in contrats %}
+        {% set stats = c.statsDef %}
+        {% if exam is defined and exam is not null and exam.code|upper == "SR" %}
+            {% set stats = c.statsSR %}
+        {% elseif exam is defined and exam is not null and exam.code|upper == "SN" %}
+            {% set stats = c.statsSN %}
+        {% endif %}
+        {# On affiche uniquement les noms des etudiants qui n'ont pas encore valide cet ec ou qui ont fait le rattrappage  #}
+        {% if not c.isValidated or stats['exam'] is not null %}
+            <tr class="{{ not stats['isValidated'] ? "bg-danger" : "bg-success" }}">
+                <td class="text-center">{{ c.etudiantInscris.etudiant.matricule }}</td>
+                <td>{{ c.etudiantInscris.etudiant.nomComplet|slice(0, nbChar) }}</td>
+                <td class="text-center">{{ c.etudiantInscris.etudiant.dateDeNaissance|date("d/m/Y") }}</td>
+                {% if exam is defined and exam is not null %}
+                    <td class="text-center">{{ stats['cc'] }}</td>
+                    <td class="text-center">{{ stats['exam'] }}</td>
+                {% endif %}
+                <td class="text-center">{{ stats['moyenne'] }}</td>
+                <td class="text-center">{{ stats['note'] }}</td>
+                <td class="text-center">{{ stats['grade'] }}</td>
+                <td class="text-center">{{ stats['decision'] }}</td>
+            </tr>
+        {% endif %}
+            
+    {% endfor %}
+</tbody>

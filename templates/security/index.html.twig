@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES UTILISATEURS " }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES UTILISATEURS" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{"utilisateurs"}}</li>
+{% endblock %}
+
+{% block contentTitle %} Liste des utilisateurs {% endblock %}
+
+{% block footerContent %}
+    <a href="{{ path('security_user_registration') }}" class="btn btn-outline-primary">Ajouter un nouvel utilisateur</a>
+    <a href="{{ path('security_add_operateur', {'slug': app.session.get('annee').slug}) }}" class="btn btn-outline-danger">Ajouter opérateurs de saisie</a>
+{% endblock %}
+
+{% block page_content %}
+    <table id="example1" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nom & Prenom</th>
+                <th>Sexe</th>
+                <th>Télephone</th>
+                <th>E-mail</th>
+                <th>Op. Saisie</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for user in users %}
+                {% if user.employe.isVisible %}
+                    <tr>
+                        {% set i = i + 1 %}
+                        {% set urlMS = '' %}
+                        {% if user.role('ROLE_SAISIE_NOTES') and user.matiereASaisirs is not empty %}
+                            {% set urlMS = path("security_user_list_matiere", {'id': user.id, 'slugAnnee': app.session.get('annee').slug}) %}
+                        {% endif %}
+                        <td>{{ i }}</td>
+                        <td>
+                            <a href="{{ urlMS }}">
+                                {{ user.employe.nomComplet }}
+                            </a>
+                        </td>
+                        <td>{{ user.employe.sexe|slice(0, 1) }}</td>
+                        <td>{{ user.employe.telephone }}</td>
+                        <td>{{ user.employe.adresseEmail }}</td>
+                        <td class="text-center">
+                            {% if user.role('ROLE_SAISIE_NOTES') and user.matiereASaisirs is not empty %}
+                                <i class="fa fa-check text-green"> oui</i>
+                            {% else %}
+                                <i class="fa fa-times text-red"> non</i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('security_user_edit', {'id': user.id}) }}" class="btn btn-outline-warning btn-xs" title="Modifier"><i class="fas fa-pen"></i></a>
+                            {% if user.role('ROLE_SAISIE_NOTES') and user.matiereASaisirs is not empty %}
+                                <a href="{{ urlMS }}" class="btn btn-outline-info btn-xs" title="Afficher la liste des matières à saisir"><i class="fa fa-eye"></i></a>
+                            {% endif %}
+                            
+                            <a href="{{ path('security_delete_user', {'id': user.id}) }}" class="btn btn-outline-danger btn-xs btn-confirm-ajax-action" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                {% endif %}
+                    
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

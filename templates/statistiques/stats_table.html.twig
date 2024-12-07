@@ -1,0 +1,45 @@
+
+{% if data['modules'] is defined and data['modules'] is not empty %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th rowspan="2" style="width: 300px;vertical-align: middle;">Intitule de l'EC</th>
+                <th rowspan="2" style="vertical-align: middle;" class="text-center">code de l'EC</th>
+                <th colspan="4" class="text-center">Taux de validation</th>
+            </tr>
+            <tr style="vertical-align: middle;">
+                <th style="vertical-align: middle;" class="text-center">Garçons</th>
+                <th style="vertical-align: middle;" class="text-center">Filles</th>
+                <th style="vertical-align: middle;" class="text-center">Total</th>
+                <th style="vertical-align: middle;" class="text-center">Moy Gen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in data['modules'] %}
+                {% set module = d['module'] %}
+                <tr class=" bg-danger">
+                    <td colspan="6" class="text-center">RECAPITULATIF DE L'UE</td>
+                </tr>
+                <tr class=" bg-primary">
+                    <td>Intitule UE: {{ module.intitule }}</td>
+                    <td>Code UE: {{ module.code }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% for line in d['stats'] %}
+                    <tr style="vertical-align: middle;">
+                        <td style="vertical-align: middle;">{{ line['intituleEC'] }}</td>
+                        <td style="vertical-align: middle;" class="text-center">{{ line['codeEC'] }}</td>
+                        <td style="vertical-align: middle;" class="text-center">{{ line['statsGarcons']|raw }}</td>
+                        <td style="vertical-align: middle;" class="text-center">{{ line['statsFilles']|raw }}</td>
+                        <td style="vertical-align: middle;" class="text-center">{{ line['statsTotal']|raw }}</td>
+                        <td style="vertical-align: middle;" class="text-center">{{ line['moyGenClasse']|raw }}</td>
+                    </tr>
+                {% endfor %}
+                
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

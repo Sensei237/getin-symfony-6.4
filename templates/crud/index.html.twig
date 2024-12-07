@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{"CREATION "}}{% endblock %}
+
+{% block pageTitle %} {{ "CREATION" }} {% endblock %}
+
+{% block contentTitle %} {{ "Consignes" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{"Création"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row alert alert-info">
+        <div class="col-1"><span style="font-size:3em">✅</span></div>
+        <p class="col-11">
+            Cette page vous fournit des informations concernant le module de création et 
+            les différents objets que vous devrez créer pour le bon fonctionnement de votre 
+            logiciel. 
+        </p>
+    </div>
+
+    <div class="alert alert-success">
+        <h4><a href="{{ path('filieres_home') }}">1. Filères</a></h4>
+        <p>
+            Il s'agit ici des départements qu'on retrouve au sein de votre école. <br>
+            <a href="{{ path('creer_filiere') }}">Cliquer ici pour en créer</a> ou 
+            <a href="{{ path('filieres_home') }}">ici pour afficher l'existant</a>
+        </p>
+    </div>
+
+    <div class="alert alert-secondary">
+        <h4><a style="color: #222" href="{{ path('formation_home') }}">2. Formations</a></h4>
+        <p>
+            Il s'agit ici des différents styles de cours que vous dispensez. Généralement 
+            on en distingue deux à savoir les formations initiales ou cours du jours et 
+            les formations formations continues ou cours du soir (CPS). <br>
+            <a style="color: #222" href="{{ path('creer_formation') }}">Cliquer ici pour en créer</a> ou 
+            <a style="color: #222" href="{{ path('formation_home') }}">ici pour afficher l'existant</a>
+        </p>
+    </div>
+
+    <div class="alert alert-primary">
+        <h4><a href="{{ path('show_all_specialites') }}">3. Spécialités</a></h4>
+        <p>
+            On les connais aussi sous le nom d'option. Ce sont les discipline qu'on retrouve 
+            dans une filière ou département. Exemple <b>Génie informatique</b> peut être 
+            la filière et <b><i>Informatique Industrielle</i></b> l'option ou la spécialité. <br>
+            <div class="alert alert-error">
+                <p>Vous devez au préalable créer les filières avant de créer les spécialités.</p>
+            </div>
+            <a href="{{ path('show_all_specialites') }}">Cliquer pour aller sur la page des spécialités</a>
+        </p>
+    </div>
+
+    <div class="alert alert-light">
+        <h4><a style="color: blue" href="{{ path('all_classes') }}">4. Classes</a></h4>
+        <p>
+            Il est simplement question de créer toutes les salles de classe qu'on retrouve dans votre école.<br>
+            <div class="alert alert-error">
+                <p>Vous devez au préalable créer les filières et les formations avant de créer les classes.</p>
+            </div>
+            <a style="color: blue" href="{{ path('all_classes') }}">Cliquer pour aller sur la page des classes</a>
+        </p>
+    </div>
+
+    <div class="alert alert-primary">
+        <h4><a href="{{ path('creer_service') }}">5. Services</a></h4>
+        <p>
+            Les services ici representent les postes qu'on retrouve dans votre école. 
+            Exemple: <b>la cellule informatique</b> est un service.
+            <a href="{{ path('show_services') }}">Cliquer pour aller sur la page des services</a> ou 
+            <a href="{{ path('creer_service') }}">pour en créer</a>.
+        </p>
+    </div>
+
+{% endblock %}

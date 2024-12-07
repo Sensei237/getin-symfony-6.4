@@ -1,0 +1,4 @@
+<option value="">{{ "Sélectionner un élément dans la liste" }}</option>
+{% for dpt in region.departements %}
+    <option value="{{ dpt.id }}">{{ dpt.nom|upper }}</option>
+{% endfor %}

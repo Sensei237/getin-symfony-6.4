@@ -1,0 +1,292 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "LISTE DES MATIERES POUR L'ANNEE ACADEMIQUE " ~ annee.denomination }} {% endblock %}
+
+{% block pageTitle %} {{ "LISTE DES MATIERES POUR L'ANNEE ACADEMIQUE " ~ annee.denomination }} {% endblock %}
+
+{% block contentTitle %} {{ "Liste des matières" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('programme_academique', {'slug': annee.slug}) }}">{{"programmes academiques"}}</a></li>
+    <li class="breadcrumb-item active">{{"liste des ec"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div>
+        <a href="{{ path('programme_academique', {'slug': annee.slug}) }}" class="btn btn-outline-primary">{{ "Liste des programmes académiques" }}</a>
+    </div><br>
+    <div class="alert alert-info">
+        <h3>{{ "Consigne !" }}</h3>
+        {{ "Seules les matières figurant dans la liste des contrats des étudiants seront affichées <br>Cliquer sur l'intitulé de l'ec pour afficher les options"|raw }}
+    </div>
+    {% if ecs is not empty %}
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>{{ "#" }}</th>
+                    <th>{{ "Intitulé de l'EC" }}</th>
+                    <th>{{ "Code de l'EC" }}</th>
+                    <th>{{ "Nombre de contrats" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ec in ecs %}
+                    <tr>
+                        <td>{{ cmp }}</td>
+                        <td>
+                            <div class="input-group-prepend">
+                                <a style="width: 100%" class="text-secondary no-loader" href="#" data-toggle="dropdown" title="{{ "Cliquez pour afficher les options" }}">
+                                    {{ ec['ec'].intitule }}
+                                    <i class="fa fa-angle-down float-right text-secondary"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li style="font-size:10px" class="dropdown-item-title text-center">{{ (ec['ec'].intitule ~ " (" ~ ec['ec'].code ~ ")")|upper }}</li>
+                                    <li class="divider dropdown-divider"></li>
+                                    {% if classe is defined and classe is not null %}
+                                        <li class="dropdown-item">
+                                            <div class="input-group-prepend">
+                                                <div class="dropright">
+                                                    <i class="fa fa-list-alt"></i>
+                                                    <a href="#" class="dropdown-toggle lien-sous-menu no-loader" data-toggle="dropdown">{{"Saisir les notes de " ~ classe.code ~ " pour cette matière"}}</a>
+                                                    <ul class="dropdown-menu bg-secondary">
+                                                        <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                        
+                                                        <li class="divider dropdown-divider"></li>
+                                                        {% for exam in examens %}
+                                                            <li class="dropdown-item bg-secondary">
+                                                                <i class="fa fa-arrow-right"></i>
+                                                                <a href="{{ path('note_saisie_note_ec_classe', {'slugAnnee': annee.slug, 'slugEC': ec['ec'].slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                            </li>
+                                                            <li class="divider dropdown-divider"></li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="dropdown-item">
+                                            <div class="input-group-prepend">
+                                                <div class="dropright">
+                                                    <i class="fa fa-list-alt"></i>
+                                                    <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown">{{"Saisie anonymée"}}</a>
+                                                    <ul class="dropdown-menu bg-secondary">
+                                                        <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                        
+                                                        <li class="divider dropdown-divider"></li>
+                                                        {% for exam in examens %}
+                                                            {% if exam.type|upper != 'C' and exam.type|upper != 'TP' and exam.type|upper != 'TPE' %}
+                                                                <li class="dropdown-item bg-secondary">
+                                                                    <i class="fa fa-arrow-right"></i>
+                                                                    <a href="{{ path('note_saisie_note_ec_classe_anonymat', {'slugAnnee': annee.slug, 'slugEC': ec['ec'].slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug, 'withAnonymat': true}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                                </li>
+                                                                <li class="divider dropdown-divider"></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        
+                                        <li class="divider dropdown-divider"></li>
+                                        <li class="dropdown-item-title">{{ "AUTRES OPTIONS" }}</li>
+                                        <li class="divider dropdown-divider"></li>
+                                    {% endif %}
+                                    <li class="dropdown-item">
+                                        {% set urlList = classe is defined and classe is not null ? path('etudiant_suivent_matiere_classe', {'slug': ec['ec'].slug, 'slug_annee': annee.slug, 'page': 1, 'slugClasse': classe.slug}) : path('etudiant_suivent_matiere', {'slug': ec['ec'].slug, 'slug_annee': annee.slug, 'page': 1}) %}
+                                        <i class="fa fa-users"></i> 
+                                        <a href="{{ urlList }}">
+                                            {{ "Afficher la liste des étudiants" }}
+                                        </a>
+                                    </li>
+
+                                    <li class="dropdown-item">
+                                        <div class="input-group-prepend">
+                                            <div class="dropright">
+                                                <i class="fa fa-list-alt"></i>
+                                                <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown">{{"Saisir les anonymats"}}</a>
+                                                <ul class="dropdown-menu bg-secondary">
+                                                    <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                    <li class="divider dropdown-divider"></li>
+                                                    {% for exam in examens %}
+                                                        {% if exam.type|upper != 'C' and exam.type|upper != 'TP' and exam.type|upper != 'TPE' %}
+                                                            <li class="dropdown-item bg-secondary">
+                                                                <i class="fa fa-arrow-right"></i>
+                                                                <a href="{{ path("etudiant_saisir_anonymats", {'slugEC': ec['ec'].slug, 'slugAnnee': annee.slug, 'slugExam': exam.slug}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                            </li>
+                                                            <li class="divider dropdown-divider"></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <div class="input-group-prepend">
+                                            <div class="dropright">
+                                                <i class="fa fa-list-alt"></i>
+                                                <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown">{{"Afficher les notes des étudiants pour cette matière"}}</a>
+                                                <ul class="dropdown-menu bg-secondary">
+                                                    <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                    
+                                                    <li class="divider dropdown-divider"></li>
+                                                    {% for exam in examens %}
+                                                        <li class="dropdown-item bg-secondary">
+                                                            <i class="fa fa-arrow-right"></i>
+                                                            <a href="{{ path("note_show_notes_ec_examen", {'slugEC': ec['ec'].slug, 'slugAnnee': annee.slug, 'page': 1, 'slugExamen': exam.slug}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                        </li>
+                                                        <li class="divider dropdown-divider"></li>
+                                                    {% endfor %}
+                                                    <li class="dropdown-item bg-secondary">
+                                                        <i class="fa fa-arrow-right"></i>
+                                                        <a href="{{ path("note_show_notes_ec", {'slugEC': ec['ec'].slug, 'slugAnnee': annee.slug, 'page': 1}) }}">
+                                                            {{ "Toutes les notes" }}
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    {% if ec['classes']|length > 1 %}
+                                        <li class="divider dropdown-divider"></li>
+                                        <li class="dropdown-item">
+                                            <div class="input-group-prepend">
+                                                <div class="dropright">
+                                                    <i class="fa fa-list-alt"></i>
+                                                    <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown">{{"Saisir les notes de tous les contrats de cette matière"}}</a>
+                                                    <ul class="dropdown-menu bg-secondary">
+                                                        <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                        <li class="divider dropdown-divider"></li>
+                                                        {% for exam in examens %}
+                                                            <li class="dropdown-item bg-secondary">
+                                                                <i class="fa fa-arrow-right"></i>
+                                                                <a href="{{ path('note_saisie_note_ec', {'slugAnnee': annee.slug, 'slugEC': ec['ec'].slug, 'slugExamen': exam.slug}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                            </li>
+                                                            <li class="divider dropdown-divider"></li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li class="divider dropdown-divider"></li>
+                                    {% set existe = false %}
+                                    {% for cl in ec['classes'] %}
+                                        {% if classe is null or cl.id != classe.id %}
+                                            <li class="dropdown-item">
+                                                <div class="input-group-prepend">
+                                                    <div class="dropright">
+                                                        <i class="fa fa-list-alt"></i>
+                                                        <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown">{{"Saisir les notes de " ~ cl.code ~ " pour cette matière"}}</a>
+                                                        <ul class="dropdown-menu bg-secondary">
+                                                            <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                                                            <li class="divider dropdown-divider"></li>
+                                                            {% for exam in examens %}
+                                                                <li class="dropdown-item bg-secondary">
+                                                                    <i class="fa fa-arrow-right"></i>
+                                                                    <a href="{{ path('note_saisie_note_ec_classe', {'slugAnnee': annee.slug, 'slugEC': ec['ec'].slug, 'slugExamen': exam.slug, 'slugClasse': cl.slug}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                                                                </li>
+                                                                <li class="divider dropdown-divider"></li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            {% set existe = true %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if existe %}<li class="divider dropdown-divider"></li>{% endif %}
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-user-edit"></i> 
+                                        <a class=" text-gray-dark" href="{{ path('request_manage', {'slugAnnee': annee.slug, 'slugEC': ec['ec'].slug}) }}">
+                                            Gérer les requêtes de cette matière
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </td>
+                        <td>{{ ec['ec'].code }}</td>
+                        <td>
+                            <a href="{{ urlList }}" title="{{ "Afficher la liste" }}">
+                                {{ ec['nbEtudiants'] > 1 ? ec['nbEtudiants'] ~ " étudiants suivent la matière" : ec['nbEtudiants'] ~ " étudiant suit le matière" }}
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    {% set cmp = cmp+1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if pages is defined and pages is not empty  %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                        {% set prevUrl = classe is defined and classe is not null ? path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': (currentPage - 1), 'slugClasse': classe.slug}) : path('pa_liste_matieres', {'slug': annee.slug, 'page': (currentPage - 1)}) %}
+                        <a class="page-link" href="{{ prevUrl }}" tabindex="-1">{{"Prev"}}</a>
+                    </li>
+                    {% for p in pages %}
+                        <li class="page-item {{ currentPage == p ? 'active' : '' }}">
+                            {% set pageUrl = classe is defined and classe is not null ? path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': p, 'slugClasse': classe.slug}) : path('pa_liste_matieres', {'slug': annee.slug, 'page': p}) %}
+                            <a class="page-link" href="{{ pageUrl }}">{{ p }}</a class="page-link">
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ nbPages == currentPage ? 'disabled' : '' }}">
+                        {% set nextUrl = classe is defined and classe is not null ? path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': (currentPage + 1), 'slugClasse': classe.slug}) : path('pa_liste_matieres', {'slug': annee.slug, 'page': (currentPage + 1)}) %}
+                        <a class="page-link" href="{{ nextUrl }}">{{"Next"}}</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+        
+    {% else %}
+       <div class="alert alert-warning">
+           <h1>{{ "aucune matière trouvée !"|upper }}</h1>
+       </div> 
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    
+    <script>
+
+        $('.form-deliberer-ec .overlay').fadeOut();
+
+        $('.form-deliberer-ec').on("submit", function(e){
+            e.preventDefault();
+            let $formulaire = $(this);
+            let $overlay = $formulaire.parent().prev().prev();
+            $.ajax({
+                url: $formulaire.attr('action'),
+                type: $formulaire.attr('method'),
+                data: $formulaire.serialize(),
+                dataType: "JSON",
+                beforeSend: function(){
+                    $overlay.fadeIn(300);
+                },
+                success: function(response){
+                    $overlay.fadeOut(300)
+                    $overlay.attr('style', 'display: none !important;');
+                    if (response.status) {
+                        toastr.success(response.msg)
+                    }else {
+                        toastr.warning(response.msg)
+                    }
+                },
+                error: function(){
+                    toastr.error('Une erreur est survenue pendant la mise à jour des notes');
+                    $overlay.fadeOut(300)
+                    $overlay.attr('style', 'display: none !important;');
+                }
+            });
+        })
+    </script>
+
+{% endblock %}

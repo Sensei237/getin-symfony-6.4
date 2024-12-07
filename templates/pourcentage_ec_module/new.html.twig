@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block page_content %}
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ include('pourcentage_ec_module/_form.html.twig') }}
+
+            <a href="{{ path('pourcentage_e_c_module_index') }}" class="mt-4">Afficher tout</a>
+        </div>
+    </div>
+{% endblock %}

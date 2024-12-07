@@ -1,0 +1,153 @@
+{% extends "pdf/releve_layout.html.twig" %}
+
+{% block otherStyles %}
+    <style>
+        .inline-block {
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+        .img-contenair {
+            width: 30% !important;
+            height: 250px;
+        }
+        .img-contenair img {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px
+        }
+        p {
+            margin: 2px;
+        }
+        .page {
+            width: 205mm !important;
+            padding: 10px 10px !important;
+            margin-bottom: 0px;
+            border: none !important;
+            height: 290mm !important;
+            background-color: rgb(255, 255, 255);
+        }
+        .contenair {
+            margin-top: 30px;
+            margin-left: 60px;
+            margin-right: 30px;
+        }
+        @page{
+            margin: 0px 0px 0px 0px !important;
+            background-color: rgb(255, 255, 255) !important;
+        }
+        .contenair h3 {
+            background-color: rgb(121, 99, 247);
+            color:rgb(255, 255, 255);
+            margin-bottom: 5px;
+            padding: 3px 15px;
+        }
+        .contenair h4 {
+            margin-bottom: 3px;
+            margin-top: 3px;
+        }
+        b {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block releveBody %}
+    <div class="page">
+        <header>
+            <div class="header-cmr">
+                <div class="inline-block block-fr">
+                    <h3 class="text-uppercase">Republique du cameroun</h3>
+                    <span>paix - travail - Patrie</span>
+                    <h4 class="text-uppercase">Ministere de l'enseignement superieur</h4>
+                    <h4 class="text-uppercase universite">Universite de douala</h4>
+                </div>
+                <div class="inline-block block-en">
+                    <h3 class="text-uppercase">Republic of Cameroon</h3>
+                    <span>peace - work - fatherland</span>
+                    <h4 class="text-uppercase">Ministry of Higher Education</h4>
+                    <h4 class="text-uppercase universite">University of Douala</h4>
+                </div>
+                
+            </div>
+
+            <div class="header-school">
+                <div class="logo1 inline-block">
+                    <img src="{{ annee.configuration.logoUniversityBase64 }}" alt="">
+                </div>
+                <div class="inline-block school-info">
+                    <h3>{{ annee['configuration']['nomEcole'] }}</h3>
+                    <h3>{{ annee['configuration']['nomEcoleEn'] }}</h3>
+                    <span><b>BP: {{ annee['configuration']['boitePostale'] }}</b></span>
+                    <span><b>Tel: {{ annee['configuration']['telephone'] }}</b></span>
+                    <span><b>E-mail: {{ annee['configuration']['email'] }}</b></span>
+                    <h1 style="margin-bottom: 0px" class="text-uppercase">Fiche de preinscription en ligne</h1>
+                    <h1 style="margin-top:0px;color:red" class="text-uppercase text-center">(Online inscription)</h1>
+                </div>
+                <div class="logo2 inline-block">
+                    <img src="{{ annee.configuration.logoEcoleBase64 }}" alt="">
+                </div>
+            </div>
+        </header>
+        <div class="contenair">
+            <div>
+                <div class="inline-block img-contenair">
+                    <img src="{{ inscrit.etudiant.photoBase64 }}" alt="">
+                </div>
+                <div class="inline-block">
+                    <p>Nom : <b>{{ inscrit.etudiant.nom }}</b></p>
+                    <p>Prenom : <b>{{ inscrit.etudiant.prenom }}</b></p>
+                    <p>Né(e) le <b>{{ inscrit.etudiant.dateDeNaissance|date("d/m/Y") }}</b> à <b>{{ inscrit.etudiant.lieuDeNaissance }}</b></p>
+                    <p>De sexe <b>{{ inscrit.etudiant.sexeL }}</b></p>
+                    <p>Pays d'origine : <b>{{ inscrit.etudiant.pays.nom }}</b></p>
+                    <p>Région d'origine : <b>{{ inscrit.etudiant.departement.region.nom }}</b></p>
+                    <p>Département d'origine : <b>{{ inscrit.etudiant.departement.nom }}</b></p>
+                    <p>Situation matrimoniale : <b>{{ inscrit.etudiant.situationMatrimoniale }}</b></p>
+                    <p>Nombre d'enfants : <b>{{ inscrit.etudiant.nombreDEnfants }}</b></p>
+                    <p>Téléphones : <b>{{ inscrit.etudiant.telephone1 }}</b> / <b>{{ inscrit.etudiant.telephone2 }}</b></p>
+                    <p>Adresse Email : <b>{{ inscrit.etudiant.adresseEmail }}</b></p>
+                </div>
+            </div>
+            {% if inscrit.etudiant.skills %}
+                <div>
+                    <h3>Centres d'interets</h3>
+                    <p>{{ inscrit.etudiant.skills }}</p>
+                </div>
+            {% endif %}
+            <div>
+                <h3>Parcourt académique</h3>
+                <p>Diplôme académique le plus élévé : <b>{{ inscrit.etudiant.diplomeAcademiqueMax }}</b>; année d'obtention : <b>{{ inscrit.etudiant.anneeObtentionDiplomeAcademiqueMax }}</b></p>
+                <p>Diplôme d'entrer : <b>{{ inscrit.etudiant.diplomeDEntre }}</b>; année d'obtention : <b>{{ inscrit.etudiant.anneeObtentionDiplomeEntre }}</b></p>
+                {% if inscrit.etudiant.autreFormation %}
+                    <h4>Autres formations suivies</h4>
+                    <p>{{ inscrit.etudiant.autreFormation }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <h3>Inscription</h3>
+                <p>Filière choisie : <b>{{ inscrit.classe.specialite.filiere.name ~ ' (' ~ inscrit.classe.specialite.filiere.code ~ ')' }}</b></p>
+                <p>Option choisie : <b>{{ inscrit.classe.specialite.name ~ ' (' ~ inscrit.classe.specialite.code ~ ')' }}</b></p>
+                <p>Niveau d'étude : <b>{{ inscrit.classe.niveauRomain }}</b></p>
+            </div>
+            <div>
+                <h3>Parents / Tuteurs</h3>
+                <p>
+                    Nom du père : <b>{{ inscrit.etudiant.nomDuPere }}</b>; 
+                    profession : <b>{{ inscrit.etudiant.professionDuPere }}</b>; 
+                    Numéro de téléphone : <b>{{ inscrit.etudiant.numeroDeTelephoneDuPere }}</b>
+                </p>
+                <p>
+                    Nom de la mère : <b>{{ inscrit.etudiant.nomDeLaMere }}</b>; 
+                    profession : <b>{{ inscrit.etudiant.professionDeLaMere }}</b>; 
+                    Numéro de téléphone : <b>{{ inscrit.etudiant.numeroDeTelephoneDeLaMere }}</b>
+                </p>
+                <p>Adresse des parents : <b>{{ inscrit.etudiant.adresseDesParents }}</b></p>
+                <h4>En cas de problème contacter en urgence </h4>
+                <p>
+                    Monsieur / Madame / Mademoiselle <b>{{ inscrit.etudiant.personneAContacterEnCasDeProbleme }}</b>
+                    au numéro <b>{{ inscrit.etudiant.numeroDUrgence }}</b>
+                </p>
+            </div>
+        </div>
+            
+    </div>
+{% endblock %}

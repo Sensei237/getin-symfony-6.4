@@ -1,0 +1,312 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{"GESTION DES ETUDIANTS"}}
+{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DES ETUDIANTS" }} 
+{% endblock %}
+
+{% block fil_ariane %}
+    {% if classe is defined and classe is not null %}
+        <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{ "étudiants" }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ classe.formation.slug }}">{{ classe.formation.name }}</a></li>
+        <li class="breadcrumb-item active">{{ classe.code }}</li>
+    {% elseif specialite is defined and specialite is not null %}
+        <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{ "étudiants" }}</a></li>
+        {% if formation is defined and formation is not null %}
+            <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ formation.slug }}">{{ formation.code }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ formation.slug ~ "filiere=" ~ specialite.filiere.slug }}">{{ specialite.filiere.code }}</a></li>
+        {% else %}
+            <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?filiere=" ~ specialite.filiere.slug }}">{{ specialite.filiere.code }}</a></li>        
+        {% endif %}
+        <li class="breadcrumb-item active">{{ specialite.code }}</li>
+    {% elseif filiere is defined and filiere is not null %}
+        <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{ "étudiants" }}</a></li>
+        {% if formation is defined and formation is not null %}
+            <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ formation.slug }}">{{ formation.code }}</a></li>       
+        {% endif %}
+        <li class="breadcrumb-item active">{{ filiere.code }}</li>
+    {% elseif formation is defined and formation is not null %}
+        <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{ "étudiants" }}</a></li>
+        <li class="breadcrumb-item active">{{ formation.name }}</li>
+    {% else %}
+        <li class="breadcrumb-item active">{{ "étudiants" }}</li>
+    {% endif %}
+    
+{% endblock %}
+
+{% block contentTitle %}
+    {{ "Liste des étudiants année académique " ~ annee.denomination }}
+    {% if formation is defined and formation is not null %}
+        <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ formation.slug }}" title="{{"Afficher la liste des étudiants"}}">
+            <strong class="text-blue">{{ " / " ~ formation.name }}</strong>
+        </a>
+    {% endif %}
+    {% if classe is defined and classe is not null %}
+        <strong>{{ " > " ~ classe.nom }}</strong>
+    {% elseif specialite is defined and specialite is not null %}
+        <strong>{{ " > " ~ specialite.name }}</strong>
+    {% elseif filiere is defined and filiere is not null %}
+        <strong>{{ " > " ~ filiere.name }}</strong>
+    {% endif %}
+{% endblock %}
+
+{% set param = '' %}
+{% if classe is defined and classe is not empty %}
+    {% set param = '?formation=' ~ classe.formation.slug ~ '&filiere=' ~ classe.specialite.filiere.slug ~ '&specialite=' ~ classe.specialite.slug ~ '&classe=' ~ classe.slug ~ '&statut=' ~ statut %}
+{% elseif specialite is defined and specialite is not empty %}
+    {% if formation is defined and formation is not empty %}
+        {% set param = '?formation=' ~ formation.slug ~ '&filiere=' ~ specialite.filiere.slug ~ '&specialite=' ~ specialite.slug ~ '&statut=' ~ statut %}
+    {% else %}
+        {% set param = '?formation=&filiere=' ~ specialite.filiere.slug ~ '&specialite=' ~ specialite.slug ~ '&statut=' ~ statut %}
+    {% endif %}
+{% elseif filiere is defined and filiere is not empty %}
+    {% if formation is defined and formation is not empty %}
+        {% set param = '?formation=' ~ formation.slug ~ '&filiere=' ~ filiere.slug ~ '&statut=' ~ statut %}
+    {% else %}
+        {% set param = '?formation=&filiere=' ~ filiere.slug ~ '&statut=' ~ statut %}
+    {% endif %}
+{% elseif formation is defined and formation is not empty %}
+    {% set param = '?formation=' ~ formation.slug ~ '&statut=' ~ statut %}
+{% elseif statut %}
+    {% set param = '?statut=' ~ statut %}
+{% endif %}
+
+{% block navSearchFormInputValue %}{{ searchText }}{% endblock %}
+{% block navSearchFormMethod %} {{ "GET" }} {% endblock %}
+{% block navSearchFormAction %} {{ path('etudiants', {'slug': annee.slug}) }} {% endblock %}
+
+{% block footerContent %}
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown">
+                    {{ "Ajouter un nouvel étudiant" }}
+                </button>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item-title">{{ "Liste des spécialités" }}</li>
+                    {% for s in allSpecialites %}
+                        <li class="dropdown-item">
+                            <div class="dropright">
+                                <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown"> {{ s.name }}</a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item-title">{{ "Liste des classes" }}</li>
+                                    {% for cl in s.classes %}
+                                        <li class="dropdown-item"><a href="{{ path('ajouter_etudiant', {'slug_annee': annee.slug, 'slug': cl.slug}) }}">{{ cl.nom }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    
+                </ul>
+            </div>
+        </div>
+        <a href="{{ path('importer_etudiants', {'slug': annee.slug}) }}" class="btn btn-outline-primary"><i class="fa fa-file-excel"></i> {{ "Importer via un fichier" }}</a>
+        {% if etudiants is defined and etudiants is not empty %}
+            <a target="_blank" style="margin: auto 10px;" class="btn btn-outline-success" href="{{ path('etudiant_exporter_etudiants', {'slug': annee.slug, 'format': 'pdf'}) ~ param }}">{{ "Télécharger en pdf" }} <i class="fa fa-file-pdf"></i></a>
+            <a target="_blank" class="btn btn-outline-secondary" href="{{ path('etudiant_exporter_etudiants', {'slug': annee.slug, 'format': 'excel'}) ~ param }}">{{ "Exporter sur excel" }} <i class="fa fa-file-excel"></i></a>
+        {% endif %}
+        
+    </div>
+{% endblock %}
+
+{% block page_content %}
+    <a href="{{ path('contrat_generer_tous', {'slug': annee.slug}) }}" class="btn btn-outline-danger btn-ajax-action">{{ "Générer les contrats académiques" }}</a>
+    <a href="{{ path('etudant_list', {'slugAnnee': annee.slug}) }}" class="btn btn-outline-secondary btn-flat">Télécharger les listes</a>
+    <br><br>
+
+    <form id="filtre-etudiants" action="{{ path('etudiants', {'slug': annee.slug}) }}" method="GET">
+        <div class="row">
+            <div class="col-2">
+                <label>{{ "Statut" }}</label>
+                <select name="statut" class="form-control select2">
+                    <option value="tous">{{ "Tous" }}</option>
+                    <option {{ statut is defined and statut|lower == 'add' ? 'selected' : '' }} value="add">{{ "Etudiants Admis Définitivement (ADD)" }}</option>
+                    <option {{ statut is defined and statut|lower == 'adc' ? 'selected' : '' }} value="adc">{{ "Etudiants Admis avec Credits (ADC)" }}</option>
+                    <option {{ statut is defined and statut|lower == 'redouble' ? 'selected' : '' }} value="redouble">{{ "Redoublants" }}</option>
+                    <option {{ statut is defined and statut|lower == 'nouveaux' ? 'selected' : '' }} value="nouveaux">{{ "Nouveaux dans la classe" }}</option>
+                    <option {{ statut is defined and statut|lower == 'redoublants' ? 'selected' : '' }} value="redoublants">{{ "Reprenent la classe" }}</option>
+                </select>
+            </div>
+            {% if formations is defined and formations is not empty %}
+                <div class="col-2 form-group">
+                    <label for="filtre_etudiants_formation">{{ "Formation" }}</label>
+                    <select class="form-control select2" name="formation" id="filtre_etudiants_formation">
+                        <option value="">{{ "Toutes" }}</option>
+                        {% for f in formations %}
+                            <option {{ formation is defined and formation is not null and f.id == formation.id ? 'selected' : '' }} value="{{ f.slug }}">{{ f.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            {% if filieres is defined and filieres is not empty %}
+                <div class="col-2 form-group">
+                    <label for="filtre_etudiants_filiere">{{ "Filière" }}</label>
+                    <select class="form-control select2" name="filiere" id="filtre_etudiants_filiere">
+                        <option value="">{{ "Toutes" }}</option>
+                        {% for f in filieres %}
+                            <option {{ filiere is defined and filiere is not null and f.id == filiere.id ? 'selected' : '' }} value="{{ f.slug }}">{{ f.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if specialites is defined and specialites is not empty %}
+                    <div class="col-2 form-group">
+                        <label for="filtre_etudiants_specialite">{{ "Spécialité" }}</label>
+                        <select class="form-control select2" name="specialite" id="filtre_etudiants_specialite">
+                            <option value="">{{ "Toutes" }}</option>
+                            {% for s in specialites %}
+                                <option {{ specialite is defined and specialite is not null and s.id == specialite.id ? 'selected' : '' }} value="{{ s.slug }}">{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if classes is defined and classes is not empty %}
+                        <div class="col-2 form-group">
+                            <label for="filtre_etudiants_classe">{{ "Classe" }}</label>
+                            <select class="form-control select2" name="classe" id="filtre_etudiants_classe">
+                                <option value="">{{ "Toutes" }}</option>
+                                {% for c in classes %}
+                                    <option {{ classe is defined and classe is not null and c.id == classe.id ? 'selected' : '' }} value="{{ c.slug }}">{{ c.nom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            {% if (formations is defined and formations is not empty) or (filieres is defined and filieres is not empty) %}
+                <div class="col-1">
+                    <br>
+                    <button style="margin-top: 9px;" type="submit" class="btn btn-outline-success">{{"filtrer"}}</button>
+                </div>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if etudiants is defined and etudiants is not empty %}
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center">#</th>
+                    <th>{{ "Nom et prenom" }}</th>
+                    <th class="text-center">{{ "Matricule" }}</th>
+                    <th class="text-center">{{ "Date de naissance" }}</th>
+                    <th class="text-center">{{ "Classe" }}</th>
+                    <th class="text-center">{{ "Spécialité" }}</th>
+                    <th class="text-center">{{ "Filière" }}</th>
+                    <th class="text-center">{{ "Statut" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in etudiants %}
+                    <tr>
+                        <td class="text-center">{{ cmp }}</td>
+                        <td>
+                            <div class="input-group-prepend">
+                                <div class="dropup actions-etudiant">
+                                    <a class="" href="{{ path('etudiant_profile_etudiant', {'matricule': i.etudiant.matricule, 'slug': i.anneeAcademique.slug}) }}" title="Profil">
+                                        {{ i.etudiant.nomComplet|upper }}
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item-title">{{ i.etudiant.nom|upper }}</li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-user"></i>
+                                            <a href="{{ path('etudiant_profile_etudiant', {'matricule': i.etudiant.matricule, 'slug': i.anneeAcademique.slug}) }}">{{ "Toutes les informations" }}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-list-alt"></i>
+                                            <a href="{{ path('contrat_academique_afficher', {'matricule': i.etudiant.matricule, 'slug': annee.slug}) }}">{{ "Contrats academiques" }} <i class="badge badge-info">{{ i.contrats|length ~ " matières" }}</i></a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-graduation-cap"></i>
+                                            <a href="{{ path('note_show_notes_etudiant', {'slugAnnee': annee.slug, 'matricule': i.etudiant.matricule}) }}">{{ "Gestion des notes" }}</a>
+                                        </li>
+                                        
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-file-image"></i>
+                                            <a href="{{ path("paiement_etat_etudiant", {'slug': annee.slug, 'matricule': i.etudiant.matricule}) }}">{{ "Valider les paiements" }}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-edit"></i>
+                                            <a href="{{ path('etudiant_edit_profile_etudiant', {'slug': annee.slug, 'matricule': i.etudiant.matricule}) }}">{{ "Modifier les informations" }}</a>
+                                        </li>
+                                        <li class="divider dropdown-divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-trash text-red"></i>
+                                            <a class="text-red btn-confirm-ajax-action" href="{{ path('etudiant_delete_inscription', {'slugAnnee': annee.slug, 'idInscription': i.id}) }}">Supprimer définitivement cette inscription</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">{{ i.etudiant.matricule }}</td>
+                        <td class="text-center">{{ i.etudiant.dateDeNaissance|date("d/m/Y") }}</td>
+                        <td class="text-center">
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ i.classe.formation.slug ~ "&filiere=" ~ i.classe.specialite.filiere.slug ~ "&specialite=" ~ i.classe.specialite.slug ~ "&classe=" ~ i.classe.slug }}" title="{{"Afficher la liste des étudiants"}}">
+                                {{ i.classe.code }}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ i.classe.formation.slug ~ "&filiere=" ~ i.classe.specialite.filiere.slug ~ "&specialite=" ~ i.classe.specialite.slug }}" title="{{"Afficher la liste des étudiants"}}">
+                                {{ i.classe.specialite.code }}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ i.classe.formation.slug ~ "&filiere=" ~ i.classe.specialite.filiere.slug }}" title="{{"Afficher la liste des étudiants"}}">
+                                {{ i.classe.specialite.filiere.code }}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            {{ i.isRedoublant ? "redoublant" : "nouveau" }}
+                        </td>
+                    </tr>
+                    {% set cmp = cmp+1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">
+            <br>
+            <h1 class="align-text-center">{{ "Aucun étudiant trouvé !"|upper }} <i class="fa fa-angry"></i></h1>
+            {% if searchText is defined and searchText is not null and searchText != '' and searchText|length > 2 %}
+                <h4 class="align-text-center">{{ ("<b>" ~ searchText ~ "</b> ne correspond à aucun nom d'étudiant ni matricule")|raw }}</h4 class="align-text-center">
+            {% endif %}
+            <br>
+        </div>
+    {% endif %}
+    
+    {% if pages is defined and pages is not empty  %}
+        <br>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('etudiants', {'slug': annee.slug, 'page': (currentPage - 1)}) ~ param }}" tabindex="-1">{{"Prev"}}</a>
+                </li>
+                {% for p in pages %}
+                    <li class="page-item {{ currentPage == p ? 'active' : '' }}">
+                        <a class="page-link" href="{{ path('etudiants', {'slug': annee.slug, 'page': p}) ~ param }}">{{ p }}</a class="page-link">
+                    </li>
+                {% endfor %}
+                <li class="page-item {{ nbPages == currentPage ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('etudiants', {'slug': annee.slug, 'page': (currentPage + 1)}) ~ param }}">{{"Next"}}</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('#filtre-etudiants select').each(function(){
+            $(this).on('change', function(e){
+                showLoader();
+                $('#filtre-etudiants').submit();
+            })
+        })
+    </script>
+{% endblock %}

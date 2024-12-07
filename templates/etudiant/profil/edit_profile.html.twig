@@ -1,0 +1,45 @@
+{% extends "etudiant/profil/base.html.twig" %}
+
+{% block titre %}
+    {{ (inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block titreP %}
+     > {{ "Profil > Modifier" }}
+{% endblock %}
+
+{% block navSearchFormMethod %}{{ "GET" }}{% endblock %}
+{% block navSearchFormAction %}{{ path('etudiants', {'slug': annee.slug}) }}{% endblock %}
+{% block ariane %}
+    <li class="breadcrumb-item">
+        <a href="{{ path('etudiant_profile_etudiant', {'matricule': inscription.etudiant.matricule, 'slug': annee.slug}) }}">{{ "profil" }}</a>
+    </li>
+    <li class="breadcrumb-item active">{{ "modifier" }}</li>
+{% endblock %}
+
+{% block profileContent %}
+    {% set classe = inscription.classe %}
+    {% include "etudiant/include/inscription_form.html.twig" %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        var fetchDepartementUrl = "{{ path('home_fetchDepartementUrl') }}";
+        var selectRegionText = "{{ 'Sélectionner une région' }}";
+    </script>
+    {% if inscription is defined and inscription.etudiant is defined and inscription.etudiant is not null and inscription.etudiant.departement is defined and inscription.etudiant.departement is not null and inscription.etudiant.departement.region is defined and inscription.etudiant.departement.region is not null %}
+        <script>
+            $filiere = "{{ classe.specialite.filiere.name }}";
+            $specialite = "{{ classe.specialite.name }}";
+            $level = "{{ classe.niveauRomain}}";
+            var $regions = $('#etudiant_inscris_etudiant_region option');
+            var idRegion = "{{ inscription.etudiant.departement.region.id }}";
+            for (var i=0; i< $regions.length; i++) {
+                if ($($regions[i]).prop('value') == idRegion) {
+                    $($regions[i]).prop('selected', true);
+                }
+            }
+        </script>
+    {% endif %}
+    <script src="{{ absolute_url(asset('js/inscription_etudiant.js')) }}"></script>
+{% endblock %}

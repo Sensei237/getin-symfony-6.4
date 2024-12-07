@@ -1,0 +1,120 @@
+{% extends "etudiant/profil/base.html.twig" %}
+
+{% block titre %}
+    {{ (inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block titreP %}
+     > {{ "Profil" }}
+{% endblock %}
+
+{% block navSearchFormMethod %}{{ "GET" }}{% endblock %}
+{% block navSearchFormAction %}{{ path('etudiants', {'slug': annee.slug}) }}{% endblock %}
+{% block ariane %}
+    <li class="breadcrumb-item active">{{ "profil" }}</li>
+{% endblock %}
+
+{% block profileContent %}
+    <h3 style="margin-top: 10px;">{{ "Informations personnelles" }}</h3>
+    <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;">
+    <div class="row">
+        <div class="col-md-5">
+            {% set img_url = absolute_url(asset('dist/img/avatar.png')) %}
+            {% if inscription is defined and inscription.etudiant.photo %}
+                {% set img_url = absolute_url(asset('dist/img/etudiants/' ~ inscription.etudiant.photo)) %}
+            {% endif %}
+            <img style="width:100%;" class="profile-user-img img-fluid" src="{{ img_url }}" alt="User profile picture">
+        </div>
+        <div class="col-md-7">
+            <div style="padding-left: 15px;">
+                <h5>{{ "Nom : " ~ inscription.etudiant.nom}}</h5>
+                <h5>{{ "Prenom : " ~ inscription.etudiant.prenom }}</h5>
+                <h5>{{ "Né(e) le : " ~ inscription.etudiant.dateDeNaissance|date("d/m/Y") }}</h5>
+                <h5>{{ "à : "|upper ~ inscription.etudiant.lieuDeNaissance }}</h5>
+                <h5>{{ "Genre : " ~ (inscription.etudiant.sexe == 'M' ? "Masculin" : "Feminin") }}</h5>
+                <h5>{{ "Téléphone : " ~ inscription.etudiant.telephone1 ~ (inscription.etudiant.telephone2 ? " / " ~ inscription.etudiant.telephone2 : "") }}</h5>
+                <h5>{{ "Adresse e-mail : " ~ inscription.etudiant.adresseEmail }}</h5>
+                <h5>{{ "Situation matrimoniale : " ~ inscription.etudiant.situationMatrimoniale }}</h5>
+                <h5>{{ "Nombre d'enfants : " ~ inscription.etudiant.nombreDEnfants }}</h5>
+                {% if inscription.etudiant.departement %}
+                    <h5>{{ "Département d'origine : " ~ inscription.etudiant.departement.nom }}</h5>
+                    <h5>{{ "Région d'origine : " ~ inscription.etudiant.departement.region.nom }}</h5>
+                {% endif %}
+                {% if inscription.etudiant.pays is defined and inscription.etudiant.pays is not null %}
+                    <h5>{{ "Pays d'origine : " ~ inscription.etudiant.pays.nom }}</h5>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <h3 style="margin-top: 20px;">{{ "Situation Académique" }}</h3>
+    <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;">
+    <div class="row">
+        <div class="col-12">
+            <div style="padding-left: 15px;">
+                <h5>{{ "Diplôme académique le plus élévé : " ~ (inscription.etudiant.diplomeAcademiqueMax ? inscription.etudiant.diplomeAcademiqueMax : inscription.etudiant.autreDiplomeMax) }}</h5>
+                <h5>{{ "Année d'obtention : " ~ inscription.etudiant.anneeObtentionDiplomeAcademiqueMax }}</h5>
+                <hr>
+                <h5>{{ "Diplôme utilisé pour entrer dans l'école : " ~ (inscription.etudiant.diplomeDEntre ? inscription.etudiant.diplomeDEntre : inscription.etudiant.autreDiplomeEntre) }}</h5>
+                <h5>{{ "Année d'obtention : " ~ inscription.etudiant.anneeObtentionDiplomeEntre }}</h5>
+                <hr>
+            </div>
+            <div class="alert alert-primary">
+                <h3>{{ "Actuellement !" }}</h3>
+                <hr>
+                <h5>{{ "Filiere ou département : " ~ inscription.classe.specialite.filiere.name ~ "(" ~ inscription.classe.specialite.filiere.code ~ ")" }}</h5>
+                <h5>{{ "Spécialité ou option : " ~ inscription.classe.specialite.name ~ "(" ~ inscription.classe.specialite.code ~ ")" }}</h5>
+                <h5>{{ "Classe ou niveau : " ~ inscription.classe.nom ~ "(" ~ inscription.classe.code ~ ")" }}</h5>
+                <h5>{{ "Type de formation : " ~ inscription.classe.formation.name ~ "(" ~ inscription.classe.formation.code ~ ")" }}</h5>
+                <h5>{{ "Matricule : " ~ inscription.etudiant.matricule }}</h5>
+            </div>
+            {% if inscription.etudiant.etudiantInscris|length > 1 %}
+                <div class="alert alert-info">
+                    <h3>{{ "Précedemment !" }}</h3>
+                    <hr>
+                    <ul>
+                        {% for ins in inscription.etudiant.etudiantInscris %}
+                            {% if ins.id != inscription.id %}
+                                <li>
+                                    Durant l'année académique {{ ins.anneeAcademique.denomination }}, 
+                                    il était inscrit en classe de {{ ins.classe.code }}
+                                    {% if ins.isADD %}
+                                        et a été admis en classe supérieure avec une moyenne de {{ ins.moyenneObtenue }}
+                                    {% elseif ins.isADC %}
+                                        et a été admis en classe supérieure avec une moyenne de {{ ins.moyenneObtenue }} mais il a 
+                                        laissé quelque(s) module(s) ouvert(s)
+                                    {% else %}
+                                        et a repris cette classe.
+                                    {% endif %}
+                                </li>
+                                <hr>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <h3 style="margin-top: 20px;">{{ "Parents et tuteurs" }}</h3>
+    <hr style="background-color: #007bff;margin-top:0px;height: 2.5px;width: 200px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div style="padding-left: 15px;">
+                <h5>{{ "Nom du père : " ~ inscription.etudiant.nomDuPere }}</h5>
+                <h5>{{ "Contact : " ~ inscription.etudiant.NumeroDeTelephoneDuPere }}</h5>
+                <h5>{{ "Profession : " ~ inscription.etudiant.professionDuPere }}</h5>
+                <hr>
+                <h5>{{ "Nom de la mère : " ~ inscription.etudiant.nomDeLaMere }}</h5>
+                <h5>{{ "Contact : " ~ inscription.etudiant.NumeroDeTelephoneDeLaMere }}</h5>
+                <h5>{{ "Profession : " ~ inscription.etudiant.professionDeLaMere }}</h5>
+                <hr>
+            </div>
+            <div class="alert alert-warning">
+                <h4>{{ "En cas de problème, veuillez contacter en priorité" }}</h4>
+                <h5>{{ "Nom du tuteur : " ~ inscription.etudiant.personneAContacterEnCasDeProbleme }}</h5>
+                <h5>{{ "Téléphone : " ~ inscription.etudiant.numeroDUrgence }}</h5>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

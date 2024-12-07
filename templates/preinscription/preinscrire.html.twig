@@ -1,0 +1,19 @@
+{% extends "preinscription/base.html.twig" %}
+
+{% block contentTitle %}
+
+{% endblock %}
+
+{% block pageContent %}
+    <div id="preinscription">
+        {% include "etudiant/include/inscription_form.html.twig" %}
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $filiere = "{{ classe.specialite.filiere.name }}";
+        $specialite = "{{ classe.specialite.name }}";
+        $level = "{{ classe.niveauRomain}}";
+    </script>
+{% endblock %}

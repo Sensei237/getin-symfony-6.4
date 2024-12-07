@@ -1,0 +1,9 @@
+{% extends "pdf/base.html.twig" %}
+
+{% block pdfBody %}
+    {% for d in data %}
+        {% include "pdf/pdf_body.html.twig" with {'classe': d["classe"], 'annee': annee} %}
+            {% include "paiement/pdf_etudiant_model.html.twig" with {'inscris': d["etudiants"], 'isForStudent': true, 'inPDF': true} only %}
+        </div>
+    {% endfor %}
+{% endblock %}

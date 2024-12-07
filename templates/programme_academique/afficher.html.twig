@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "PROGRAMME ACADEMIQUE " ~ classe.code ~ " "~ annee.denomination }} {% endblock %}
+
+{% block pageTitle %} {{ "PROGRAMME ACADEMIQUE" }} {% endblock %}
+
+{% block contentTitle %} {{ "Programme académique classe de " ~ classe.code ~ " année academique " ~ annee.denomination }} {% endblock %}
+
+{% block footerContent %}
+    <a class="btn btn-warning" href="{{ path('edit_programme', {'annee_slug': annee.slug, 'slug': classe.slug}) }}"><i class="fa fa-pencil-alt"></i> {{ "Modifier le programme" }}</a>
+    <a class="btn btn-primary" href="{{ path("export_pdf_program", {'annee_slug': annee.slug, 'slug': classe.slug}) }}"><i class="fa fa-file-pdf"></i> {{ "PDF" }}</a>
+    <a class="btn btn-primary" href="{{ path("export_program", {'annee_slug': annee.slug, 'slug': classe.slug}) }}"><i class="fa fa-file-excel"></i> {{ "Excel" }}</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('programme_academique', {'slug': annee.slug}) }}">{{"programmes academiques"}}</a></li>
+    <li class="breadcrumb-item active">{{ classe.code }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered align-text-center">
+        <thead class="table-head-fixed align-self-center">
+            <tr>
+                <th style="width: 40%;min-width: 200px;">{{ "Unité d'Enseignement (UE)" }}</th>
+                <th>{{ "Eléments Constitutifs (EC)" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for module in modules %}
+                <tr>
+                    <td class="align-text-center">
+                        <h4>{{ module.intitule }}</h4>
+                        <h5><i>{{ module.code }}</i></h5>
+                    </td>
+                    <td>
+                        <table class="table">
+                            <tr>
+                                <th>{{ "Intitulé" }}</th>
+                                <th>{{ "Code" }}</th>
+                                <th>{{ "Crédit" }}</th>
+                                <th>{{ "Semestre" }}</th>
+                                <th>#</th>
+                            </tr>
+                            {% for ecm in module.ecModules %}
+                                <tr>
+                                    <td>{{ ecm.ec.intitule }}</td>
+                                    <td>{{ ecm.ec.code }}</td>
+                                    <td>{{ ecm.credit }}</td>
+                                    <td>{{ ecm.semestre }}</td>
+                                    <td>
+                                        <a href="{{ path("pourcentage_e_c_module_config", {'id': ecm.id}) }}" class="btn btn-xs btn-secondary">confg</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

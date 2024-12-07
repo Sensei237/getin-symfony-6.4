@@ -1,0 +1,18 @@
+{% extends "pdf/releve_layout.html.twig" %}
+
+{% block releveBody %}
+    {% for d in data %}
+        {% set inscri = d['inscri'] %}
+        {% set contratsByModule = d['contratsByModule'] %}
+        {% set contratsModule = contratsByModule['contratsByModule'] %}
+        {% set final = contratsByModule['final'] %}
+        {% set inPDF = inPDF %}
+        {% include "note/releve_model.html.twig" %}
+    {% endfor %}
+    {% if data is empty %}
+        <div  class="alert alert-danger">
+            <h4 class="text-center">Aucune donnée à afficher ! <i class="fa fa-angry"></i></h4>
+        </div>
+    {% endif %}
+{% endblock %}
+    

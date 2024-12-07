@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{"GESTION DU PERSONNEL "}}{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DU PERSONNEL" }} 
+{% endblock %}
+
+{% block contentTitle %}
+    Profile 
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active"><a href="{{ path('employe') }}">personnel</a></li>
+    <li class="breadcrumb-item active">profile</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-5">
+            <div class="img-bordered img-responsive">
+                {% set img_url = 'dist/img/avatar.png' %}
+                {% if employe.photo %}
+                    {% set img_url = 'uploads/images/' ~ employe.photo %}
+                {% endif %}
+                <img width="100%" height="100%" style="max-height: 400px;" class="carousel" src="{{ absolute_url(asset(img_url)) }}" alt="Photo profil">
+            </div>
+        </div>
+        <div class="col-7">
+            <div class="panel-body panel-primary">
+                <p><b>Nom & Prenom</b> : <i>{{ employe.nomComplet }}</i></p>
+                <p><b>Date de naissance</b> : <i>{{ employe.dateDeNaissance|date("d/m/Y") }}</i></p>
+                <p><b>Lieu de naissance</b> : <i>{{ employe.lieuDeNaissance }}</i></p>
+                <p><b>Sexe</b> : <i>{{ employe.sexe }}</i></p>
+                <p><b>Téléphones</b> : <i>{{ employe.telephone ~ ' / ' ~ employe.telephone2 }}</i></p>
+                <p><b>Adresse Email</b> : <i>{{ employe.adresseEmail }}</i></p>
+                <p><b>Nombre d'enfants</b> : <i>{{ employe.nombreDenfants }}</i></p>
+                {% if employe.nomConjoint %}
+                    {% set titre = "Nom de la conjointe" %}
+                    {% if employe.sexe|first|upper == 'F' %}
+                        {% set tittre = "Nom du conjoint" %}
+                    {% endif %}
+                    <p><b>{{ titre }}</b> : <i>{{ employe.nomConjoint }}</i></p>
+                {% endif %}
+                {% if employe.telephoneConjoint %}
+                    <p><b>Téléphone du (de la) conjoint(e)</b> : <i>{{ employe.telephoneConjoint }}</i></p>
+                {% endif %}
+                {% if employe.service is defined and employe.service is not null %}
+                    <p><b>Service d'attache</b> : <i>{{ employe.service.nom }}</i></p>
+                {% endif %}
+                <div class="form-group border-dark">
+                    <br>
+                    <a href="{{ path('employe_modifer', {'reference': employe.reference}) }}" style="width:100%" class="btn btn-outline-warning btn-flat">Modifier les informations</a>
+                    {% if is_granted('ROLE_SUPER_USER') %}
+                        <br><br>
+                        <a href="{{ path('employe_delete', {'reference': employe.reference}) }}" style="width:100%" class="btn btn-outline-danger btn-flat">Supprimer l'employé</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+td, th, tr {
+    padding: .25rem !important;
+    border-collapse: collapse;
+    word-wrap: break-word;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+}
+table {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+    word-wrap: break-word;
+}
+body {
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+}
+.btn-remove-ec {
+    position: absolute !important;
+    right:-12px !important;
+    top:18px !important;
+}
+.align-text-center {
+    text-align: center !important;
+    vertical-align:middle !important;
+}
+.dropright:hover>.dropdown-menu {
+    display: block;
+}
+.actions-etudiant:hover>.dropdown-menu {
+    display: block !important;
+}
+.table th.vertical-alignement {
+    writing-mode: vertical-lr !important;
+    text-orientation:sideways !important; 
+    min-width: 50px !important;
+    text-align: center !important;
+}
+.dropdown-item{
+    font-size: 10px !important;
+}
+.hidden{
+    display: none !important;
+}

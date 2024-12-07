@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "PAIEMENTS " }}{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DES PAIEMENTS" }}
+{% endblock %}
+
+{% block contentTitle %}
+    {% if inscris is defined %}
+        Liste des étudiants concernés
+    {% elseif tp is defined and tp is not null %}
+        {{ "Liste des classe concernées par le type de paiement " ~ tp.denomination}}
+    {% endif %}
+{% endblock %}
+
+
+{% block navSearchFormInputValue %}{{ searchText }}{% endblock %}
+{% block navSearchFormMethod %} {{ "GET" }} {% endblock %}
+{% block navSearchFormAction %} {{ path('paiement_etudiants_search', {'anneeSlug': annee.slug}) }} {% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item">
+        <a href="{{ path("paiement") }}">{{ "paiements" }}</a>
+    </li>
+    <li class="breadcrumb-item active">{{ "classes" }}</li>
+{% endblock %}
+
+{% block footerContent %}
+    {% if form is defined %}
+        <a id="importer-quitus-btn" href="" class="btn btn-default no-loader">Importer les quitus</a>
+    {% endif %}
+{% endblock %}
+
+{% block page_content %}
+    {% if isForStudent is defined and isForStudent and tp is defined and tp is not null %}
+        <h4>Type de paiement : {{ tp.denomination }}</h4>
+        {% if inscris is defined and etats is defined %}
+            {% if tranche is defined and tranche is not null %}
+                <h4>Tranche : {{ tranche.denomination }}</h4>
+            {% endif %}
+            {% if hasPaied is defined and hasPaied %}
+                <h4>Liste des etudiant ayant déjà payé</h4>
+            {% else %}
+                <h4>Liste des insolvables</h4>
+            {% endif %}
+            <h4>Effectif : {{ inscris|length }}</h4>
+            <div class=" float-right">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-outline-info btn-flat dropdown-toggle" data-toggle="dropdown">
+                        {{ "Cliquez pour afficher d'autres options" }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item">
+                            <i class="fa fa-users"></i>
+                            <a href="{{ path("paiement_liste_etudiant_etat", {'slugTP': tp.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug}) }}">
+                                {{"Afficher les etudiants pour validation du paiement"}}
+                            </a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li class=" dropdown-item-title">Statistiques</li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-check text-success"></i>
+                            <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'solde'}) }}" class="text-dark">
+                                {{"Liste des étudiants ayant soldé"}}
+                            </a>
+                        </li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-times text-danger"></i>
+                            <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'insolvables'}) }}" class="text-dark">
+                                {{"Liste des étudiants insolvables"}}
+                            </a>
+                        </li>
+                        {% for t in pc.tranches %}
+                        <li class="dropdown-item">
+                            <i class="fa fa-check-circle text-success"></i>
+                            <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'solde', 'tranche': t.slug}) }}" class="text-dark">
+                                {{"Liste des étudiants ayant soldé la " ~ t.denomination|lower }}
+                            </a>
+                        </li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-times-circle text-danger"></i>
+                            <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'insolvable', 'tranche': t.slug}) }}" class="text-dark">
+                                {{"Liste des étudiants n'ayant pas soldé la " ~ t.denomination|lower }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        {% set params = {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug} %}
+                        {% set status = 'insolvable' %}
+                        {% if hasPaied is defined and hasPaied %}
+                            {% set status = 'solde' %}
+                        {% endif %}
+                        {% set params = params|merge({'statut': status}) %}
+                        {% if tranche is defined and tranche is not null %}
+                            {% set params = params|merge({'tranche': tranche.slug}) %}
+                        {% endif %}
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-file-pdf text-red"></i>
+                            <a target="_blank" href="{{ path('paiement_liste_etudiant_etat', params) }}&file=pdf" class=" text-primary">Télécharcher la liste en pdf</a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-trash text-danger"></i>
+                            {% set url = path('paiement_delete_pc', {'id': pc.id}) %}
+                            {% if is_granted('ROLE_SUPER_USER') %}
+                                {% set url = path('paiement_delete_pc', {'id': pc.id, 'strict': 'yes'}) %}
+                            {% endif %}
+                            <a href="{{ url }}" class="text-danger btn-confirm-ajax-action">
+                                {{"Retirer cette classe pour ce paiement"}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% include "paiement/pdf_etudiant_model.html.twig" %}
+
+    <div class="modal fade" id="valider-tranche" data-backdrop="false">
+        <div class="modal-dialog">
+            <form method="POST" action="" class="modal-content form-ajax-action2">
+                <div class="modal-header">
+                    <h4 class="modal-title">Validation de paiement</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+    
+                <div class="modal-body">
+                    <input type="text" name="numero_quitus" placeholder="Entrer le numero du reçu ou du quitus" class="form-control">
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-success">Valider</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if form is defined %}
+        <div id="quitus-form-import-container" style="width:100%; max-width: 500px;display:none;margin-top:100px;">
+            <div class="alert alert-primary">
+                <i id="close-import-container" class="fa fa-times close pull-right"></i>
+                <div>
+                    l'entête du fichier doit être à la ligne 2 du fichier et contient les champs 
+                    suivant : 
+                    <b>A</b> = <i>Matricule de l'étudiant</i>
+                    <b>B</b> = <i>Nom et prenom de l'étudiant</i>
+                    <b>C</b> = <i>Numéro quitus de la première tranche</i>
+                    <b>C</b> = <i>Numéro quitus de la deuxième tranche</i> <br>
+                    Les données commencent à la ligne 3 du fichier
+                </div>
+                <br>
+                <hr>
+                {{ form_start(form) }}
+                    {{ form_row(form) }}
+
+                    <button type="submit" class="btn btn-success">Importer</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+
+
+{% block javascript %}
+    <script>
+        $(function() {
+            $('.customSwitches').change(function() {
+                var id = $(this).attr('pc');
+                var elt = $(this);
+                $.ajax({
+                    url: "{{ path('paiement_change_pc_statusb') }}"+id,
+                    dataType: "JSON",
+                    success: function(e) {
+                        if ($(elt).prop('checked')) {
+                            $(elt).next().text('OUI')
+                        }else{
+                            $(elt).next().text('NON')
+                        }
+                    },
+                    error: function(){
+                        alert();
+                    }
+                })
+                
+            });
+        });
+
+        $('#importer-quitus-btn').on('click', function(e){
+            e.preventDefault();
+            $('#quitus-form-import-container').fadeIn(500);
+            $(this).fadeOut(300);
+        });
+
+        $('#close-import-container').on('click', function(e){
+            e.preventDefault();
+            $('#quitus-form-import-container').fadeOut(500);
+            $('#importer-quitus-btn').fadeIn(500);
+        });
+
+        $('.valider-tranche').on('click', function(e){
+            e.preventDefault();
+            $('#valider-tranche form').prop('action', $(this).prop('href'));
+            $('#valider-tranche form').attr('ref', $(this).prop('id'));
+
+        });
+
+        $('.form-ajax-action2').on('submit', function(e){
+            e.preventDefault();
+            let $elt = $(this);
+            var $ref = $(this).attr('ref');
+            $.ajax({
+                url: $elt.attr("action"),
+                type: $elt.attr("method"),
+                data: $elt.serialize(),
+                dataType: "JSON",
+                beforeSend: function(){
+                    showLoader();
+                }, 
+                success: function(response) {
+                    showLoader(false);
+                    if (!response.hasError) {
+                        toastr.success(response.msg)
+                        $('#'+$ref).prev().text('payé').addClass('badge-success').removeClass('badge-danger');
+                        $('#'+$ref).removeClass('btn-outline-success').addClass('btn-outline-warning').prop('title', 'Annuler la validation');
+                        $('#'+$ref).html("<i class='fa fa-times-circle'></i>").removeAttr('data-toggle').removeAttr('data-target');
+                        $('#'+$ref).prop('href', "{{ path('paiement_remove2') }}"+response.idPayment);
+                        setTimeout(function(){
+                            window.location.reload();
+                        }, 1000)
+                        $('#valider-tranche').modal('hide');
+                    }else {
+                        toastr.warning(response.msg);
+                    }
+                },
+                error: function() {
+                    showLoader(false);
+                    toastr.error($ajaxErrorMsg);
+                }
+            });
+        });
+    </script>
+{% endblock %}

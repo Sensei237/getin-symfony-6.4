@@ -1,0 +1,28 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{"AJOUTER UN ETUDIANT EN " ~ classe.nom}}{% endblock %}
+
+{% block pageTitle %}{{"AJOUTER UN ETUDIANT EN " ~ classe.nom}}{% endblock %}
+
+{% block contentTitle %}{{ "Le formulaire est divisé en 4 parties" }}{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{"étudiants"}}</a></li>
+    <li class="breadcrumb-item active">{{ "ajouter" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    {% include "etudiant/include/inscription_form.html.twig" %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        var fetchDepartementUrl = "{{ path('home_fetchDepartementUrl') }}";
+        var selectRegionText = "{{ 'Sélectionner une région' }}";
+        $filiere = "{{ classe.specialite.filiere.name }}";
+        $specialite = "{{ classe.specialite.name }}";
+        $level = "{{ classe.niveauRomain}}";
+    </script>
+    
+    <script src="{{ absolute_url(asset('js/inscription_etudiant.js')) }}"></script>
+{% endblock %}

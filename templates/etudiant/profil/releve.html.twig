@@ -1,0 +1,35 @@
+{% extends "etudiant/profil/base.html.twig" %}
+
+{% block titre %}
+    {{ (inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block titreP %}
+     > {{ "Releve de note" }}
+{% endblock %}
+
+{% block profileContent %}
+
+    {% if not isEmpty %}
+        {% set downloadUrl = path('note_releve_note_etudiant', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'file': 'pdf', 'matriculeEtudiant': etudiant.matricule}) %}
+        {% if semestre is defined and semestre is not null %}
+            {% set downloadUrl = path('note_releve_note_etudiant', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'file': 'pdf', 'matriculeEtudiant': etudiant.matricule, 'semestre': semestre}) %}
+        {% endif %}
+        <div class="btn-group" style="margin: 15px 20px;">
+            {# {% if inscription.canTakeReleve %} #}
+                <a href="{{ downloadUrl }}" target="_blank" class="btn btn-outline-secondary">Télécharger en pdf</a>
+            {# {% endif %} #}
+            
+            {% if semestre is defined and semestre is not null %}
+                {% set semestre = semestre == 1 ? 2 : 1 %}
+                <a href="{{ path('note_releve_note_etudiant', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'matriculeEtudiant': etudiant.matricule, 'semestre': semestre}) }}" class="btn btn-outline-warning">Afficher le semestre {{ semestre }}</a>
+
+            {% endif %}
+            
+        </div>
+    {% endif %}
+    <div style="overflow: auto;width:100%;height:1150px" class="scrollBar">
+        {{ releves|raw }}
+    </div>
+
+{% endblock %}

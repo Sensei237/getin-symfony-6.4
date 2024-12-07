@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}{{"CONFIGURATION "}}{% endblock %}
+
+{% block pageTitle %} {{ "Saisie des paramètres de l'école" }} {% endblock %}
+
+{% block contentTitle %} {% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{ "configuration" }}</li>
+{% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+
+{% block page_content %}
+
+    <div class="row">
+        <div class="col-md-8">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+{% endblock %}

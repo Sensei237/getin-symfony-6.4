@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{"GESTION DES ETUDIANTS"}}
+{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DES ETUDIANTS" }} 
+{% endblock %}
+
+{% block page_content %}
+    <form action="{{ path('etudant_list', {'slugAnnee': annee.slug}) }}" method="POST">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Formations</label>
+                    <select name="formation" id="formationsFilter" required class="form-control select2">
+                        <option value="">Sélectionner une formation</option>
+                        {% for formation in formations %}
+                            <option value="{{ formation.slug }}">{{ formation.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Filières (Départements)</label>
+                    <select name="filiere" id="filieresFilter" class="form-control select2">
+                        <option value="">---------------------</option>
+                        {% for filiere in filieres %}
+                            <option value="{{ filiere.slug }}">{{ filiere.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Spécialités (options)</label>
+                    <select name="specialite" id="specialitesFilter" disabled class="form-control select2"></select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Classes (Niveaux)</label>
+                    <select name="classe" id="classesFilter" disabled class="form-control select2"></select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% for k, v in champs %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" value="{{ k }}" name="champs[]">
+                            {{ v }}
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="generer" value="generer">
+        <div class="form-group">
+            <button type="submit" class="btn btn-outline-success float-right">Télécharger le fichier</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        let baseUrl = "{{ path('etudant_list', {'slugAnnee': annee.slug}) }}";
+
+        $('form select').each(function(){
+            if ($(this).val() == '') {
+                $(this).prop('disabled', true);
+                $('#formationsFilter').prop('disabled', false);
+            }
+        })
+
+
+        $('select#formationsFilter').on('change', function(){
+            var value = $(this).val();
+            if (value == ''){
+                $('#filieresFilter').attr('disabled', true);
+                $('form').prop('action', baseUrl);
+                $('#specialitesFilter').prop('disabled', true);
+                $('#classesFilter').prop('disabled', true);
+            }else {
+                $('#filieresFilter').prop('disabled', false);
+                $('form').prop('action', baseUrl+"/"+value);
+            }
+        })
+
+        $('#filieresFilter').on('change', function(){
+            var value = $(this).val();
+            var formation = $('#formationsFilter').val();
+            if (value == '' || formation == '') {
+                $('#specialitesFilter').prop('disabled', true).html('');
+                $('#classesFilter').prop('disabled', true).html('');
+                $('form').prop('action', baseUrl+"/"+formation);
+            }else{
+                var url = "{{ path('home_find_optionsb') }}/"+value;
+                $.ajax({
+                    url: url,
+                    success: function(response) {
+                        $('#specialitesFilter').html(response).prop('disabled', false);
+                        $('form').prop('action', baseUrl+"/"+formation+"/"+value);
+                    }
+                })
+            }
+        })
+
+        $('#specialitesFilter').on('change', function(){
+            var value = $(this).val();
+            var formation = $('#formationsFilter').val();
+            var filiere = $('#filieresFilter').val();
+            if (value == '') {
+                $('#classesFilter').prop('disabled', true).html('');
+                $('form').prop('action', baseUrl+"/"+formation+"/"+filiere);
+            }else {
+                $.ajax({
+                    url: "{{ path('home_find_classesb') }}/"+value,
+                    success: function(response) {
+                        $('#classesFilter').prop('disabled', false).html(response);
+                        $('form').prop('action', baseUrl+"/"+formation+"/"+filiere+"/"+value);
+                    }
+                })
+            }
+        })
+    </script>
+{% endblock %}

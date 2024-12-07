@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES SERVICES" }} {% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES SERVICES" }} {% endblock %}
+
+{% block contentTitle %} {{ "Tous nos services" }} {% endblock %}
+
+{% block footerContent %}
+    <a class="btn btn-xs btn-primary" href="{{ path('creer_service') }}">{{ "Ajouter un nouveau service" }}</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item active">{{"Service"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ "Nom du service" }}</th>
+                <th>{{ "Code du service" }}</th>
+                <th>{{ "Action" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set i = 1 %}
+            {% for service in services %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ service.nom }}</td>
+                    <td>{{ service.code }}</td>
+                    <td><a class="btn btn-xs btn-warning" href="{{ path('edit_service', {'slug': service.slug}) }}" title="{{"Modifier"}}"><i class="fa fa-pencil-alt"></i></a></td>
+                </tr>
+                {% set i = i+1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

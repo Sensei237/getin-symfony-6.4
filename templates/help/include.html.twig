@@ -1,0 +1,53 @@
+<ul class="aside">
+    <li>
+        <a class="{{ m is not defined or m == 'ac' ? 'active' : '' }}" href="{{ path('help') }}">Accueil</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'et' ? 'active' : '' }}" href="{{ path('aide_etudiant') }}">Gestion des étudiants</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'pa' ? 'active' : '' }}" href="{{ path('aide_paiement') }}">Gestion des paiements</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'pe' ? 'active' : '' }}" href="{{ path('aide_personnel') }}">Gestion du personnel</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'no' ? 'active' : '' }}" href="{{ path('aide_note') }}">Gestion des notes</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'rq' ? 'active' : '' }}" href="{{ path('aide_requete') }}">Gestion des requetes</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'cl' ? 'active' : '' }}" href="{{ path('aide_classes') }}">Gestion des classes</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'ec' ? 'active' : '' }}" href="{{ path('aide_ec') }}">Gestion des EC (Matières)</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'ex' ? 'active' : '' }}" href="{{ path('aide_examen') }}">Gestion des examens</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'pr' ? 'active' : '' }}" href="{{ path('aide_programme') }}">Gestion des programmes</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'st' ? 'active' : '' }}" href="{{ path('aide_stats') }}">Statistiques</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'ut' ? 'active' : '' }}" href="{{ path('aide_user') }}">Gestion des utilisateurs</a>
+    </li>
+    <li>
+        <a href="{{ path('aide_config') }}">Configuration</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'cr' ? 'active' : '' }}" href="{{ path('aide_creation') }}">Création</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'mi' ? 'active' : '' }}" href="{{ path('aide_migration') }}">Gestion des migrations</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'ca' ? 'active' : '' }}" href="{{ path('aide_clorurer_annee') }}">Cloturer l'année</a>
+    </li>
+    <li>
+        <a class="{{ m is defined and m == 'ta' ? 'active' : '' }}" href="{{ path('aide_contact') }}">Contact</a>
+    </li>
+</ul>

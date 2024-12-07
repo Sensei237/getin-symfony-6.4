@@ -1,0 +1,136 @@
+{% extends "base.html.twig" %}
+
+{% block title %}GESTION DES EXAMENS{% endblock %}
+
+{% block pageTitle %}GESTION DES EXAMENS{% endblock %}
+
+{% block contentTitle %}
+    liste des examens
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{ "examen" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th>Intitulé</th>
+                <th class="text-center">Code</th>
+                <th class="text-center">type</th>
+                <th class="text-center">pourcentage CC</th>
+                <th class="text-center">pourcentage exam</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% set annee = app.session.get('annee') %}
+            
+            {% for exam in examens %}
+                <tr>
+                    {% set i = i + 1 %}
+                    <td class="text-center">{{ i }}</td>
+                    <td>{{ exam.intitule }}</td>
+                    <td class="text-center">{{ exam.code }}</td>
+                    <td class="text-center">{{ exam.type }}</td>
+                    <td class="text-center">
+                        {{ exam.pourcentageCC }}
+                        {% if exam.pourcentageCC %}
+                            <a data-toggle="modal" data-value="{{ exam.pourcentageCC }}" data-target="#modal-edit-pourcentage" href="{{ path('examen_edit_pourcentage', {'slug': exam.slug, 'champ': 'pcc'}) }}" title="Modifier le pourcentage" class="text-danger btn-edit-pourcentage">
+                                <i class="fa fa-pen-alt"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {{ exam.pourcentage }}
+                        {% if exam.pourcentage %}
+                            <a data-toggle="modal" data-value="{{ exam.pourcentage }}" data-target="#modal-edit-pourcentage" href="{{ path('examen_edit_pourcentage', {'slug': exam.slug, 'champ': 'p'}) }}" title="Modifier le pourcentage" class="text-danger btn-edit-pourcentage">
+                                <i class="fa fa-pen-alt"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if exam.type|upper != 'C' %}
+                            {% set params = {'slugAnnee': annee.slug, 'slugExam': exam.slug} %}
+                            {% set url = path('examen_liste_etudiant', params) %}
+                            {% if classe is defined and classe is not null %}
+                                {% set params = params|merge({'slugClasse': classe.slug}) %}
+                                {% set url = path('examen_liste_etudiant_classe', params) %}
+                            {% endif %}
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                    {{ "Action" }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-pencil-alt"></i>
+                                        <a href="{{ url }}?semestre=1">
+                                            {{ 
+                                                exam.type|upper == 'R' ? 
+                                                'Liste des etudiants attendus au rattrapage semestre 1' : 
+                                                'Liste des etudiants ayant tout validé en session normale semestre 1'
+                                            }}
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-pencil-alt"></i>
+                                        <a href="{{ url }}?semestre=2">
+                                            {{ 
+                                                exam.type|upper == 'R' ? 
+                                                'Liste des etudiants attendus au rattrapage semestre 2' : 
+                                                'Liste des etudiants ayant tout validé en session normale semestre 2'
+                                            }}
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-pencil-alt"></i>
+                                        <a href="{{ url }}">
+                                            {{ 
+                                                exam.type|upper == 'R' ? 
+                                                'Liste des etudiants attendus au rattrapage' : 
+                                                'Liste des etudiants ayant tout validé en session normale'
+                                            }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="modal-edit-pourcentage">
+        <div class="modal-dialog">
+            <form action="" method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Modifier le pourcentage</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="value">Valeur</label>
+                        <input type="text" name="value" id="value" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="submit" class="btn btn-outline-success">Valider</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Fermer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('.btn-edit-pourcentage').on('click', function(e){
+            e.preventDefault();
+            $('#modal-edit-pourcentage form').prop('action', $(this).prop('href'));
+            $('#modal-edit-pourcentage form input').prop('value', $(this).attr('data-value'))
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %} {{ "TOUTES LES FORMATIONS" }} {% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES FORMATIONS" }} {% endblock %}
+
+{% block contentTitle %} {{ editMode ? "Modifier une formation" : "Créer une nouvelle formation" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('formation_home') }}">{{ "formations" }}</a></li>
+    <li class="breadcrumb-item active">{{ editMode ? "modifier" : "créer" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-6">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-6">
+            <h4>{{ "Autres formations" }}</h4>
+            <hr>
+            <ul>
+                {% for f in formations %}
+                    {% if editMode and f.id != formation.id %}
+                        <li><a href="{{ path('edit_formation', {'slug': f.slug}) }}" title="{{ "modifier" }}">{{ f.name }}</a></li>
+                    {% elseif not editMode %}
+                        <li><a href="{{ path('edit_formation', {'slug': f.slug}) }}" title="{{ "modifier" }}">{{ f.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

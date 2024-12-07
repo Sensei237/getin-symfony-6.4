@@ -1,0 +1,53 @@
+{% extends "pdf/base.html.twig" %}
+
+{% block pdfBody %}
+    {% include "pdf/pdf_body.html.twig" %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-head-fixed">
+                <tr>
+                    <th class="text-center">#</th>
+                    <th class="text-center">{{ "Matricule" }}</th>
+                    <th>{{ "Nom et prenom" }}</th>
+                    <th class="text-center">{{ "Classe" }}</th>
+                    {% if examen is defined and examen is not null %}
+                        <th class="text-center">{{ "Note (sur 20)" }}</th>
+                    {% else %}
+                        <th class="text-center">CC</th>
+                        <th class="text-center">EX</th>
+                        <th class="text-center">Rat</th>
+                    {% endif %}
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% set params = {'slugEC': ec.slug, 'slugAnnee': annee.slug, 'page': 1} %}
+                {% set route = 'note_show_notes_ec' %}
+                {% if examen is defined and examen is not null %}
+                    {% set params = params|merge({'slugExamen': examen.slug}) %}
+                    {% set route = 'note_show_notes_ec_examen' %}
+                {% endif %}
+                {% set i = 1 %}
+                {% for c in contrats %}
+                    <tr>
+                        <td class="text-center">{{ i }}</td>
+                        <td class="text-center">{{ c.etudiantInscris.etudiant.matricule|upper }}</td>
+                        <td>{{ (c.etudiantInscris.etudiant.nomComplet)|upper }}</td>
+                        <td class="text-center">{{ c.etudiantInscris.classe.code }}</td>
+                        {% if examen is defined and examen is not null %}
+                            <td class="text-center">
+                                {% set oldNote = examen.type|upper == 'E' ? c.noteSN : (examen.type|upper == 'C' ? c.noteCC : c.noteSR) %}
+                                {{ oldNote < 10 ? '0' ~ oldNote : oldNote }}
+                            </td>
+                        {% else %}
+                            <td class="text-center">{{ c.noteCC }}</td>
+                            <td class="text-center">{{ c.noteSN }}</td>
+                            <td class="text-center">{{ c.noteSR }}</td>
+                        {% endif %}
+                            
+                    </tr>
+                    {% set i = i + 1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

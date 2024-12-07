@@ -1,0 +1,98 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {{ "PROFIL |" }} {% block titre %}{% endblock %}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path("etudiants", {'slug': app.session.get('annee').slug}) }}">{{ "etudiants" }}</a></li>
+    {% block ariane %}{% endblock %}
+{% endblock %}
+
+{% block pageTitle %}
+    {{ "Etudiant" }}
+    {% block titreP %}{% endblock %}
+{% endblock %}
+
+{% block defaultContent %}
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card">
+                {% block profileContent %}{% endblock %}
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+                <div class="card-body box-profile">
+                    <div class="text-center">
+                        {% set img_url = absolute_url(asset('dist/img/avatar.png')) %}
+                        {% if inscription is defined and inscription.etudiant.photo %}
+                            {% set img_url = absolute_url(asset('dist/img/etudiants/' ~ inscription.etudiant.photo)) %}
+                        {% endif %}
+                        <img class="profile-user-img img-fluid img-circle" src="{{ img_url }}" alt="User profile picture">
+                    </div>
+                    <h3 class="profile-username text-center">{{ inscription.etudiant.nom }}</h3>
+                    <p class="text-muted text-center">
+                        <a title="{{ "Afficher la liste des étudiants de cette classe (" ~ inscription.classe.etudiantInscris|length ~ ")" }}" href="{{ path('etudiants', {'slug': inscription.anneeAcademique.slug}) ~ "?formation=" ~ inscription.classe.formation.slug ~ "&filiere=" ~ inscription.classe.specialite.filiere.slug ~ "&specialite=" ~ inscription.classe.specialite.slug ~ "&classe=" ~ inscription.classe.slug }}">
+                            {{ "Classe " ~ inscription.classe.code }}
+                        </a>
+                    </p>
+                    <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item">
+                            <a href="{{ path('etudiant_profile_etudiant', {'matricule': inscription.etudiant.matricule, 'slug': annee.slug}) }}">
+                                <b>{{ "Profil" }}</b>
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a title="Liste des matieres à valider pour cette année {{ annee.denomination }}" href="{{ path('contrat_academique_afficher', {'matricule': inscription.etudiant.matricule, 'slug': annee.slug}) }}">
+                                <b>{{"Contrat academique"}}</b> <a class="float-right">{{ inscription.contrats|length }}</a>
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{{ path('note_show_notes_etudiant', {'slugAnnee': annee.slug, 'matricule': inscription.etudiant.matricule}) }}">
+                                <b>{{"Notes"}}</b>
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{{ path('note_releve_note_etudiant', {'slugAnnee': annee.slug, 'slugClasse': inscription.classe.slug, 'matriculeEtudiant': inscription.etudiant.matricule, 'semestre': 1}) }}">
+                                <b>{{"Releves de notes"}}</b>
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{{ path("paiement_etat_etudiant", {'slug': annee.slug, 'matricule': inscription.etudiant.matricule}) }}">
+                                <b>{{"Paiements"}}</b>
+                            </a>
+                        </li>
+                    </ul>
+                    <a href="{{ path('etudiant_edit_profile_etudiant', {'slug': annee.slug, 'matricule': inscription.etudiant.matricule}) }}" class="btn btn-outline-primary btn-block"><b>{{"Modifier le profil"}}</b></a>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <!-- About Me Box -->
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">{{"Apropos de moi"}}</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <strong><i class="fas fa-book mr-1"></i> {{"Autres formations"}}</strong>
+                    <p class="text-muted">{{ inscription.etudiant.autreFormation }}</p>
+                    <hr>
+                    <strong><i class="fas fa-map-marker-alt mr-1"></i> {{"Adresse"}}</strong>
+                    <p class="text-muted">{{ inscription.etudiant.localisation }}</p>
+                    <hr>
+                    <strong><i class="fas fa-pencil-alt mr-1"></i> {{ "Centres d'intérêt" }}</strong>
+                    <p class="text-muted">
+                        <span class="tag tag-success">{{ inscription.etudiant.skills }}</span>
+                    </p>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+{% endblock %}

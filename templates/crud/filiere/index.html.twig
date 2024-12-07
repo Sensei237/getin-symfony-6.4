@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "TOUTES LES FILIERES" }} {% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES FILIERES" }} {% endblock %}
+
+{% block contentTitle %} {{ "Nos filières ou départements" }} {% endblock %}
+
+{% block footerContent %}
+    <a class="btn btn-sm btn-primary" href="{{ path('creer_filiere') }}">{{ "Ajouter une nouvelle filière" }}</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item active">{{ "filières" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ "Nom filière" }}</th>
+                <th>{{ "Code filière" }}</th>
+                <th>{{ "Action" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set i = 1 %}
+            {% for filiere in filieres %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ filiere.name }}</td>
+                    <td>{{ filiere.code }}</td>
+                    <td>
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                {{"Action"}}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item"><a href="{{ path('edit_filiere', {'slug': filiere.slug}) }}">{{"Modifier"}}</a></li>
+                                <li class="dropdown-item"><a href="{{ path('show_specialites', {'slug': filiere.slug}) }}">{{"Liste des spécialités"}}</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li class="dropdown-item"><a href="">{{"Liste des étudiants"}}</a></li>
+                                                                                                
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% set i = i+1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

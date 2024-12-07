@@ -1,0 +1,236 @@
+{% extends "preinscription/base.html.twig" %}
+
+{% block contentTitle %}
+
+{% endblock %}
+
+{% block pageTitle %}
+{% endblock %}
+
+{% block mainContent %}
+    <style>
+        .over_connect {
+            background: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            z-index: 500;
+        }
+        .bg_black {
+            background: #232A34;
+            color: white;
+        }
+        .bg_black p {
+            text-align: center;
+            width: 100%;
+        }
+        .small_detail {
+            position: relative;
+            top: 40px;
+        }
+        .conteur {
+            font-weight: bolder;
+            font-size: 150px;
+        }
+        .bg_black h1 {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #FF6160;
+            text-align: center;
+            font-size: 2em;
+        }
+        .big_detail {
+            font-size: 20px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        .btn_mic {
+            border-radius: 0px;
+            border: 0px;
+            margin-bottom: 20px;
+        }
+        .text-center{
+            text-align: center;
+        }
+        form{
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 0px 15px 20px 15px;
+        }
+    </style>
+    <div>
+        <img id="bg-page" src="{{ asset('dist/img/logo_getin.jpg') }}" style="width: 100%;position:absolute;opacity:.5;top:0px" alt="">
+        <div class="col-md-8 over_connect">
+            <div class="row">
+                <div class="col-4 bg_black">
+                    <div>
+                        <h1>{{ annee.configuration.nomEcole }}</h1>
+                        <div>
+                            <p class="text-green small_detail">Fin des inscription dans:</p>
+                            <p><span class="conteur">26</span>Jrs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-8 text-center">
+                    <div class="row text-center">
+                        <div class="col-12 sinscrire-zone">
+                            <p class="text-green big_detail text-center">Commencez votre procedure de préinscription !</p>
+                            <a href="" data-form="start-preinscription-form" class="btn btn-success btn_mic col-md-5 col-md-offset-1">S'inscrire maintenant!</a>
+                            <a href="" data-form="edit-preinscription-form" class="col-md-5 btn btn-primary btn_mic">Modifier mon inscription</a>
+                            <div class="row incription-zone">
+                                <form action="" class="start-preinscription-form bg-success">
+                                    <a href="" style="font-size: 20px;color:red" class="close" data-close="start-preinscription-form">x</a>
+                                    <div class="row text-left">
+                                        <div class="col-4">
+                                            <label>Formations</label>
+                                            <select name="" required class="form-control" id="">
+                                                <option value="">Selectionner une formation</option>
+                                                {% for f in formations %}
+                                                    <option value="{{ f.slug }}">{{ f.name|upper }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label>Filières</label>
+                                            <select name="" required class="form-control" id="filieres">
+                                                <option value="">Sélectionner une Filières</option>
+                                                {% for f in filieres %}
+                                                    <option value="{{ f.slug }}">{{ f.name|upper }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label>Options</label>
+                                            <select required disabled name="" class="form-control" id="options">
+        
+                                            </select>
+                                        </div>
+                                        <div class="col-8">
+                                            <label>Classes / Niveaux</label>
+                                            <select required disabled name="" class="form-control" id="classes">
+        
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label></label>
+                                            <button style="margin-top:8px" type="submit" class="btn btn-primary form-control">Continuer <i class="fa fa-hand-right"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <form action="" class="edit-preinscription-form bg-primary">
+                                    <a href="" style="font-size: 20px;color:red" class="close" data-close="edit-preinscription-form">x</a>
+                                    <div class="row text-left">
+                                        <div class="col-6">
+                                            <label for="matricule">Matricule</label>
+                                            <input type="text" class="form-control" id="matricule" required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="codesecret">Code Secret</label>
+                                            <input type="text" class="form-control" id="codesecret" required>
+                                        </div>
+                                        <div class="col-8">
+                                            <label for="classe">Classe / Niveau</label>
+                                            <select name="classe" id="classe">
+                                                <option value="">Sélectionner votre classe</option>
+                                                {% for classe in classes %}
+                                                    <option value="{{ classe.slug }}">{{ classe.nom|upper }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label></label>
+                                            <button style="margin-top:8px" type="submit" class="btn btn-success form-control">Continuer <i class="fa fa-hand-right"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <button id="down" data-toggle="modal" data-target="#download" href="#" class="col-md-10 btn btn-danger btn_mic col-md-offset-1">Deja inscrit, telecharger votre fiche d'inscription</button>
+                        </div>
+
+                    </div>
+                    <div class="text-center row">
+                        <div class="col-md-12">
+                            <p class="">Vous pouvez télécharger le tutoriel d'inscription: <a href="">en français</a>, <a href="">en anglais</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8" style="position: absolute; bottom: 0px; right: 0px; background: #e0e0e0">
+                    <div class="col-md-12">
+                        <h3 style="margin: 0px; padding: 0px;">Contact</h3>
+                        <p><b>support@ecole.net</b></p>
+                        <p><b>675-775-593 / 675-775-593 / 675-775-593 / 675-775-593</b></p>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $('.incription-zone form').hide();
+        let $filieres = $('#filieres');
+        let $options = $('#options');
+        let $classes = $('#classes');
+        function updateContent()
+        {
+            let $height = $(document).height();
+            let headerHeight = $('nav.main-header').height();
+            let titleHeight = $('.title-contenair').height();
+            $('#bg-page').prop('height', $height);
+        }
+        updateContent();
+        $(window).resize(function(){
+            updateContent();
+        });
+        $('.close').on("click", function(e){
+            e.preventDefault();
+            var c = $(this).data('close');
+            $('.'+c).fadeOut(500);
+        });
+        $('.sinscrire-zone a').each(function(){
+            $(this).on("click", function(e){
+                e.preventDefault();
+                $('.incription-zone form').fadeOut();
+                $('.'+$(this).data('form')).fadeIn(500);
+            });
+        });
+        $filieres.on('change', function(){
+            var slug = $(this).val();
+            $.ajax({
+                url: "{{ path('home_find_optionsb') }}/"+slug,
+                success: function(response) {
+                    $options.prop('disabled', false).html(response);
+                }
+            });
+        });
+        $options.on('change', function(){
+            var slug = $(this).val();
+            $.ajax({
+                url: "{{ path('home_find_classesb') }}/"+slug,
+                success: function(response) {
+                    $classes.prop('disabled', false).html(response);
+                }
+            });
+        });
+        $('form.start-preinscription-form').on('submit', function(e){
+            e.preventDefault();
+            if ($classes.val() != '' && $classes.val() != 'undefined') {
+                var url = "{{ path('preins_preinscription2', {'slugAnnee': annee.slug}) }}"+$classes.val();
+                window.location.href = url;
+            }
+        });
+        $('form.edit-preinscription-form').on('submit', function(e){
+            e.preventDefault();
+            var clas = $('form.edit-preinscription-form #classe').val().trim();
+            var matricule = $('form.edit-preinscription-form #matricule').val().trim();
+            var code = $('form.edit-preinscription-form #codesecret').val().trim();
+            if (clas != '' && matricule != '' && code != '') {
+                var url = "{{ path('preins_preinscription_edit2', {'slugAnnee': annee.slug}) }}/"+clas+"/"+matricule+"/"+code;
+                window.location.href = url;
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,219 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES REQUETES" }} {% endblock %}
+
+{% block pageTitle %} GESTION DES REQUETES {% endblock %}
+
+{% block contentTitle %} {{ ("Gestion des requetes pour l'ec <b>" ~ ec.intitule ~ "</b>")|raw }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('request', {'slugAnnee': annee.slug}) }}">requêtes</a></li>
+    <li class="breadcrumb-item active">{{ ec.code }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-9">
+            <div class="list-group-item scrollBar" style="max-height: 900px;overflow:auto">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr style="vertical-align: middle;">
+                            <th style="vertical-align: middle;" class="text-center" rowspan="2">#</th>
+                            <th style="vertical-align: middle;" class="text-center" rowspan="2">Matricule</th>
+                            <th style="vertical-align: middle;" rowspan="2">Noms & Prenoms</th>
+                            <th style="vertical-align: middle;" class="text-center" rowspan="2">Classe</th>
+                            <th style="vertical-align: middle;" class="text-center" colspan="5">Notes Actuelles</th>
+                            <th style="vertical-align: middle;" class="text-center" colspan="5">Nouvelles notes</th>
+                            <th style="vertical-align: middle;" class="text-center" rowspan="2">
+                                <a href="#" title="Enregistrer tout" class="btn-save-all-request btn btn-outline-success btn-flat"><i class="fa fa-check-double"></i></a>
+                            </th>
+                        </tr>
+                        <tr style="vertical-align: middle;" class="text-center">
+                            <th>TPE</th>
+                            <th>TP</th>
+                            <th>CC</th>
+                            <th>Ex</th>
+                            <th>Rat</th>
+                            <th>TPE</th>
+                            <th>TP</th>
+                            <th>CC</th>
+                            <th>Ex</th>
+                            <th>Rat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set i = 0 %}
+                        {% for c in contrats %}
+                            <tr class="text-center" style="vertical-align: middle;">
+                                {% set i = i + 1 %}
+                                <td>{{ i }}</td>
+                                <td>{{ c.etudiantInscris.etudiant.matricule }}</td>
+                                <td class="text-left">{{ c.etudiantInscris.etudiant.nomComplet|slice(0, 20) }}</td>
+                                <td>{{ c.etudiantInscris.classe.code }}</td>
+                                <td class="actual-tpe-{{ i }}">{{ c.noteTPE }}</td>
+                                <td class="actual-tp-{{ i }}">{{ c.noteTP }}</td>
+                                <td class="actual-cc-{{ i }}">{{ c.noteCC }}</td>
+                                <td class="actual-sn-{{ i }}">{{ c.noteSN }}</td>
+                                <td class="actual-sr-{{ i }}">{{ c.noteSR }}</td>
+                                <td><input placeholder="TPE" pattern="[0-9]+(\.[0-9]+)?" style="max-width: 40px;padding:0 !important;height:23px;font-size:10px;" id="new-tpe-{{ i }}" class="form-control request-input text-center" type="text"></td>
+                                <td><input placeholder="TP" pattern="[0-9]+(\.[0-9]+)?" style="max-width: 40px;padding:0 !important;height:23px;font-size:10px;" id="new-tp-{{ i }}" class="form-control request-input text-center" type="text"></td>
+                                <td><input placeholder="CC" pattern="[0-9]+(\.[0-9]+)?" style="max-width: 40px;padding:0 !important;height:23px;font-size:10px;" id="new-cc-{{ i }}" class="form-control request-input text-center" type="text"></td>
+                                <td><input placeholder="EX" pattern="[0-9]+(\.[0-9]+)?" style="max-width: 40px;padding:0 !important;height:23px;font-size:10px;" id="new-sn-{{ i }}" class="form-control request-input text-center" type="text"></td>
+                                <td><input placeholder="RAT" pattern="[0-9]+(\.[0-9]+)?" style="max-width: 40px;padding:0 !important;height:23px;font-size:10px;" id="new-sr-{{ i }}" class="form-control request-input text-center" type="text"></td>
+                                <td>
+                                    <a href="{{ path('request_save', {'slugAnnee': annee.slug, 'contratId': c.id}) }}" title="Enregistrer" data-index="{{ i }}" class="btn btn-flat btn-outline-success btn-xs btn-save-request"><i class="fa fa-check-circle"></i></a>
+                                    <i class="fas fa-1x fa-sync fa-spin" style="display: none;"></i>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <a href="#" title="Enregistrer tout" class="btn-save-all-request btn btn-outline-success btn-flat float-right"><i class="fa fa-check-double"></i></a>
+        </div>
+        <div class="col-3">
+            <div class="list-group-item">
+                <h5 class="text-center"><small>Autres matières</small></h5>
+                <hr style="width: 50%;height: 5px;background-color: rgb(73, 11, 243)">
+                <div class="scrollBar" style="max-height: 700px;overflow:auto">
+                    <ul class=" list-unstyled">
+                        {% for e in ecs %}
+                            {% if e.id != ec.id %}
+                                <li class=" list-link">
+                                    <a href="{{ path('request_manage', {'slugAnnee': annee.slug, 'slugEC': e.slug}) }}">{{ e.code ~ ' (' ~ e.intitule|slice(0, 30) ~ ')' }}</a>
+                                </li>
+                                <li class="list-seperator"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function validerNote($note, $idElt) {
+            // LA NOTE EST VALIDE SI ELLE EST DANS LE BON INTERVAL
+            if ($note != '') {
+                if ($note == ' ') {
+                    $($idElt).removeClass('border-danger').addClass('border-success');
+                    return true;
+                }
+                if (/^[0-9]+(\.[0-9]+)?$/.test($note) && $note <= 20) {
+                    $($idElt).removeClass('border-danger').addClass('border-success');
+                    return true;
+                }else {
+                    $($idElt).removeClass('border-success').addClass('border-danger');
+                    return false;
+                }
+            }else{
+                $($idElt).removeClass('border-success').removeClass('border-danger');
+                return true;
+            }
+        }
+
+        $('.btn-save-all-request').on('click', function(e){
+            e.preventDefault();
+            $('.btn-save-request').each(function(){
+                $(this).trigger('click');
+            })
+        })
+
+        $('.btn-save-request').each(function(){
+            $(this).on("click", function(e){
+                e.preventDefault();
+                let elt = $(this);
+                let index = $(elt).data('index');
+                let noteCC = $('input#new-cc-'+index).val();
+                let noteSN = $('input#new-sn-'+index).val();
+                let noteSR = $('input#new-sr-'+index).val();
+                let noteTPE = $('input#new-tpe-'+index).val();
+                let noteTP = $('input#new-tp-'+index).val();
+                if (noteCC != '' || noteSN != '' || noteSR != '' || noteTPE != '' || noteTP != '') {
+                    if (validerNote(noteCC, '#new-cc-'+index) && validerNote(noteTPE, 'input#new-tpe-'+index)&& validerNote(noteTP, 'input#new-tp-'+index) && validerNote(noteSN, 'input#new-sn-'+index) && validerNote(noteSR, 'input#new-sr-'+index)) {
+                        $.ajax({
+                            url: $(elt).prop('href'),
+                            type: "GET",
+                            data: {noteCC: noteCC, noteSN: noteSN, noteSR: noteSR, noteTPE: noteTPE, noteTP: noteTP},
+                            dataType: "JSON",
+                            beforeSend: function(){
+                                $(elt).fadeOut(250);
+                                setTimeout(function(){
+                                    $(elt).next().fadeIn(300);
+                                }, 200)
+                            },
+                            success: function(response){
+                                $(elt).next().fadeOut(200);
+                                setTimeout(function(){$(elt).fadeIn(300);},200)
+                                if (!response.hasError) {
+                                    $('input#new-cc-'+index+', input#new-sn-'+index+', input#new-sr-'+index+', input#new-tpe-'+index+', input#new-tp-'+index).removeClass("border-danger").removeClass('border-success').prop('value', '');
+                                    if (noteTPE != '') {$('.actual-tpe-'+index).text(noteTPE)}
+                                    if (noteTP != '') {$('.actual-tp-'+index).text(noteTP)}
+                                    if (noteCC != '') {$('.actual-cc-'+index).text(noteCC)}
+                                    if (noteSN != '') {$('.actual-sn-'+index).text(noteSN)}
+                                    if (noteSR != '') {$('.actual-sr-'+index).text(noteSR)}
+                                }
+                                else {
+                                    if (response.msg.errorTPE) {
+                                        $('input#new-tpe-'+index).addClass("border-danger");
+                                    }
+                                    if (response.msg.errorTP) {
+                                        $('input#new-tp-'+index).addClass("border-danger");
+                                    }
+                                    if (response.msg.errorCC) {
+                                        $('input#new-cc-'+index).addClass("border-danger");
+                                    }
+                                    if (response.msg.errorSN) {
+                                        $('input#new-sn-'+index).addClass("border-danger");
+                                    }
+                                    if (response.msg.errorSR) {
+                                        $('input#new-sr-'+index).addClass("border-danger");
+                                    }
+                                }
+                            },
+                            error: function(){
+
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        $('.request-input').each(function(){
+            $(this).on('blur', function(){
+                validerNote($(this).val(), 'input#'+$(this).prop('id'));
+            })
+        });
+        
+        function validerNote($note, $idElt) {
+            // LA NOTE EST VALIDE SI ELLE EST DANS LE BON INTERVAL
+            if ($note != '') {
+                if ($note == ' ') {
+                    $($idElt).removeClass('border-danger').addClass('border-success');
+                    return true;
+                }
+                if (/^[0-9]+(\.[0-9]+)?$/.test($note) && $note <= 20) {
+                    $($idElt).removeClass('border-danger').addClass('border-success');
+                    return true;
+                }else {
+                    $($idElt).removeClass('border-success').addClass('border-danger');
+                    return false;
+                }
+            }else{
+                $($idElt).removeClass('border-success').removeClass('border-danger');
+                return true;
+            }
+        }
+        
+    </script>
+{% endblock %}

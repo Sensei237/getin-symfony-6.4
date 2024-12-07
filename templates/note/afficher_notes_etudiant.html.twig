@@ -1,0 +1,124 @@
+{% extends "etudiant/profil/base.html.twig" %}
+
+{% block title %} 
+    {{ ("NOTES DE " ~ inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block pageTitle %}
+{{ ("NOTES DE " ~ inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block navSearchFormMethod %}{{ "GET" }}{% endblock %}
+{% block navSearchFormAction %}{{ path('etudiants', {'slug': annee.slug}) }}{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="">{{"notes"}}</a></li>
+    <li class="breadcrumb-item active">{{"afficher"}}</li>
+{% endblock %}
+
+{% block profileContent %}
+    <div class="form-group">
+        <a class="btn btn-secondary" href="{{ path('note_releve_note_etudiant', {'slugAnnee': annee.slug, 'slugClasse': inscription.classe.slug, 'matriculeEtudiant': inscription.etudiant.matricule, 'semestre': 1}) }}">Afficher le releves de notes</a>
+    </div>
+    <div style="overflow: auto;height:700px;" class="scrollBar">
+        <table class="table table-bordered table-hover">
+            <thead class="table-head-fixed">
+                <tr>
+                    <th>#</th>
+                    <th style="min-width: 200px;width:auto;">{{ "Unité d'enseignement" }}</th>
+                    <th style="min-width: 350px;width:auto;">{{ "Elément constitutif" }}</th style="min-width: 350px;">
+                    <th class="vertical-alignement">{{ "Crédit" }}</th>
+                    <th class="{{ examen is null ? "vertical-alignement" : '' }}">{{ "Semestre" }}</th>
+                    {% if examen is null %}
+                        <th class="vertical-alignement" title="{{ "Note de TPE" }}">{{ "Note de TPE" }}</th>
+                    {% endif %}
+                    {% if examen is null %}
+                        <th class="vertical-alignement" title="{{ "Note de TP" }}">{{ "Note de TP" }}</th>
+                    {% endif %}
+                    {% if examen is null or examen.type|upper == "C" %}
+                        <th class="vertical-alignement" title="{{ "Note de contrôle continu" }}">{{ "Note de CC" }}</th>
+                    {% endif %}
+                    {% if examen is null or examen.type|upper == "E" %}
+                        <th class="vertical-alignement" title="{{ "Note de la session normale" }}">{{ "Note de SN" }}</th>
+                    {% endif %}
+                    {% if examen is null or examen.type|upper == "R" %}
+                        <th class="vertical-alignement" title="{{ "Note de la session de rattrapage" }}">{{ "Note de SR" }}</th>
+                    {% endif %}
+                    {% if examen is null %}
+                        <th class="vertical-alignement" title="{{ "Moyenne avant rattrapage" }}">{{ "Moy av rat." }}</th>
+                        <th class="vertical-alignement" title="{{ "Moyenne après rattrapage" }}">{{ "Moy ap rat." }}</th>
+                        <th class="vertical-alignement" title="{{ "Moyenne après jury" }}">{{ "Note jury." }}</th>
+                        <th class="vertical-alignement" title="{{ "Moyenne après délibération" }}">{{ "Moy ap dél." }}</th>
+                        <th class="vertical-alignement" title="{{ "Moyenne définitive" }}">{{ "Moy def." }}</th>
+                        <th class="vertical-alignement" title="{{ "note sur 4" }}">{{ "Note/4" }}</th>
+                        <th class="vertical-alignement" title="{{ "Grade" }}">{{ "Grade" }}</th>
+                        <th class="vertical-alignement" title="{{ "Décision" }}">{{ "Déc." }}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% set i = 0 %}
+                {% for c in inscription.contrats %}
+                    {% set i = i+1 %}
+                    <tr style="text-transform: uppercase;font-size: 12px" class="align-middle {{ not c.isValidated ? 'bg-danger' : 'bg-success' }}">
+                        <td>{{ i }}</td>
+                        <td style="text-transform: uppercase;font-size: 12px">{{ (c.ecModule.module.intitule ~ " - " ~ c.ecModule.module.code)|upper }}</td>
+                        <td style="text-transform: uppercase;font-size: 12px">{{ (c.ecModule.ec.intitule ~ " - " ~ c.ecModule.ec.code)|upper }}</td>
+                        <td class="text-center">{{ c.ecModule.credit }}</td>
+                        <td class="text-center">{{ c.ecModule.semestre }}</td>
+                        {% if examen is null %}
+                            <td class="text-center">{{ c.noteTPE is not null ? c.noteTPE : '-' }}</td>
+                        {% endif %}
+                        {% if examen is null %}
+                            <td class="text-center">{{ c.noteTP is not null ? c.noteTP : '-' }}</td>
+                        {% endif %}
+                        {% if examen is null or examen.type|upper == "C" %}
+                            <td class="text-center">{{ c.noteCC is not null ? c.noteCC : '-' }}</td>
+                        {% endif %}
+                        {% if examen is null or examen.type|upper == "E" %}
+                            <td class="text-center">{{ c.noteSN is not null ? c.noteSN : '-' }}</td>
+                        {% endif %}
+                        {% if examen is null or examen.type|upper == "R" %}
+                            <td class="text-center">{{ c.noteSR is not null ? c.noteSR : '-' }}</td>
+                        {% endif %}
+                        {% if examen is null %}
+                            <td class="text-center">{{ c.moyAvantRattrapage is not null ? c.moyAvantRattrapage : '-' }}</td>
+                            <td class="text-center">{{ c.moyApresRattrapage is not null ? c.moyApresRattrapage : '-' }}</td>
+                            <td class="text-center">{{ c.noteJury is not null ? c.noteJury : '-' }}</td>
+                            <td class="text-center">{{ c.moyApresJury is not null ? c.moyApresJury : '-' }}</td>
+                            <td class="text-center">{{ c.moyDefinitive is not null ? c.moyDefinitive : '-' }}</td>
+                            <td class="text-center">{{ c.note is not null ? c.note : '-' }}</td>
+                            <td class="text-center">{{ c.grade is not null ? c.grade : 'E' }}</td>
+                            <td class="text-center">{{ c.decision is not null ? c.decision : 'NV' }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="input-group-prepend">
+                <a href="#" data-toggle="dropdown" class="btn btn-outline-secondary dropdown-toggle">{{ "Saisir les notes" }} </a>
+                <ul class="dropdown-menu bg-secondary">
+                    <li class="dropdown-item-title bg-secondary">{{ "Sélectionner le type de note" }}</li>
+                    <li class="divider dropdown-divider"></li>
+                    {% for exam in examens %}
+                        <li class="dropdown-item bg-secondary">
+                            <i class="fa fa-arrow-right"></i>
+                            <a href="{{ path('note_saisie_notes_etudiant', {'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'matricule': inscription.etudiant.matricule}) }}">{{ exam.intitule ~ " (" ~ exam.code ~ ")" }}</a>
+                        </li>
+                        <li class="divider dropdown-divider"></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% if inscription.contrats is not empty %}
+            <div class="col-md-9">
+                <a href="" class="btn btn-outline-info">{{ "Télécharger le pdf" }} <i class="fa fa-file-pdf"></i></a>
+                <a href="" class="btn btn-outline-success">{{ "Télécharger sur excel" }} <i class="fa fa-file-excel"></i></a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

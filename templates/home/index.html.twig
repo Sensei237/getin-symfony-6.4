@@ -1,0 +1,414 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesBlock %}
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/fontawesome-free/css/all.min.css')) }}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Tempusdominus Bbootstrap 4 -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')) }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css')) }}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/jqvmap/jqvmap.min.css')) }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('dist/css/adminlte.min.css')) }}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/overlayScrollbars/css/OverlayScrollbars.min.css')) }}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/select2/css/select2.min.css')) }}">
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')) }}">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/daterangepicker/daterangepicker.css')) }}">
+    <!-- summernote -->
+    <link rel="stylesheet" href="{{ absolute_url(asset('plugins/summernote/summernote-bs4.css')) }}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+{% endblock %}
+
+{% block jsBlock %}
+    <!-- jQuery -->
+    <script src="{{ absolute_url(asset('plugins/jquery/jquery.min.js')) }}"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="{{ absolute_url(asset('plugins/jquery-ui/jquery-ui.min.js')) }}"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button)
+    </script>
+    <!-- Bootstrap 4 -->
+    <script src="{{ absolute_url(asset('plugins/bootstrap/js/bootstrap.bundle.min.js')) }}"></script>
+    <!-- Select2 -->
+    <script src="{{ absolute_url(asset('plugins/select2/js/select2.full.min.js')) }}"></script>
+    <!-- ChartJS -->
+    <script src="{{ absolute_url(asset('plugins/chart.js/Chart.min.js')) }}"></script>
+    <!-- Sparkline -->
+    <script src="{{ absolute_url(asset('plugins/sparklines/sparkline.js')) }}"></script>
+    <!-- JQVMap -->
+    <script src="{{ absolute_url(asset('plugins/jqvmap/jquery.vmap.min.js')) }}"></script>
+    <script src="{{ absolute_url(asset('plugins/jqvmap/maps/jquery.vmap.usa.js')) }}"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="{{ absolute_url(asset('plugins/jquery-knob/jquery.knob.min.js')) }}"></script>
+    <!-- daterangepicker -->
+    <script src="{{ absolute_url(asset('plugins/moment/moment.min.js')) }}"></script>
+    <script src="{{ absolute_url(asset('plugins/daterangepicker/daterangepicker.js')) }}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{{ absolute_url(asset('plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js')) }}"></script>
+    <!-- Summernote -->
+    <script src="{{ absolute_url(asset('plugins/summernote/summernote-bs4.min.js')) }}"></script>
+    <!-- overlayScrollbars -->
+    <script src="{{ absolute_url(asset('plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js')) }}"></script>
+    <!-- AdminLTE App -->
+    <script src="{{ absolute_url(asset('dist/js/adminlte.js')) }}"></script>
+    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+    <script src="{{ absolute_url(asset('dist/js/pages/dashboard.js')) }}"></script>
+
+    <script>
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        });
+        $('.select2').select2();
+
+        $.ajax({
+            url: "{{ path('home_fetch_data_graph', {'id': app.session.get('annee').id}) }}",
+            dataType: "JSON",
+            success: function(response) {
+                if (response.hasData) {
+                    var salesGraphChartCanvas = $('#line-chart').get(0).getContext('2d');
+                    
+                    var effectifs = []; var labels = [];
+                    effectifs.push([0]);labels.push([0]);
+                    for (var i=0; i<response.effectifs.length; i++) {
+                        effectifs.push([response.effectifs[i]]);
+                        labels.push([response.labels[i]]);
+                    }
+
+                    var salesGraphChartData = {
+                        labels  : labels,
+                        datasets: [
+                            {
+                                label               : 'Effectif',
+                                fill                : false,
+                                borderWidth         : 2,
+                                lineTension         : 0,
+                                spanGaps            : false,
+                                borderColor         : '#efefef',
+                                pointRadius         : 3,
+                                pointHoverRadius    : 7,
+                                pointColor          : '#efefef',
+                                pointBackgroundColor: '#efefef',
+                                data                : effectifs
+                            }
+                        ]
+                    }
+                    var salesGraphChartOptions = {
+                        maintainAspectRatio : false,
+                        responsive : true,
+                        legend: {
+                            display: true,
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks : {
+                                fontColor: '#efefef',
+                                },
+                                gridLines : {
+                                    display : false,
+                                    color: '#efefef',
+                                    drawBorder: false,
+                                }
+                            }],
+                            yAxes: [{
+                                ticks : {
+                                    stepSize: 50,
+                                    fontColor: '#efefef',
+                                },
+                                gridLines : {
+                                display : true,
+                                color: '#efefef',
+                                drawBorder: false,
+                                }
+                            }]
+                        }
+                    }
+                    var salesGraphChart = new Chart(salesGraphChartCanvas, { 
+                            type: 'line', 
+                            data: salesGraphChartData, 
+                            options: salesGraphChartOptions
+                        }
+                    )
+                }
+            }
+        })
+
+        $.ajax({
+            url: "{{ path('home_fech_data_graph2') }}",
+            dataType: "JSON",
+            success: function(response) {
+                if (response.hasData) {
+                    var salesChartCanvas = document.getElementById('revenue-chart-canvas').getContext('2d');
+                    var salesChartOptions = {
+                        maintainAspectRatio : false,
+                        responsive : true,
+                        legend: {
+                            display: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                    gridLines : {
+                                    display : true,
+                                }
+                            }],
+                            yAxes: [{
+                                    gridLines : {
+                                    display : true,
+                                }
+                            }]
+                        }
+                    }
+
+                    var labels = []; var dataSets = [];
+                    for (var i=0; i<response.labels.length; i++) {
+                        labels.push([response.labels[i]]);
+                    }
+
+                    for (var i=0; i<response.dataSets.length; i++) {
+                        var dataset = response.dataSets[i];
+                        var values = {
+                            label               : dataset.label,
+                            backgroundColor     : dataset.backgroundColor,
+                            borderColor         : dataset.borderColor,
+                            pointRadius         : dataset.pointRadius,
+                            pointColor          : dataset.pointColor,
+                            pointStrokeColor    : dataset.pointStrokeColor,
+                            pointHighlightFill  : dataset.pointHighlightFill,
+                            pointHighlightStroke: dataset.pointHighlightStroke,
+                            data                : dataset.data
+                        };
+                        dataSets.push(values);
+                    }
+
+                    var salesChartData = {
+                        labels  : labels,
+                        datasets: dataSets
+                    }
+
+
+                    var salesChart = new Chart(salesChartCanvas, { 
+                            type: 'line', 
+                            data: salesChartData, 
+                            options: salesChartOptions
+                        }
+                    )
+
+                }
+            }
+        })
+        
+    </script>
+    
+{% endblock %}
+
+{% block title %}{{"ACCUEIL "}}{% endblock %}
+
+{% block pageTitle %}TABLEAU DE BORD{% endblock %}
+
+{% block defaultContent %}
+
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ employes|length < 10 ? '0' : '' }}{{ employes|length }}</h3>
+                    <p>Employés</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="{{ path('employe') }}" class="small-box-footer">voir plus <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ etudiants|length < 10 ? '0' : '' }}{{ etudiants|length }}</h3>
+                    <p>Etudiants</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-graduation-cap"></i>
+                </div>
+                <a href="{{ path('etudiants', {'slug': annee.slug, 'page': 1}) }}" class="small-box-footer">voir plus <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ specialites|length < 10 ? '0' : '' }}{{ specialites|length }}</h3>
+                        <p>Specialités</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-bullseye"></i>
+                    </div>
+                    <a href="{{ path('show_all_specialites') }}" class="small-box-footer">voir plus <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ classes|length < 10 ? '0' : '' }}{{ classes|length }}</h3>
+                    <p>Classes</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-building"></i>
+                </div>
+                <a href="{{ path('all_classes') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+    </div>
+
+    <!-- Main row -->
+    <div class="row">
+        <section class="col-lg-12 connectedSortable">
+            <!-- solid sales graph -->
+            <div class="card bg-gradient-info">
+                <div class="card-header border-0">
+                    <h3 class="card-title">
+                        <i class="fas fa-th mr-1"></i>
+                        Effectifs par classe pour l'année académique {{ app.session.get('annee').denominationSlash }}
+                    </h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas class="chart" id="line-chart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        {% set total = 0 %}
+                        {% for stats in statsNiveaux %}
+                            <div title="Effectif: {{ (stats['effectif'] / 100) * effectifTotal }} étudiants" class="col-2 text-center">
+                                <input type="text" class="knob" data-readonly="true" value="{{ stats['effectif'] }}" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                                <div class="text-white">{{ stats['niveau'] }}</div>
+                                
+                            </div>
+                        {% endfor %}
+                        <div title="Effectif total: {{ effectifTotal }} étudiants" class="col-2 text-center">
+                            <input type="text" class="knob" data-readonly="true" value="99" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                            <div class="text-white">Total</div>
+                        </div>
+                    </div>
+                <!-- /.row -->
+                </div>
+                <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+        </section>
+        <!-- Left col -->
+        <section class="col-lg-7 connectedSortable">
+            <!-- Calendar -->
+            <div class="card bg-gradient-success">
+                <div class="card-header border-0">
+
+                <h3 class="card-title">
+                    <i class="far fa-calendar-alt"></i>
+                    Calendrier
+                </h3>
+                <!-- tools card -->
+                <div class="card-tools">
+                    <!-- button with a dropdown -->
+                    <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /. tools -->
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body pt-0">
+                <!--The calendar -->
+                    <div id="calendar" style="height: 350px;" style="width: 100%"></div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </section>
+        <!-- /.Left col -->
+        <!-- right col (We are only adding the ID to make the widgets sortable)-->
+        <section class="col-lg-5 connectedSortable">
+            <!-- Map card -->
+            <div class="card bg-gradient-primary">
+                <div class="card-header border-0">
+                <h3 class="card-title">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    Monde
+                </h3>
+                <!-- card tools -->
+                <div class="card-tools">
+                    <button type="button" class="btn btn-primary btn-sm" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /.card-tools -->
+                </div>
+                <div class="card-body">
+                    <div id="world-map" style="height: 250px; width: 100%;"></div>
+                </div>
+                <!-- /.card-body-->
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <div id="sparkline-1"></div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-4 text-center">
+                            <div id="sparkline-2"></div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-4 text-center">
+                            <div id="sparkline-3"></div>
+                        </div>
+                        <!-- ./col -->
+                    </div>
+                <!-- /.row -->
+                </div>
+            </div>
+            <!-- /.card -->
+        </section>
+
+        <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-pie mr-1"></i>
+                        Evolution des effectifs par classe sur les cinq dernières années
+                    </h3>
+                </div><!-- /.card-header -->
+
+                <div class="card-body">
+                    <div class="tab-content p-0">
+                        <!-- Morris chart - Sales -->
+                        <div class="chart tab-pane active" id="revenue-chart"
+                            style="position: relative; height: 300px;">
+                            <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>                         
+                        </div>
+                          
+                    </div>
+                </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "pdf/base.html.twig" %}
+
+{% block pdfBody %}
+    {% set fileTitle = "STATISTIQUES " %}
+    {% for dt in data %}
+        {% set classe = dt['classe'] %}
+        {% if dt['statsClasse']['modules'] is defined and dt['statsClasse']['modules'] is not empty %}
+                {% include "pdf/pdf_body.html.twig" with {'annee': annee, 'classe': classe, 'fileTitle': fileTitle} %}
+                {% include "statistiques/stats_table.html.twig" with {'data': dt['statsClasse']} %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

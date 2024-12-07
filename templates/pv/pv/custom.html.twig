@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Procès Verbal
+{% endblock %}
+
+{% block pageTitle %}
+    Générer un pv
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('p_v', {'slug': annee.slug}) }}">pv</a></li>
+    <li class="breadcrumb-item active">custom</li>
+{% endblock %}
+
+{% block page_content %}
+
+    {# 
+        Nous allons creer un formulaire et ce formulaire donnera a l'utilisateur la 
+        possibilite de customiser les champs de chaque EC qui figureront dans le pv
+        ainsi que les champs a afficher dans la synthese du module. 
+        La forme du pv aussi    
+    #}
+    {{ form_start(customJuryPVForm) }}
+        <h3>Les champs du PV</h3>
+        
+        <fieldset>
+            {{ form_row(customJuryPVForm.ec) }}
+        </fieldset>
+
+        <fieldset>
+            {{ form_row(customJuryPVForm.module) }}
+        </fieldset>
+
+        <fieldset>
+            {{ form_row(customJuryPVForm.synthese) }}
+        </fieldset>
+        
+        <h3>La disposition des modules</h3>
+        <fieldset>
+            {{ form_row(customJuryPVForm.disposition) }}
+        </fieldset>
+
+        <fieldset>
+            {{ form_row(customJuryPVForm.classes) }}
+        </fieldset>
+
+        <fieldset>
+            {{ form_row(customJuryPVForm.semestre) }}
+        </fieldset>
+
+        <div>
+            <button type="submit" class="btn btn-outline-success">Exporter</button>
+        </div>
+
+    {{ form_end(customJuryPVForm) }}
+
+{% endblock %}

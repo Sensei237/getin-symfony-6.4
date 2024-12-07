@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block page_content %}
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ pourcentage_e_c_module.id }}</td>
+            </tr>
+            <tr>
+                <th>PourcentageCC</th>
+                <td>{{ pourcentage_e_c_module.pourcentageCC }}</td>
+            </tr>
+            <tr>
+                <th>PourcentageTPE</th>
+                <td>{{ pourcentage_e_c_module.pourcentageTPE }}</td>
+            </tr>
+            <tr>
+                <th>PourcentageTP</th>
+                <td>{{ pourcentage_e_c_module.pourcentageTP }}</td>
+            </tr>
+            <tr>
+                <th>PourcentageExam</th>
+                <td>{{ pourcentage_e_c_module.pourcentageExam }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('pourcentage_e_c_module_index') }}">Afficher tout</a>
+
+    <a href="{{ path('pourcentage_e_c_module_edit', {'id': pourcentage_e_c_module.id}) }}">modifier</a>
+
+    {{ include('pourcentage_ec_module/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,226 @@
+<!-- Ce fichier contient le formulaire permettant de creer ou de modifier les donnees des etudiants -->
+
+{{ form_start(form) }}
+    <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-edit"></i>
+                Formulaire de préinscription
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 col-sm-12">
+                    <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
+                        <a style='display:none' class="nav-link active" id="vert-tabs-home-tab" data-toggle="pill" href="#vert-tabs-home" role="tab" aria-controls="vert-tabs-home" aria-selected="true">{{"Naissance"}}</a>
+                        <a style='display:none' class="nav-link" id="vert-tabs-profile-tab" data-toggle="pill" href="#vert-tabs-profile" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">{{"Contact"}}</a>
+                        <a style='display:none' class="nav-link" id="vert-tabs-messages-tab" data-toggle="pill" href="#vert-tabs-messages" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">{{"Académique"}}</a>
+                        <a style='display:none' class="nav-link" id="vert-tabs-settings-tab" data-toggle="pill" href="#vert-tabs-settings" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">{{"Tuteurs"}}</a>
+                        <a style='display:none' class="nav-link" id="vert-tabs-confirm-tab" data-toggle="pill" href="#vert-tabs-confirm" role="tab" aria-controls="vert-tabs-confirm" aria-selected="false">{{"confirmation"}}</a>
+                        
+                        <a class="nav-link visible active text-primary" id="vert-nais" data-toggle="pill" href="" role="tab" aria-controls="vert-tabs-home" aria-selected="true">{{"Naissance"}}</a>
+                        <a class="nav-link visible disabled" id="vert-contact" data-toggle="pill" href="" role="tab" aria-controls="vert-tabs-profile" aria-selected="false">{{"Contact"}}</a>
+                        <a class="nav-link visible disabled" id="vert-academique" data-toggle="pill" href="" role="tab" aria-controls="vert-tabs-messages" aria-selected="false">{{"Académique"}}</a>
+                        <a class="nav-link visible disabled" id="vert-tuteur" data-toggle="pill" href="" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">{{"Tuteurs"}}</a>
+                        <a class="nav-link visible disabled" href="" id="vert-confirmation" data-toggle="pill" role="tab" aria-controls="vert-tabs-confirm" aria-selected="false">{{"confirmation"}}</a>
+                    </div>
+                </div>
+                <div class="col-md-9 col-sm-12">
+                    <div class="tab-content" id="vert-tabs-tabContent">
+                        <div class="tab-pane text-left fade show active" id="vert-tabs-home" role="tabpanel" aria-labelledby="vert-tabs-home-tab">
+                            <h5>{{ "Remplir tel sur l'acte de naissance" }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-3">
+                                    <div style="display: none;">{{ form_row(form.etudiant.image) }}</div>
+                                </div>
+                                <div class="col-7" class="text-md-right">
+                                    {% set img_url = absolute_url(asset('dist/img/avatar.png')) %}
+                                    {% if inscription is defined and inscription.etudiant.photo %}
+                                        {% set img_url = absolute_url(asset('dist/img/etudiants/' ~ inscription.etudiant.photo)) %}
+                                    {% endif %}
+                                    <label title="{{ "CLIQUER POUR MODIFIER LA PHOTO DE L'ETUDIANT" }}" style="cursor: pointer;" for="etudiant_inscris_etudiant_image">
+                                        <img id="previsualisation" style="width: 100%;width:215px;height:215px;border-radius:100%" src="{{ img_url }}" alt="">
+                                    </label>
+                                </div>
+                                <div class="col-12">
+                                    {{ form_row(form.etudiant.nom) }}
+                                    {{ form_row(form.etudiant.prenom) }}
+                                    {{ form_row(form.etudiant.dateDeNaissance) }}
+                                    {{ form_row(form.etudiant.lieuDeNaissance) }}
+                                    {{ form_row(form.etudiant.sexe) }}
+                                    {{ form_row(form.etudiant.pays) }}
+                                    {{ form_row(form.etudiant.region) }}
+                                    {{ form_row(form.etudiant.departement) }}
+                                    {{ form_row(form.etudiant.departement) }}
+                                </div>
+                                <div class="col-12 text-right">
+                                    <a href="#" id="first-next">{{ "suivant" }} <i class="fa fa-chevron-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="vert-tabs-profile" role="tabpanel" aria-labelledby="vert-tabs-profile-tab">
+                            <h5>{{ "Votre civilité et contats" }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.localisation) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.civilite) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.situationMatrimoniale) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.nombreDEnfants) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.telephone1) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.telephone2) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.adresseEmail) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.skills) }}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <a class="pull-left" href="#" id="first-prev"><i class="fa fa-chevron-circle-left"></i> {{ "précédent" }}</a>
+                                <a style="float: right !important;" class="pull-right" href="#" id="second-next">{{ "suivant" }} <i class="fa fa-chevron-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="vert-tabs-messages" role="tabpanel" aria-labelledby="vert-tabs-messages-tab">
+                            <h5>{{ "Situation académique de l'étudiant" }}</h5>
+                            <hr>
+                            {% if form.classe is defined %}
+                                <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-dark">
+                                        {{ form_row(form.classe) }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.diplomeAcademiqueMax) }}
+                                    {{ form_row(form.etudiant.autreDiplomeMax) }}
+                                    {{ form_row(form.etudiant.anneeObtentionDiplomeAcademiqueMax) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.diplomeDEntre) }}
+                                    {{ form_row(form.etudiant.autreDiplomeEntre) }}
+                                    {{ form_row(form.etudiant.anneeObtentionDiplomeEntre) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.autreFormation) }}
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label>Filière ou Département choisi</label> : 
+                                                <strong><i>{{ classe.specialite.filiere.name ~ " (" ~ classe.specialite.filiere.code ~ ")" }}</i></strong>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label>Spécialité ou Option</label> : 
+                                                <strong><i>{{ classe.specialite.name ~ " (" ~ classe.specialite.code ~ ")" }}</i></strong>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label>Classe</label> : 
+                                                <strong><i>{{ classe.specialite.name ~ " (" ~ classe.specialite.code ~ ")" }}</i></strong>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label>Niveau d'étude</label> : 
+                                                <strong><i>{{ classe.NiveauRomain }}</i></strong>
+                                            </div>
+                                            {% if classe.formation is defined and classe.formation is not null %}
+                                                <div class="col-md-12">
+                                                    <label>Formation</label> : 
+                                                    <strong><i>{{ classe.formation.name }}</i></strong>
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="col-12">
+                                                <div class="alert alert-danger">
+                                                    {{ form_row(form.matricule) }}
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    {{ form_row(form.isRedoublant) }}
+                                </div>
+
+                            </div>
+                            <div class="col-12">
+                                <a class="pull-left" href="#" id="second-prev"><i class="fa fa-chevron-circle-left"></i> {{ "précédent" }}</a>
+                                <a style="float: right !important;" class="pull-right" href="#" id="tirth-next">{{ "suivant" }} <i class="fa fa-chevron-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="vert-tabs-settings" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
+                            <h5>{{ "Parents et tuteurs" }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.nomDuPere) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.numeroDeTelephoneDuPere) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.professionDuPere) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.nomDeLaMere) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.etudiant.numeroDeTelephoneDeLaMere) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.professionDeLaMere) }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form_row(form.etudiant.adresseDesParents) }}
+                                </div>
+                                <div class="alert alert-warning col-md-8">
+                                    {{ form_row(form.etudiant.personneAContacterEnCasDeProbleme) }}
+                                    {{ form_row(form.etudiant.numeroDUrgence) }}
+                                </div>
+                            </div>
+                            {{ form_rest(form) }}
+                            <br><br>
+                            <div class="form-group text-right">
+                                <a style="float: left !important;" href="#" id="tirth-prev"><i class="fa fa-chevron-circle-left"></i> {{ "précédent" }}</a>
+                                <a style="float: right !important;" class="pull-right" href="#" id="confirmation-btn">Confirmation <i class="fa fa-hand-point-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="vert-tabs-confirm" role="tabpanel" aria-labelledby="vert-tabs-settings-tab">
+                            <div id="confirm-space" style="min-height: 400px;">
+
+                            </div>
+                            <hr>
+                            <a href="#" id="last-prev">{{ "précédent" }} <i class="fa fa-chevron-circle-left"></i></a>
+                            <button class="btn btn-outline-primary float-right" type="submit">Enregistrer mes informations</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+
+{{ form_end(form) }}

@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "SAISIE DES NOTES" }} {% endblock %}
+
+{% block pageTitle %} {{ ("SAISIE DES NOTES DE <b>" ~ ec.intitule ~ "</b>")|raw }} {% endblock %}
+
+{% block contentTitle %} {{ ("Saisie des notes de <b><i>" ~ examen.intitule ~ "</i></b> matière <b>" ~ ec.intitule ~ "</b>")|raw }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="">{{"notes"}}</a></li>
+    <li class="breadcrumb-item active">{{"saisir"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    {% if contrats is defined and contrats is not empty %}
+        <div class="row">
+            <div class="col-8">
+                <form action="" class="form-ajax-action" id="form-saisie-note" method="post">
+                    <div class="list-group-item scrollBar" style="max-height: 900px;">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-head-fixed">
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    {% if withAnonymat is not defined or not withAnonymat %}
+                                        <th class="text-center">{{ "Matricule" }}</th>
+                                        <th>{{ "Nom et prenom" }}</th>
+                                        <th class="text-center">{{ "Classe" }}</th>
+                                    {% else %}
+                                        <th class="text-center">Anonymats</th>
+                                    {% endif %}
+                                    
+                                    <th class="text-center">{{ examen.code == 'CC' ? "Note CC" : (examen.code == 'SN' ? "Note SN" : "Note Rat" ) }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set i = 0 %}
+                                {% set hasEtudiant = false %}
+                                {% for c in contrats %}
+                                    <!-- 
+                                        Le nom de l'etudiant apparait dans trois cas
+                                            - On est pas entrain de saisir les notes du rattrapage
+                                            - On est entrain de saisir les notes du rattrapage et la matiere n'est pas encore validee
+                                            - on doit saisir le rattrapage et la configuration du logiciel autorise l'etudiant a ameliorer
+                                    -->
+                                    {% if (( examen.type|upper != 'R' ) or ( examen.type == 'R' and ( not c.isValidated or config.isRattrapageSurToutesLesMatieres ) )) %}
+                                        {% set i = i + 1 %}
+                                        {% set hasEtudiant = true %}
+                                        <tr style="vertical-align: middle;">
+                                            <td style="vertical-align: middle;" class="text-center">{{ i }}</td>
+                                            {% if withAnonymat is not defined or not withAnonymat %}
+                                                <td style="vertical-align: middle;" class="text-center">{{ c.etudiantInscris.etudiant.matricule|upper }}</td>
+                                                <td style="vertical-align: middle;">{{ (c.etudiantInscris.etudiant.nom ~ " " ~ c.etudiantInscris.etudiant.prenom)|upper }}</td>
+                                                <td style="vertical-align: middle;" class="text-center">{{ c.etudiantInscris.classe.code }}</td>
+                                            {% else %}
+                                                <td style="vertical-align: middle;" class="text-center">
+                                                    {% set anonymat = '' %}
+                                                    {% for a in c.anonymats %}
+                                                        {% if a.examen.id == examen.id %}
+                                                            {% set anonymat = a.anonymat %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {{ anonymat|upper }}
+                                                </td>
+                                            {% endif %}
+                                            <td style="vertical-align: middle;">
+                                                {% set oldNote = examen.type|upper == 'E' ? c.noteSN : (examen.type|upper == 'C' ? c.noteCC : c.noteSR) %}
+                                                {% if errorData and oldNotes and oldNotes[i - 1] is not empty %}
+                                                    {% set oldNote = oldNotes[i - 1]['note'] %}
+                                                    {% if oldNotes[i - 1]['error'] is defined %}
+                                                        <label style="font-size: 11px;" for="etudiant_{{ i }}" class="text-red"><i class="badge badge-danger">{{ "error" }}</i> {{ oldNotes[i - 1]['error'] }}</label>
+                                                    {% endif %}
+                                                {% endif %}
+                                                <input id="etudiant_{{ i }}" type="hidden" name="etudiant[{{i}}][contrat]" value="{{ c.id }}">
+                                                <input data-url="{{ path('note_auto_save_on_blur0', {'contratId': c.id, 'examenId': examen.id}) }}" style="max-width: 70px;" pattern="[0-9]+(\.[0-9]+)?" value="{{ oldNote }}" name="etudiant[{{i}}][note]" type="text" class="form-control text-center input-note">
+                                                <i style="float: right;margin-top:-25px;margin-right:50px;display:none;" class="fas fa-1x fa-sync fa-spin"></i>
+                                                <i style="float: right;margin-top:-25px;" class="fas fa-1x fa-check text-success"></i>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </form>
+            </div>
+            {% if matieresSaisir is defined and matieresSaisir is not empty %}
+                <div class="col-4">
+                    <div class="list-group-item">
+                        <h5 class="text-center"><small>Autres matières à saisir</small></h5>
+                        <hr style="width: 50%;height: 5px;background-color: rgb(73, 11, 243)">
+                        <div class="scrollBar" style="max-height: 700px;">
+                            <ul class="list-unstyled">
+                                {% for ms in matieresSaisir %}
+                                    {% set isNotMs = is_granted('ROLE_NOTE_MANAGER') ? ms.ec.id != ec.id : ms.ecModule.ec.id != ec.id %}
+                                    {% if isNotMs %}
+                                        <li class=" list-link">
+                                            {% set url = '' %}
+                                            {% set name = '' %}
+                                            {% if is_granted('ROLE_NOTE_MANAGER') %}
+                                                {% set name = ms.ec.code ~ " (" ~ ms.ec.intitule|slice(0, 33) ~ ")" %}
+                                                {% set url = path('note_saisie_note_ec_classe', {'slugAnnee': annee.slug, 'slugEC': ms.ec.slug, 'slugExamen': examen.slug, 'slugClasse': ms.module.classe.slug}) %}
+                                            {% else %}
+                                                {% set name = ms.ecModule.ec.code ~ " (" ~ ms.ecModule.ec.intitule|slice(0, 33) ~ ")" %}
+                                                {% set parametres = {'slugAnnee': annee.slug, 'slugEC': ms.ecModule.ec.slug, 'slugExamen': examen.slug, 'slugClasse': ms.ecModule.module.classe.slug} %}
+                                                {% set url = path('note_saisie_note_ec_classe', parametres) %}
+                                                {% if ms.isSaisiAnonym is defined and ms.isSaisiAnonym %}
+                                                    {% set parametres = parametres|merge({'withAnonymat': true}) %}
+                                                    {% set url = path('note_saisie_note_ec_classe_anonymat', parametres) %}
+                                                {% endif %}
+                                            {% endif %}
+                                            <a href="{{ url }}">{{ name }}</a>
+                                        </li>
+                                        <li class="list-seperator"></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+                
+    {% else %}
+        <h1 class="align-text-center">{{ "AUCUN ETUDIANT TROUVE" }} <i class="fa fa-angry"></i></h1>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function editClass($elt, $hasError) {
+            if ($hasError) {
+                $($elt).removeClass('border-success').addClass('border-danger');
+                $($elt).next().next().removeClass('fa-check').addClass('fa-times').removeClass('text-success').addClass('text-danger');
+            }else {
+                $($elt).removeClass('border-danger').addClass('border-success');
+                $($elt).next().next().removeClass('fa-times').addClass('fa-check').removeClass('text-danger').addClass('text-success');
+            }
+        }
+
+        function isValid($input, $save=false) {
+            if (isNaN($($input).val()) || $($input).val() < 0 || $($input).val() > 20) {
+                editClass($input, true);
+            }else {
+                editClass($input, false);
+                if ($save) {
+                    var url = $($input).data('url')+"/"+$($input).val();
+                    $.ajax({
+                        url: url,
+                        dataType: "JSON",
+                        beforeSend: function() {
+                            $input.next().fadeIn(300);
+                        },
+                        success: function(response) {
+                            $input.next().fadeOut(300);
+                            editClass($input, response.hasError)
+                        }
+                    });
+                }
+            }
+        }
+
+        $('.input-note').each(function(){
+            isValid($(this));
+            var oldNote = $(this).val();
+            $(this).on('blur', function(){
+                if (oldNote != $(this).val()){
+                    oldNote = $(this).val();
+                    isValid($(this), true);
+                }
+                
+            });
+        });
+    </script>
+{% endblock %}

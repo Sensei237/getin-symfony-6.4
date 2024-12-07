@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}{{"GESTION DES FILIERES "}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES FILIERES" }} {% endblock %}
+
+{% block contentTitle %} {{ editMode ? "Modifier une filière" : "Créer une filière" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('filieres_home') }}">{{ "filières" }}</a></li>
+    <li class="breadcrumb-item active">{{ editMode ? "modifier" : "créer" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-6">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-6">
+            <h4>{{ "Autres filières" }}</h4>
+            <ul>
+                {% for fil in filieres %}
+                    {% if editMode and fil.id != filiere.id %}
+                        <li><a title="{{ "Modifier" }}" href="{{ path('edit_filiere', {'slug': fil.slug}) }}">{{ fil.name }}</a></li>
+                    {% elseif not editMode %}
+                        <li><a title="{{ "Modifier" }}" href="{{ path('edit_filiere', {'slug': fil.slug}) }}">{{ fil.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+

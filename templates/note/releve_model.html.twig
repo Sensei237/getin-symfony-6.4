@@ -1,0 +1,254 @@
+
+        <div class="page">
+            <header>
+                <div class="header-cmr">
+                    <div class="inline-block block-fr">
+                        <h3 class="text-uppercase">Republique du cameroun</h3>
+                        <span>paix - travail - Patrie</span>
+                        <h4 class="text-uppercase">Ministere de l'enseignement superieur</h4>
+                        <h4 class="text-uppercase universite">Universite de douala</h4>
+                    </div>
+                    <div class="inline-block block-en">
+                        <h3 class="text-uppercase">Republic of Cameroon</h3>
+                        <span>peace - work - fatherland</span>
+                        <h4 class="text-uppercase">Ministry of Higher Education</h4>
+                        <h4 class="text-uppercase universite">University of Douala</h4>
+                    </div>
+                    
+                </div>
+
+                <div class="header-school">
+                    <div class="logo1 inline-block">
+                        <img src="{{ annee.configuration.logoUniversityBase64 }}" alt="">
+                    </div>
+                    <div class="inline-block school-info">
+                        <h3>{{ annee['configuration']['nomEcole'] }}</h3>
+                        <h3>{{ annee['configuration']['nomEcoleEn'] }}</h3>
+                        <span><b>BP: {{ annee['configuration']['boitePostale'] }}</b></span>
+                        <span><b>Tel: {{ annee['configuration']['telephone'] }}</b></span>
+                        <span><b>E-mail: {{ annee['configuration']['email'] }}</b></span>
+                        <h1 class="text-uppercase">Releve de note / Transcript</h1>
+                        {% if semestre is defined and semestre is not null %}
+                            <h5 class="text-uppercase">
+                                Semestre {{ semestre }} / Semester {{ semestre }}
+                            </h5>
+                        {% endif %}
+                    </div>
+                    <div class="logo2 inline-block">
+                        <img src="{{ annee.configuration.logoEcoleBase64 }}" alt="">
+                    </div>
+                </div>
+
+                <div class="header-student">
+                    <div class="no-margin-bottom no-margin-top">
+                        <div class="inline-block name-intitulate">
+                            <h4>Nom(s) & Prénom(s)</h4>
+                            <small>Name(s) & Surname(s)</small>
+                        </div>
+                        <div class="inline-block name-value">
+                            <strong>: <span>{{ inscri['etudiant']['nomComplet'] }}</span></strong>
+                        </div>
+                    </div>
+
+                    <div class="font-size-12 no-margin-bottom">
+                        <div class="inline-block vertical-middle size-200">
+                            <div class="inline-block vertical-middle">
+                                <strong>Né(e)</strong> <br>
+                                <em>Born on the</em>
+                            </div>
+                            <div class="inline-block vertical-middle">
+                                <strong>: <span class="font-size-16">{{ inscri['etudiant']['dateDeNaissance'] }}</span></strong>
+                            </div>
+                        </div>
+                        <div class="inline-block vertical-middle size-550">
+                            <div class="inline-block vertical-middle">
+                                <strong>A</strong> <br>
+                                <em>At</em>
+                            </div>
+                            <div class="inline-block vertical-middle font-size-16 text-uppercase">
+                                <strong> : <span>{{ inscri['etudiant']['lieuDeNaissance'] }}</span></strong>
+                            </div>
+                        </div>
+                        <div class="inline-block vertical-middle size-200">
+                            <div class="inline-block vertical-middle">
+                                <strong>N<sup>o</sup> Matricule</strong> <br>
+                                <em>Registration N<sup>o</sup></em>
+                            </div>
+                            <div class="inline-block vertical-middle text-uppercase">
+                                <strong>: <span class="font-size-16">{{ inscri['etudiant']['matricule'] }}</span></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="font-size-12 no-margin-bottom no-margin-top2">
+                        <div class="inline-block vertical-middle size-700">
+                            <div class="inline-block vertical-middle">
+                                <strong>Filière</strong> <br>
+                                <em>Field of study</em>
+                            </div>
+                            <div class="inline-block vertical-middle text-uppercase">
+                                <strong>: <span class="font-size-16">{{ inscri['classe']['filiere'] }}</span></strong>
+                            </div>
+                        </div>
+                        <div class="inline-block vertical-middle">
+                            <div class="inline-block vertical-middle">
+                                <strong>Niveau</strong> <br>
+                                <em>Level</em>
+                            </div>
+                            <div class="inline-block vertical-middle text-uppercase">
+                                <strong> : <span class="font-size-16">{{ inscri['classe']['niveau'] }}</span></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="font-size-12 no-margin-bottom">
+                        <div class="inline-block vertical-middle size-700">
+                            <div class="inline-block vertical-middle">
+                                <strong>Option</strong> <br>
+                                <em>Option</em>
+                            </div>
+                            <div class="inline-block vertical-middle text-uppercase">
+                                <strong> : <span class="font-size-16">{{ inscri['classe']['specialite'] }}</span></strong>
+                            </div>
+                        </div>
+                        <div class="inline-block vertical-middle">
+                            <div class="inline-block vertical-middle">
+                                <strong>Année Académique</strong> <br>
+                                <em>Academic Year</em>
+                            </div>
+                            <div class="inline-block vertical-middle">
+                                <strong> : <span class="font-size-16">{{ inscri['anneeAcademique']['denomination'] }}</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                        
+                </div>
+            </header>
+
+            <table class="table table-bordered table-liste-ec">
+                <thead>
+                    <tr class="text-center">
+                        <th class="th-ue-code">Code UE</th>
+                        <th class="th-ec-code">Code EC</th>
+                        <th class="intitule">Intitulé</th>
+                        <th style="font-size: 12px !important;">Note/20</th>
+                        <th style="font-size: 12px !important;">Note/4</th>
+                        <th style="font-size: 12px !important;">Gra.</th>
+                        <th style="font-size: 12px !important;">Cre.</th>
+                        <th style="font-size: 12px !important;">Dec.</th>
+                        <th style="font-size: 12px !important;">Tra.</th>
+                        <th style="font-size: 12px !important;">Ses.</th>
+                        <th style="font-size: 12px !important;">A.V</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cm in contratsModule %}
+                        {% set contrats = cm['contrats'] %}
+                        {% set module = cm['module']['mod'] %}
+                        {% set detailsModule = cm['module']['details'] %}
+                        <tr class="font-bold module">
+                            <td class="text-center vertical-middle" rowspan="{{ contrats|length + 1 }}">{{ module.code|upper }}</td>
+                            <td class="text-center"><b class="font-bold">>>>></b></td>
+                            
+                            <td>{{ module['intitule']|upper }}</td>
+                            <td class="text-center">{{ detailsModule['noteSur20'] }}</td>
+                            <td class="text-center">{{ detailsModule['noteSur4'] }}</td>
+                            <td class="text-center">{{ detailsModule['grade'] }}</td>
+                            <td class="text-center">{{ detailsModule['creditModule'] }}</td>
+                            <td class="text-center">{{ detailsModule['decision']|upper }}</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">{{ detailsModule['sessionValidation']|upper }}</td>
+                            <td class="text-center td-annee-validation">{{ detailsModule['anneeValidation'] }}</td>
+                        </tr>
+                        {% for c in contrats %}
+                            <tr style="font-size: 14px !important;">
+                                <td class="text-center">{{ c['ec']['code']|upper|slice(0, 10) }}</td>
+                                <td>{{ c['ec']['intitule']|upper }}</td>
+                                <td class="text-center">{{ c['moyDefinitiveStr'] }}</td>
+                                <td class="text-center">{{ c['noteStr'] }}</td>
+                                <td class="text-center">{{ c['grade'] }}</td>
+                                <td class="text-center">{{ c['credit'] }}</td>
+                                <td class="text-center">{{ c['decision'] }}</td>
+                                <td class="text-center">{{ c['isTransferable'] ? 'O' : 'N' }}</td>
+                                <td class="text-center">{{ c['sessionValidation'] }}</td>
+                                <td class="text-center td-annee-validation">{{ c['anneeValidation'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="table table2">
+                <tr>
+                    <td class="result-title" colspan="6">
+                        {% if semestre is not defined or semestre is null %}
+                            Résultat Annuel / Annual result
+                        {% else %}
+                            Résultat Semestriel / Semester result
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 16%;">Moyenne</td>
+                    <td style="width: 16%;">Note</td>
+                    <td style="width: 16%;">Grade</td>
+                    <td style="width: 16%;">Crédit</td>
+                    <td style="width: 16%;">Mention</td>
+                    <td style="width: 16%;">Décision</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ final['moyenne'] }} / 20</strong></td>
+                    <td><strong>{{ final['noteSur4'] }} / 4</strong></td>
+                    <td><strong>{{ final['grade'] }}</strong></td>
+                    <td><strong>{{ final['credit'] }}</strong></td>
+                    <td><strong>{{ final['mention'] }}</strong></td>
+                    <td><strong>{{ final['decision'] }}</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="height: 50px;"></td>
+                </tr>
+                <tr style="height: 50px;">
+                    <td colspan="2"></td>
+                    <td colspan="4">
+                        <b>{{ annee['configuration']['ville'] }}, le</b> / 
+                        <em>{{ annee['configuration']['ville'] }}, on</em>
+                        <strong>............................................................</strong>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <strong>Le chef de département</strong> <br>
+                        <em>The head of department</em>
+                    </td>
+                    <td colspan="3" style="text-align: center;">
+                        <strong>Le doyen</strong> <br>
+                        <em>Dean</em>
+                    </td>
+                </tr>
+            </table>
+            {% if annee is not null and annee.configuration is not null and annee.configuration.filigrane is not null %}
+                <div style="position: absolute;width:100%;height:100%;top:0px;">
+                    <img style="opacity: 0.5;width:100%;height:290mm;" src="{{ annee.configuration.filigrane }}" alt="" srcset="">
+                </div>
+            {% endif %}
+            {% if inPDF %}
+                <div style="width:85%;position:absolute;bottom:0px;left:8%;text-align:center;">
+                    <p style="font-size: 10px;">
+                        <b>UE</b> : Unité d'Enseignement; 
+                        <b>EC</b> : Elément Constitutif; 
+                        <b>GRA</b> : Grade; 
+                        <b>CRE</b> : Crédit; 
+                        <b>DEC</b> : Décision (<i>V</i>=Validé, <i>NV</i>=Non Validé, <i>VC</i>=Validé par Compensation); 
+                        <b>TRA</b> : Transférable (<i>O</i>=OUI, <i>N</i>=NON); 
+                        <b>SES</b> : Session (<i>N</i>=Normale, <i>R</i>=Rattrapage)
+                        <b>A.V</b> : Année de Validation <br>
+                        <b><u>NB</u></b> : <i>Il n'est délivré qu'un seul relevé de notes. Il appartient 
+                            à l'étudiant lui-même d'établir et faire certifier les copies conformes qui peuvent lui être nécessaires.<br>
+                            Only one transcript is issued. It is up to the student himself to establish and have certified the true copies that may be necessary for him.
+                        </i>
+                    </p>
+                </div>
+            {% endif %}
+            <div></div>
+        </div>

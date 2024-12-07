@@ -1,0 +1,43 @@
+    
+    {% set noSessionTitle = true %}
+    
+    {% include "etudiant/pdf_header.html.twig" %}
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;" class="text-center">#</th>
+                        <th class="text-center">Matricule</th>
+                        <th style="width: 70%;">Noms & Prenoms</th>
+                        <th style="width: 6%;" class="text-center">Sexe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set i = 0 %}
+                    {% for d in etudiants %}
+                        {% set etudiant = d['etudiant'] %}
+                        {% set title = '' %}
+                        {% if d['contrats'] is defined and d['contrats'] is not empty %}
+                            {% set title = "Matières à rattraper : " %}
+                            {% for c in d['contrats'] %}
+                                {% set title = title ~ ' //>> ' ~ c.ecModule.ec.intitule|upper ~ ' (' ~ c.ecModule.ec.code|upper ~ ') ' %}
+                            {% endfor %}
+                        {% endif %}
+                        <tr data-toggle="tooltip" data-placement="top" title="{{ title|upper }}">
+                            {% set i = i + 1 %}
+                            <td style="vertical-align: middle;" class="text-center">{{ i }}</td>
+                            <td style="vertical-align: middle;" class="text-center">{{ etudiant.etudiant.matricule }}</td>
+                            <td style="vertical-align: middle;" class="">
+                                <strong>{{ etudiant.etudiant.nomComplet }}</strong> 
+                                {% if title != '' %}
+                                    <small style="font-size: 9px;">( {{ title|upper }} )</small>
+                                {% endif %}
+                            </td>
+                            <td style="vertical-align: middle;" class="text-center">{{ etudiant.etudiant.sexe|first }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

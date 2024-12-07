@@ -1,0 +1,17 @@
+{% extends "pdf/base.html.twig" %}
+
+{% block pdfBody %}
+    {% set fileTitle = "Liste des étudiants pour l'EC " ~ data['ec'].intitule %}
+    {% if data['isForNote'] is defined and data['isForNote'] %}
+        {% set fileTitle = "Fiche de releve des notes pour l'EC " ~ data['ec'].intitule %}
+    {% endif %}
+
+    {% set withFullNames = data['withNames'] is defined ? data['withNames'] : false %}
+    
+    {% include "pdf/pdf_body.html.twig" with {'annee': annee} %}
+        {% include "paiement/pdf_etudiant_model.html.twig" with {'annee': annee, 'examen': data['examen'], 'classe': classe, 'isForNote': data['isForNote'], 'withAnonymat': data['withAnonymat'], 'inscris': data['contrats'], 'inPDF': true, 'isContrats': true, 'fileTitle': fileTitle , 'isForStudent': true, 'withNames': withFullNames} only %}
+    </div>
+{% endblock %}
+
+
+

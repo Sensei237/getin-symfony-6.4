@@ -1,0 +1,241 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES NOTES | DELIBERATIONS" }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES NOTES > DELIBERATIONS" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('note') }}">{{"notes"}}</a></li>
+    <li class="breadcrumb-item active">{{"délibérations"}}</li>
+{% endblock %}
+
+{% block contentTitle %}{% endblock %}
+
+{% block page_content %}
+    <fieldset>
+        <legend>Sélectionner les critères de délibérarion</legend>
+        <div>
+            <form action="{{ path('note_deliberation_index', {'slug': annee.slug}) }}" method="POST" class="form-ajax-actio">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Session</label>
+                            <select name="deliberationParameters[session]" class="form-control select2" required>
+                                <option value="">Sélectionner une session</option>
+                                {% for exam in exams %}
+                                    {% if exam.type|upper != 'C' %}
+                                        <option value="{{ exam.slug }}">{{ exam.intitule }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Semestre</label>
+                            <select name="deliberationParameters[semestre]" class="form-control select2" required>
+                                <option value="">Sélectionner le semestre</option>
+                                {% for semestre in semestres %}
+                                    <option value="{{ semestre }}">Semestre {{ semestre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Formations</label>
+                            <select {{ formations|length > 1 ? "required" : '' }} name="deliberationParameters[formation]" class="form-control select2">
+                                <option id="formations" value="">Toutes les formations</option>
+                                {% for f in formations %}
+                                    <option value="{{ f.slug }}">{{ f.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Niveaux</label>
+                            <select id="niveaux" name="deliberationParameters[niveau]" class="form-control select2">
+                                <option value="">Tous niveaux</option>
+                                {% for n in niveaux %}
+                                    <option value="{{ n }}">Niveau {{ n }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filieres</label>
+                            <select id="filieres" name="deliberationParameters[filiere]" class="form-control select2">
+                                <option value="">Toutes les filieres</option>
+                                {% for f in filieres %}
+                                    <option value="{{ f.slug }}">{{ f.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Spécialités</label>
+                            <select id="specialites" disabled class="form-control select2" name="deliberationParameters[specialite]"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Classe</label>
+                            <select id="classes" disabled class="form-control select2" name="deliberationParameters[classe]"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Etudiants</label>
+                            <select id="etudiants" multiple disabled class="form-control select2" name="deliberationParameters[etudiants][]"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Eléments constitutifs</label>
+                            <select id="ecsModules" multiple disabled class="form-control select2" name="deliberationParameters[ecsModules][]"></select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Note minnimale</label>
+                            <input type="text" placeholder="De" name="deliberationParameters[noteMin]" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Note maximale</label>
+                            <input type="text" placeholder="A" name="deliberationParameters[noteMax]" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Nouvelle note</label>
+                            <input type="text" placeholder="" name="deliberationParameters[newNote]" required class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <input type="hidden" name="formDeliberations" value="formDeliberations" required>
+                <div class="row">
+                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-outline-success form-control">Appliquer les critères de délibérarion</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        $('#filieres').on('change', function(e){
+            var fil = $(this).val();
+            if (fil == '') {
+                $('#classes').html('').attr('disabled', true);
+                $('#specialites').html('').attr('disabled', true);
+                $('#etudiants').html('').attr('disabled', true);
+            }else{
+                var baseUrl = "{{ path('home_find_optionsb') }}";
+                $.ajax({
+                    url: baseUrl+'/'+fil,
+                    dataType: "html",
+                    success: function(response){
+                        $('#specialites').html(response).attr('disabled', false);
+                        fetchStudents(fil);
+                    }
+                });
+            }
+        });
+
+        $('#specialites').on('change', function(e){
+            var spe = $(this).val();
+            var fil = $('#filieres').val();
+            if (spe == '') {
+                $('#classes').html('').attr('disabled', true);
+                spe = null;
+            }else{
+                var baseUrl = "{{ path('home_find_classesb') }}";
+                $.ajax({
+                    url: baseUrl+'/'+spe,
+                    dataType: "html",
+                    success: function(response){
+                        $('#classes').html(response).attr('disabled', false);
+                    }
+                });
+            }
+            fetchStudents(fil, spe);
+        });
+
+        $('#classes').on('change', function(e){
+            var cl = $(this).val();
+            var spe = $('#specialites').val();
+            var fil = $('#filieres').val();
+            if (cl == ''){
+                cl = null;
+                $('#ecsModules').html('').attr('disabled', true);
+            }
+            fetchStudents(fil, spe, cl);
+        });
+
+        function fetchStudents(filiere, specialite=null, classe=null)
+        {
+            var formation = $('#formations').val();
+            var niveau = $('#niveaux').val();
+            var baseUrl = "{{ path('home_find_etsb', {'anneeSlug': annee.slug}) }}/"+filiere;
+            if (specialite != null){
+                baseUrl = baseUrl+'/'+specialite;
+                if (classe != null) {
+                    baseUrl += '/'+classe;
+                }
+            }
+            if (formation != '' && niveau != '') {
+                baseUrl += '?formation='+formation+'&niveau='+niveau;
+            }else{
+                if (formation != ''){
+                    baseUrl += '?formation='+formation;
+                }else {
+                    if (niveau != '') {
+                        baseUrl += '?niveau='+niveau;
+                    }
+                }
+            }
+            
+            $.ajax({
+                url: baseUrl,
+                dataType: "JSON",
+                success: function(response){
+                    if (response.hasEts){
+                        $('#etudiants').html(response.etudiants).attr('disabled', false);
+                    }else{
+                        $('#etudiants').html('').attr('disabled', true)
+                    }
+
+                    if (response.hasEcms){
+                        $('#ecsModules').html(response.ecms).attr('disabled', false);
+                    }
+                    else{
+                        $('#ecsModules').html('').attr('disabled', true);
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

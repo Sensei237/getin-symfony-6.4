@@ -1,0 +1,118 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{"GESTION DES ANONYMATS"}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES ANONYMATS" }} {% endblock %}
+
+{% block contentTitle %}
+    Editer les anonymats pour l'ec {{ ec.intitule }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path("etudiants", {'slug': annee.slug}) }}">{{ "étudiants" }}</a></li>
+    <li class="active breadcrumb-item">{{ "anonymats" }}</li>
+{% endblock %}
+
+
+{% block page_content %}
+    <div class="alert alert-info alert-dismissible">
+        <button class="close" type="button" aria-hidden="true">×</button>
+        <h5>
+            <i class="icon fas fa-info"></i>
+            {{ "Info" }}
+        </h5>
+        <ul>
+            <li>Tous les champs de ce formulaire sont obligatoires</li>
+            <li>L'anonymat est unique pour chaque etudiant</li>
+            <li>L'anonymat s'etant sur 5 carateres alphanumeriques</li>
+        </ul>
+    </div>
+
+    <div class="form-group">
+        <a href="{{ path("etudiant_saisir_anonymats", {'slugAnnee': annee.slug, 'slugExam': exam.slug, 'slugEC': ec.slug, 'generate': 'auto'}) }}" class="btn btn-flat btn-outline-primary">Générer automatiquement</a>
+    </div>
+
+    <form id="formulaire" action="{{ path("etudiant_saisir_anonymats", {'slugAnnee': annee.slug, 'slugExam': exam.slug, 'slugEC': ec.slug}) }}" method="POST">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Matricule</th>
+                    <th>Nom & Prenom</th>
+                    <th>Sexe</th>
+                    <th>Date naissance</th>
+                    <th>Annonymat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set i = 0 %}
+                {% for contrat in contrats %}
+                    {% set i = i + 1 %}
+                    {% set ins = contrat.etudiantInscris %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ ins.etudiant.matricule }}</td>
+                        <td>{{ ins.etudiant.nomComplet }}</td>
+                        <td>{{ ins.etudiant.sexe }}</td>
+                        <td>{{ ins.etudiant.dateDeNaissance|date("d/m/Y") }}</td>
+                        <td>
+                            {% set value = '' %}
+                            {% if anonymats[contrat.id] is defined %}
+                                {% set value = anonymats[contrat.id] %}
+                            {% elseif contrat.anonymats is not empty %}
+                                {% for a in contrat.anonymats %}
+                                    {% if a.examen.id == exam.id %}
+                                        {% set value = a.anonymat %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <input maxlength="5" minlength="5" style="text-transform: uppercase;" pattern="[A-Za-z0-9]{5}" required value="{{ value }}" type="text" name="anonymats[{{ contrat.id }}]" class="form-control anonymat-input">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="hidden" id="invalid-form" value="">
+        <div class="form-group float-right">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Enregistrer</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        
+        $('.anonymat-input').each(function(){
+            setInvalid($(this));
+            $(this).on('blur', function(){
+                setInvalid($(this));
+            })
+        })
+
+        $('form#formulaire').on('submit', function(e){
+
+        });
+
+        function setInvalid($elt)
+        {
+            var value = $($elt).val();
+            var invalid = true;
+            if (!isvalid(value)) {
+                $($elt).removeClass('text-success').removeClass('border-success').addClass('text-danger').addClass('border-danger');
+            }
+            else{
+                invalid = false;
+                $($elt).removeClass('text-danger').removeClass('border-danger').addClass('text-success').addClass('border-success').prop('id', value);
+            }
+            $($elt).attr('invalid', invalid);
+        }
+
+        function isvalid(value) {
+            
+            if (value.trim().length != 5 || $('input#'+value).val() == 'undefined'){
+                return false;
+            }
+            return true;
+        }
+    </script>
+{% endblock %}

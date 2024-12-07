@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES NOTES " }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES NOTES" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{"notes"}}</li>
+{% endblock %}
+
+{% block contentTitle %} {{ "Sélectionner l'action à exécuter !" }} {% endblock %}
+
+{% block page_content %}
+    {% set slugAnnee = app.session.get('annee').slug %}
+    <div class="alert alert-success">
+        {% set urlSaisie = path('note_show_classes', {'slug': slugAnnee}) %}
+        {% if not is_granted('ROLE_NOTE_MANAGER') %}
+            {% set urlSaisie = path('security_user_list_matiere', {'id': app.user.id, 'slugAnnee': slugAnnee}) %}
+        {% endif %}
+        <h4>1. <a href="{{ urlSaisie }}">{{ "Saisir les notes" }}</a></h4>
+        <p>{{ "Si vous souhaitez procéder à la saisie des notes des étudiants alors cliquer sur lien ci-dessous pour afficher la liste des salles de classes" }}</p>
+        <a href="{{ urlSaisie }}">{{ "Saisir les notes" }}</a>
+    </div>
+    
+    <div class="alert alert-warning">
+        <h4>2. <a href="{{ path('note_deliberation_index', {'slug': slugAnnee}) }}">{{ "Lancer les délibérations" }}</a></h4>
+    </div>
+    <div class="alert alert-primary">
+        <h4>3. <a href="{{ path('note_calculs_index', {'slug': slugAnnee}) }}">{{ "Lancer les calculs" }}</a></h4>
+        <p>
+            {{ "Cliquez sur le lien ci-dessous pour lancer le calcul des notes." }}
+            <br> {{ "Attention vous devez avoir effectué la saisie des notes auparavant. Cette opération peut nécessiter beaucoup de temps et de ressources en fonction du nombre d'étudiants" }}
+        </p>
+        <p><a href="{{ path('note_calculs_index', {'slug': slugAnnee}) }}">{{ "Lancer les calculs" }}</a></p>
+
+    </div>
+    <div class="alert alert-danger">
+        <h4>4. <a href="{{ path('p_v', {'slug': slugAnnee}) }}">{{ "Afficher les PV" }}</a></h4>
+        <p>
+            Ce lien vous permet de consulter les procès verbaux des differentes classes pour 
+            differents examens. 
+        </p>
+        <a href="{{ path('pv_custom', {'slugAnnee': slugAnnee}) }}" class="btn btn-outline-success">exportation personnalisée</a>
+    </div>
+{% endblock %}

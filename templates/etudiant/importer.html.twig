@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle|upper }}{% endblock %}
+
+{% block pageTitle %} {{ pageTitle|upper }} {% endblock %}
+
+{% block contentTitle %} {{"Importer les étudiants pour l'année académique " ~ annee.denomination}} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('etudiants', {'slug': annee.slug}) }}">{{"étudiants"}}</a></li>
+    <li class="breadcrumb-item active">{{ "importation" }}</li>
+{% endblock %}
+
+{% block page_content %}
+<div>
+    <h4>{{ "Pensez à lire les consignes ci-dessous !" }}</h4>
+    <hr>
+    <div class="alert alert-info">
+        <h4>{{ "Consignes !" }}</h4>
+        <ol>
+            <li>{{ "Votre fichier doit être un fichier de données Excel avec l'extension xlsx" }}</li>
+            <li>{{ "Votre fichier peut avoir plusieurs feuilles" }}</li>
+            <li>{{ "Chaque feuille de votre fichier doit porter le code de la classe concernée dans la cellule B2" }}</li>
+            <li style="overflow: auto;">
+                {{ "La ligne 4 de votre fichier doit porter l'entête du tableau sous le format suivant" }}
+            </li>
+            <li>
+                {{ "Dans le cas où vous cocher la case matricule, alors, la colone A4 doit contenir le matricule de l'étudiant et tous les autres champs seront ainsi décalés" }}
+            </li>
+        </ol>
+        <h4>{{"NB :"}}</h4>
+        {{ "SEULS LE NOM, LA DATE DE NAISSANCE ET LE SEXE SONT OBLIGATOIRES" }}
+        <br>
+        {{ "L'ORDRE DOIT ABSOLUMENT ETRE RESPECTE" }}
+    </div>
+    {{ form_start(form) }}
+        {{ form_row(form) }}
+        <button class="btn btn-info" type="submit">{{ "Importer" }} <i class="fa fa-paper-plane"></i></button>
+    {{ form_end(form) }}
+    
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES UTILISATEURS " }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES UTILISATEURS" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('security_home') }}">{{"utilisateurs"}}</a></li>
+    <li class="breadcrumb-item active">{{"ajouter"}}</li>
+{% endblock %}
+
+{% block page_content %}
+    {{ form_start(form) }}
+        <div class="row">
+            <div class="col-sm-6">
+                {{ form_row(form.employe) }}
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    {{ form_row(form.username) }}
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    {{ form_row(form.password) }}
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    {{ form_row(form.droits) }}
+                </div>
+            </div>
+        </div>
+        {{ form_rest(form) }}
+        <button type="submit" class="btn btn-outline-primary">{{ btn_title }}</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascript %}
+    {% if user is defined and user %}
+        <script>
+            $('select#user_droits option').each(function(e){
+                var $elt = $(this);
+                {% for r in user.roles %}
+                    var role = '{{ r }}';
+                    if ($elt.val() == role) {
+                        $elt.attr('selected', true);
+                    }
+                {% endfor %}
+            })
+        </script>
+    {% endif %}
+{% endblock %}

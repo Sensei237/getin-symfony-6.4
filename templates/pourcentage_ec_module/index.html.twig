@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block page_content %}
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Matière</th>
+                <th>Classe</th>
+                <th>%CC</th>
+                <th>%TPE</th>
+                <th>%TP</th>
+                <th>%Exam</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pourcentage_e_c_module in pourcentage_e_c_modules %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ pourcentage_e_c_module.ecModule.ec.intitule }}</td>
+                <td>{{ pourcentage_e_c_module.ecModule.module.classe.nom }}</td>
+                <td>{{ pourcentage_e_c_module.pourcentageCC }}</td>
+                <td>{{ pourcentage_e_c_module.pourcentageTPE }}</td>
+                <td>{{ pourcentage_e_c_module.pourcentageTP }}</td>
+                <td>{{ pourcentage_e_c_module.pourcentageExam }}</td>
+                <td>
+                    <a href="{{ path('pourcentage_e_c_module_edit', {'id': pourcentage_e_c_module.id}) }}">modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

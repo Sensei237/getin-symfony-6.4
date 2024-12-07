@@ -1,0 +1,230 @@
+<table id="example1" class="table table-bordered">
+    {% if isFormClasse is defined and isFormClasse %}
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Classe</th>
+                <th>Spécialité</th>
+                <th>Tranches</th>
+                <th>Montant</th>
+                <th>Obligatoire</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for pc in tp.paiementClasses %}
+                {% if pc.classe is defined and pc.classe is not null %}
+                    <tr>
+                        {% set i = i + 1 %}
+                        <td>{{ i }}</td>
+                        <td>
+                            <a href="{{ path("paiement_liste_etudiant_etat", {'slugTP': tp.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug}) }}">{{ pc.classe.nom }}</a>
+                        </td>
+                        <td>{{ pc.classe.specialite.name }}</td>
+                        <td class="text-center">
+                            {% for tr in pc.tranches %}
+                                <span class="badge badge-info">{{ tr.montant }} XAF</span>
+                            {% endfor %}
+                        </td>
+                        <td class="text-center">{{ pc.montant }} XAF</td>
+                        <td class=" text-center">
+                            <div class="custom-control custom-switch">
+                                <input pc="{{ pc.id }}" {{ pc.isObligatoire ? 'checked' : '' }} type="checkbox" class="custom-control-input customSwitches" id="customSwitches{{ pc.id }}">
+                                <label class="custom-control-label" for="customSwitches{{ pc.id }}">{{ pc.isObligatoire ? 'OUI' : 'NON' }}</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                    {{ "Action" }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-users"></i>
+                                        <a href="{{ path("paiement_etudiants", {'slugTP': tp.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug}) }}">
+                                            {{"Afficher les etudiants pour validation du paiement"}}
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-divider"></li>
+                                    <li class=" dropdown-item-title">Statistiques</li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-check text-success"></i>
+                                        <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'solde'}) }}" class="text-dark">
+                                            {{"Liste des étudiants ayant soldé"}}
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-times text-danger"></i>
+                                        <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'insolvables'}) }}" class="text-dark">
+                                            {{"Liste des étudiants insolvables"}}
+                                        </a>
+                                    </li>
+                                    {% for t in pc.tranches %}
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-check-circle text-success"></i>
+                                        <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'solde', 'tranche': t.slug}) }}" class="text-dark">
+                                            {{"Liste des étudiants ayant soldé la " ~ t.denomination|lower }}
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-times-circle text-danger"></i>
+                                        <a href="{{ path('paiement_liste_etudiant_etat', {'slugTP': pc.typeDePaiement.slug, 'anneeSlug': app.session.get('annee').slug, 'slugClasse': pc.classe.slug, 'statut': 'insolvable', 'tranche': t.slug}) }}" class="text-dark">
+                                            {{"Liste des étudiants n'ayant pas soldé la " ~ t.denomination|lower }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+
+                                    <li class="dropdown-divider"></li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-trash text-danger"></i>
+                                        {% set url = path('paiement_delete_pc', {'id': pc.id}) %}
+                                        {% if is_granted('ROLE_SUPER_USER') %}
+                                            {% set url = path('paiement_delete_pc', {'id': pc.id, 'strict': 'yes'}) %}
+                                        {% endif %}
+                                        <a href="{{ url }}" class="text-danger btn-confirm-ajax-action">
+                                            {{"Retirer cette classe pour ce paiement"}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    {% elseif isForStudent is defined and isForStudent %}
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                {% if withAnonymat is not defined or not withAnonymat %}
+                    <th class="text-center">matricule</th>
+                    <th>Nom & Prenom</th>
+                    <th class="text-center">Date nais.</th>
+                    <th class="text-center">Sexe</th>
+                    {% else %}
+                        {% if withAnonymat is defined and withAnonymat and isContrats and examen is defined and examen is not null %}
+                            <th>Anonymats</th>
+                            {% if withNames is defined and withNames %}
+                                <th>Nom & Prenom</th>
+                                {% if classe is not defined or classe is null %}
+                                    <th class="text-center">Classe</th>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                {% endif %}
+                {% if isForNote is defined and isForNote %}
+                    {% if withNames is not defined or not withNames %}
+                        {% if withAnonymat is defined and withAnonymat and isContrats and examen is defined and examen is not null %}
+                            <th>Note correcteur 1</th>
+                            <th>Note correcteur 2</th>
+                            <th>Note correcteur 3</th>
+                        {% endif %}
+                        <th>Note / 20</th>
+                    {% endif %}
+                    
+                {% endif %}
+                {% if not inPDF %}
+                    {% if (tranche is not defined or tranche is null) and pc is defined and pc is not null %}
+                        {% for t in pc.tranches %}
+                            <th>{{ t.denomination }}</th>
+                        {% endfor %}
+                    {% else %}
+                        <th>Action</th>
+                    {% endif %}
+                {% endif %}
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for inscri in inscris %}
+                {% set ins = inscri %}
+                {% if isContrats is defined and isContrats %}
+                    {% set ins = inscri.etudiantInscris %}
+                {% endif %}
+                <tr>
+                    {% set i = i + 1 %}
+                    <td class="text-center">{{ i }}</td>
+                    {% if withAnonymat is not defined or not withAnonymat %}
+                        <td class="text-center">
+                            {% if is_granted('ROLE_SUPER_USER') and (inPDF is not defined or not inPDF) %}
+                                <a href="{{ path("paiement_etat_etudiant", {'slug': annee.slug, 'matricule': ins.etudiant.matricule}) }}">{{ ins.etudiant.matricule|upper }}</a>
+                            {% else %}
+                                <strong>{{ ins.etudiant.matricule|upper }}</strong>
+                            {% endif %}
+                            
+                        </td>
+                        <td>{{ ins.etudiant.nomComplet }}</td>
+                        <td class="text-center">{{ ins.etudiant.dateDenaissance|date("d/m/Y") }}</td>
+                        <td class="text-center">{{ ins.etudiant.sexe|first }}</td>
+                    {% else %}
+                        {% if withAnonymat is defined and withAnonymat and isContrats and examen is defined and examen is not null %}
+                            {% set anonym = '' %}
+                            {% for a in inscri.anonymats %}
+                                {% if a.examen.id == examen.id %}
+                                    {% set anonym = a.anonymat %}
+                                {% endif %}
+                            {% endfor %}
+                            <td>{{ anonym }}</td>
+                            {% if withNames is defined and withNames %}
+                                <td>{{ ins.etudiant.nomComplet }}</td>
+                                {% if not classe is defined or classe is null %}
+                                    <td>{{ classe.code }}</td>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if isForNote is defined and isForNote %}
+                        {% if withNames is not defined or not withNames %}
+                            {% if withAnonymat is defined and withAnonymat and isContrats and examen is defined and examen is not null %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        
+                    {% endif %}
+                    {% if not inPDF %}
+                        {% if (tranche is not defined or tranche is null) and pc is defined and pc is not null %}
+                            {% for t in pc.tranches %}
+                                <td>
+                                    {% set payed = false %}
+                                    {% set payment = null %}
+                                    {% for p in ins.paiements %}
+                                        {% if p.tranche.id == t.id and p.isPaied %}
+                                            {% set payed = true %}
+                                            {% set payment = p %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if payed %}
+                                        <span class="badge badge-success">payé</span>
+                                        <a href="{{ path('paiement_remove', {'id': payment.id}) }}" title="Annuler la validation" class="btn btn-xs btn-outline-warning btn-confirm-ajax-action">
+                                            <i class="fa fa-times-circle"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="badge badge-danger">non payé</span>
+                                        <a id="validation-{{ ins.id ~ t.id }}" data-target="#valider-tranche" href="{{ path("paiement_validation", {'id': ins.id, 'slugTranche': t.slug}) }}" data-toggle="modal" title="Valider le paiement" class="btn btn-xs btn-outline-success valider-tranche">
+                                            <i class="fa fa-check-circle"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                </td>
+                            {% endfor %}
+                        {% else %}
+                            <td>
+
+                            </td>
+                        {% endif %}
+                    {% endif %}
+                        
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+</table>

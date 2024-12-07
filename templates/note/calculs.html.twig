@@ -1,0 +1,277 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ "GESTION DES NOTES " }} {% endblock %}
+
+{% block pageTitle %}
+    {{ "GESTION DES NOTES" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('note') }}">{{"notes"}}</a></li>
+    <li class="breadcrumb-item active">{{"calculs"}}</li>
+{% endblock %}
+
+{% block contentTitle %}Sélectionner une methode de calcul{% endblock %}
+
+{% block page_content %}
+    <fieldset>
+        <legend>Lancer les caluls par classe</legend>
+        <form id="calcul_by_classe" class="row" method="GET" action="{{ path('note_lancer_calculs', {'slugAnnee': annee.slug}) }}">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="classe" required id="select-calcul-classe" class="form-control select2">
+                        <option value="">Sélectionner une classe</option>
+                        {% for classe in classes %}
+                            <option data-level="{{ classe.niveau }}" value="{{ classe.slug }}">{{ classe.nom ~ ' (' ~ classe.code ~ ')' }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="semestre" id="" class="form-control select2">
+                        <option value="">Sélectionner un semestre</option>
+                        <option value="1">Semestre 1</option>
+                        <option value="2">Semestre 2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="session" id="" class="form-control select2">
+                        <option value="">Sélectionner la session</option>
+                        {% for exam in exams %}
+                            {% if exam.type|upper != 'C' and exam.type|upper != 'TPE' and exam.type|upper != 'TP' %}
+                            <option value="{{ exam.slug }}">{{ exam.intitule }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-dark">Lancer</button>
+                </div>
+            </div>
+        </form>
+    </fieldset>
+    <br><br>
+
+    <fieldset>
+        <legend>Lancer les caluls par Niveau</legend>
+        <form id="calcul_by_level" class="row" method="GET" action="{{ path('note_lancer_calculs', {'slugAnnee': annee.slug}) }}">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="niveau" required class="form-control niveau select2">
+                        <option value="">Sélectionner un niveau</option>
+                        {% for niveau in [1, 2, 3, 4, 5] %}
+                            <option value="{{ niveau }}">{{ 'Niveau ' ~ niveau }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="semestre" class="form-control select2">
+                        <option value="">Sélectionner un semestre</option>
+                        <option value="1">Semestre 1</option>
+                        <option value="2">Semestre 2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="session" class="form-control select2">
+                        <option value="">Sélectionner la session</option>
+                        {% for exam in exams %}
+                            {% if exam.type|upper != 'C' and exam.type|upper != 'TPE' and exam.type|upper != 'TP' %}
+                                <option value="{{ exam.slug }}">{{ exam.intitule }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-dark">Lancer</button>
+                </div>
+            </div>
+        </form>
+    </fieldset>
+    <br><br>
+
+    <fieldset>
+        <legend>Lancer les caluls pour tous les niveaux et toutes les classes</legend>
+        <form id="calcul_for_all" class="row" method="GET" action="{{ path('note_lancer_calculs', {'slugAnnee': annee.slug}) }}">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select name="" id="" class="select2 form-control" disabled></select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="semestre" class="form-control semestre select2">
+                        <option value="">Sélectionner un semestre</option>
+                        <option value="1">Semestre 1</option>
+                        <option value="2">Semestre 2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select required name="session" class="form-control select2">
+                        <option value="">Sélectionner la session</option>
+                        {% for exam in exams %}
+                            {% if exam.type|upper != 'C' and exam.type|upper != 'TP' and exam.type|upper != 'TPE' %}
+                                <option value="{{ exam.slug }}">{{ exam.intitule }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-dark">Lancer</button>
+                </div>
+            </div>
+        </form>
+    </fieldset>
+    <br><br>
+    <div id="calculs-error-contenair" class="alert alert-danger">
+        <h5>
+            <i class="icon fas fa-ban"></i>
+            {{ "Erreurs liées au calcul" }}
+        </h5>
+        <hr>
+        <ul>
+
+        </ul>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        let $listeEtudiants=null;
+        let $etudiants = [];
+        let $semestre = null;
+        let $session = null;
+        let $niveau = null;
+        let $nbPages = 1;
+        let $max = null;
+        let $slugClasse=null;
+        let $nbRquete = 1;
+        const $BASE_URL = "{{ path('note_find_all_etudiants', {'slugAnnee': annee.slug}) }}";
+        const $POST_URL = "{{ path('note_lancer_calculs', {'slugAnnee': annee.slug}) }}";
+
+        function recherEtudiants(url) {
+            $.ajax({
+                url: url,
+                dataType: "JSON",
+                beforeSend: function(){
+                    showLoader(true);
+                },
+                success: function(response) {
+                    if (response.etudiants.length == 0) {
+                        noStudentFound();
+                    } else {
+                        noStudentFound(false, response.etudiants.length+" étudiant(s) trouvés !")
+                    }
+                    $listeEtudiants = response;
+                    $nbPages = response.nbPages;
+                    $max = response.maxResults;
+                    showLoader(false);
+                }, 
+                error: function() {
+                    mySoNiceSound($errorSon);
+                    toastr.error("Une erreur est survenue ! Vérifier l'acces au reseau.");
+                    showLoader(false);
+                }
+            });
+        }
+        
+        $('#select-calcul-classe').on('change', function(){
+            const classe = $('#select-calcul-classe option:selected');
+            $slugClasse = classe.val();
+            $niveau = classe.data('level');
+            var url = $BASE_URL+"/"+$niveau+"/"+$slugClasse;
+            if ($slugClasse != "") {
+                recherEtudiants(url);
+            }
+            $('#calcul_for_all select.semestre').prop('selectedIndex', 0);
+            $('#calcul_by_level select.niveau').prop('selectedIndex', 0);
+        });
+
+        $('#calcul_for_all select.semestre').on('change', function(){
+            $slugClasse = null;
+            $niveau = null;
+            var url = $BASE_URL;
+            $semestre = (this).val();
+            if ($semestre != "") {
+                recherEtudiants(url);
+            }
+            $('#select-calcul-classe').prop('selectedIndex', 0);
+            $('#calcul_by_level select.niveau').prop('selectedIndex', 0);
+        });
+
+        $('#calcul_by_level select.niveau').on('change', function(){
+            $slugClasse = null;
+            $niveau = $('#calcul_by_level select.niveau option:selected').val();
+            var url = $BASE_URL+"/"+$niveau;
+            if ($niveau != "") {
+                recherEtudiants(url);
+            }
+            $('#calcul_for_all select.semestre').prop('selectedIndex', 0);
+            $('#select-calcul-classe').prop('selectedIndex', 0);
+        });
+
+        $('fieldset form').on('submit', function(e){
+            e.preventDefault();
+            if (!$listeEtudiants.existe) {
+                noStudentFound();
+            }else {
+                $etudiants = $listeEtudiants.etudiants;
+                if ($etudiants.length == 0) {
+                    noStudentFound();
+                }else {
+                    showLoader(true);
+                    $session = $(this).find('select[name=session]').val();
+                    $semestre = $(this).find('select[name=semestre]').val();
+                    $nbRquete = 1;
+                    for (var i=1; i<=$nbPages; i++){
+                        var url = $POST_URL+"/"+$session+"/"+$semestre+"/"+$niveau+"/"+$slugClasse+"?page="+i+"&max="+$max;
+                        commencerCalcul(url, i);
+                    }
+                }
+            }
+        });
+
+        function commencerCalcul($url, page) {
+            var vague = ((Number(page)-1)*Number($max)+1)+" à "+(((Number(page)-1)*Number($max))+Number($max));
+            $.ajax({
+                url: $url,
+                dataType: "JSON",
+                success: function(response) {
+                    mySoNiceSound($successSon);
+                    toastr.success(response.msg+" pour les étudiants de la vague "+vague);
+                    if ($nbRquete==$nbPages) {
+                        showLoader(false);
+                        toastr.success("LE PROCESSUS DE CALCUL EST TERMINE ! VOUS POUVEZ VERIFIER LES PV");
+                    }
+                    $nbRquete++;
+                },
+                error: function(){
+                    mySoNiceSound($errorSon);
+                    var msg = "Une erreur est survenues pendant le calcul pour les étudiants de la vague "+vague;
+                    $('#calculs-error-contenair ul').append('<li>'+msg+'. Vous pouvez lancer le calcul de cette vague de maniere synchrone en <a target="_blank" href="'+url+'">cliquant ici</a></li>')
+                    toastr.error(msg);
+                    if ($nbRquete==$nbPages) {
+                        showLoader(false);
+                        toastr.success("LE PROCESSUS DE CALCUL EST TERMINE ! VOUS POUVEZ VERIFIER LES PV");
+                    }
+                    $nbRquete++;
+                }
+            });
+        }
+        
+    </script>
+{% endblock %}

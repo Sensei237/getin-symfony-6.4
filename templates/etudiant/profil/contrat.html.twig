@@ -1,0 +1,142 @@
+{% extends "etudiant/profil/base.html.twig" %}
+
+{% block titre %}
+    {{ ("CONTRATS ACADEMIQUES " ~ inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom)|upper }}
+{% endblock %}
+
+{% block titreP %}
+    > {{ "Contrats Académiques" }}
+{% endblock %}
+
+{% block navSearchFormMethod %}{{ "GET" }}{% endblock %}
+{% block navSearchFormAction %}{{ path('etudiants', {'slug': annee.slug}) }}{% endblock %}
+
+{% block ariane %}
+    <li class="breadcrumb-item active">{{ "contrats académiques" }}</li>
+{% endblock %}
+
+{% block profileContent %}
+    <div class="alert alert-info">
+        {{ ("Liste des matières que doit suivre l'étudiant <b>" ~ inscription.etudiant.nom ~ " " ~ inscription.etudiant.prenom ~ "</b> pour le compte de l'année académique " ~ annee.denomination ~ "<br>Si vous avez dans liste des lignes en rouge, ces lignes representent les matières que cet étudiant doit rattrapper.")|raw }}
+    </div>
+
+    <table class="table table-bordered">
+        <thead class="table-head-fixed">
+            <tr class="text-center">
+                <th>{{ "#" }}</th>
+                <th class="text-left">{{ "Intilulé EC" }}</th>
+                <th>{{ "Code UE" }}</th>
+                <th>{{ "Crédit" }}</th>
+                <th>{{ "Semestre" }}</th>
+                <th>{{ "Dette" }}</th>
+                <th>{{ "Optionnel" }}</th>
+                <th>{{ "Action" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for c in inscription.contrats %}
+                <tr class="text-center {{ c.isDette ? "text-danger" : "" }}">
+                    {% set i = i+1 %}
+                    <td>{{ i }}</td>
+                    <td class="text-left">{{ c.ecModule.ec.intitule ~ " (" ~ c.ecModule.ec.code ~ ")" }}</td>
+                    <td>{{ c.ecModule.module.code }}</td>
+                    <td>{{ c.ecModule.credit }}</td>
+                    <td>{{ c.ecModule.semestre }}</td>
+                    <td>{{ c.isDette ? "<i class='fa fa-check-circle text-green'></i>" : "<i class='fa fa-times-circle text-red'></i>" }}</td>
+                    <td>{{ c.isOptionnal ? "<i class='fa fa-check-circle text-green'></i>" : "<i class='fa fa-times-circle text-red'></i>" }}</td>
+                    <td>
+                        <a href="{{ path('contrat_supprimer', {'slug': annee.slug, 'id': c.id, 'matricule': c.etudiantInscris.etudiant.matricule}) }}" title="Supprimer le contrat" class="btn btn-outline-danger btn-xs btn-delete">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="7" class="text-left">
+                    <a href="{{ path('contrat_generer', {'slug': annee.slug, 'matricule': inscription.etudiant.matricule}) }}" class="btn btn-outline-primary btn-ajax-action btn-xs">
+                        {{ inscription.contrats is empty ? "Générer les contrats de " ~ inscription.etudiant.nom : "Mettre à jour les contrats de " ~ inscription.etudiant.nom }}
+                    </a>
+                    
+                    {% if othersECModules is defined and othersECModules is not empty  %}
+                        <a href="#modal-add-contrat" data-toggle="modal" class="btn btn-xs btn-outline-warning">
+                            <i class="fa fa-plus"></i>
+                            {{ "Ajouter un nouveau contrat" }}
+                        </a>
+                    {% endif %}
+                    
+                </th>
+                <th>
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                            Lancer calcul
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% for examen in examens %}
+                                {% if examen.code|upper != 'CC' and examen.code|upper != 'TP' and examen.code|upper != 'TPE' %}
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-archway"></i>
+                                        <a class="text-danger btn-ajax-action" href="{{ path('note_lancer_calculs_note_etudiant', {'slugAnnee': annee.slug, 'slugExamen': examen.slug, 'semestre': 1, 'niveau': inscription.classe.niveau, 'slugClasse': inscription.classe.slug, 'idIns': inscription.id}) }}">
+                                            {{ examen.intitule|capitalize }} (Semestre 1)
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <i class="fa fa-archway"></i>
+                                        <a class="text-danger btn-ajax-action" href="{{ path('note_lancer_calculs_note_etudiant', {'slugAnnee': annee.slug, 'slugExamen': examen.slug, 'semestre': 2, 'niveau': inscription.classe.niveau, 'slugClasse': inscription.classe.slug, 'idIns': inscription.id}) }}">
+                                            {{ examen.intitule|capitalize }} (Semestre 2)
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-divider"></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                        </ul>
+                    </div>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+
+    {% if othersECModules is defined and othersECModules is not empty  %}
+        <div class="modal fade" id="modal-add-contrat" data-backdrop="false">
+            <div class="modal-dialog">
+                <form method="post" action="{{ path('contrat_ajouter_une_nouvelle_matiere', {'slugAnnee': annee.slug, 'id': inscription.id}) }}" class="modal-content bg-warning form-ajax-action">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ "Ajouter une nouvelle matière dans la liste des contrats" }}</h4>
+                        <a href="#" data-dismiss="modal"><i class="close fa fa-times-circle"></i></a>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <select name="ecModule" required class="form-control select2">
+                                <option value="">{{ "Sélectionner la matière" }}</option>
+                                {% for ecm in othersECModules %}
+                                    <option value="{{ ecm.id }}">
+                                        {{ (ecm.ec.intitule ~ " - " ~ ecm.ec.code ~ " ( classe " ~ ecm.module.classe.code ~ ")")|upper }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="icheck-danger d-inline">
+                                <input type="checkbox" name="isDette" id="contratIsDette">
+                                <label for="contratIsDette">{{ "Dette (Cocher si oui)" }}</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="icheck-danger d-inline">
+                                <input type="checkbox" name="isOptionnal" id="contratisOptionnal">
+                                <label for="contratisOptionnal">{{ "Matière optionnelle (Cocher si oui)" }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-primary"><i class="fa fa-plus"></i> {{ "Ajouter" }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+    
+{% endblock %}

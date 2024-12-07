@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}{{"GESTION DES CLASSES"}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES CLASSE" }} {% endblock %}
+
+{% block contentTitle %} {{ editMode ? "Modifier une classe" : "Créer une nouvelle classe" }} {{ "dans la spécialité" }} <b>{{ specialite.name }}</b>{% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('classes_specialite', {'specialite_slug': specialite.slug, 'filiere_slug': specialite.filiere.slug}) }}">{{ "Classes" }}</a></li>
+    <li class="breadcrumb-item">
+        {% if editMode %}
+            {{ "modifier" }}
+        {% else %}
+            {{ "créer" }}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-6">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-6">
+            <h3>{{ "Autres classe de la même spécialité" }}</h3>
+            <hr>
+            <ul>
+                {% for cl in specialite.classes %}
+                    {% if editMode and cl.id != classe.id %}
+                        <li>
+                            <a href="{{ path('edit_classe', {'filiere_slug': specialite.filiere.slug, 'specialite_slug': specialite.slug, 'slug': cl.slug}) }}">{{ cl.nom }}</a>
+                        </li> 
+                    {% elseif not editMode %}
+                        <li>
+                            <a href="{{ path('edit_classe', {'filiere_slug': specialite.filiere.slug, 'specialite_slug': specialite.slug, 'slug': cl.slug}) }}">{{ cl.nom }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            
+        </div>
+    </div>
+{% endblock %}

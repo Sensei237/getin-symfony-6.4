@@ -1,0 +1,57 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %} STATISTIQUES {% endblock %}
+
+{% block pageTitle %} STATISTIQUES {% endblock %}
+
+{% block contentTitle %} 
+    <b>Statistiques</b> > {{ classe.nom }}
+{% endblock %}
+
+{% block footerContent %}
+    <a href="{{ path('statistiques_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'download': true}) }}" target="_blank" class="btn btn-flat btn-outline-primary"><i class="fa fa-file-pdf"></i> Télécharger le pdf</a>
+    <a href="{{ path('statistiques', {'slugAnnee': annee.slug, 'download': true}) }}" target="_blank" class="btn btn-flat btn-outline-primary"><i class="fa fa-file-pdf"></i> Télécharger le pdf pour toutes les classes</a>
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">statistiques</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-9">
+            <div class="list-group-item">
+                <div class="scrollBar" style="max-height: 800px;overflow:auto;">
+                    {% if data['modules'] is defined and data['modules'] is not empty %}
+                        {% include "statistiques/stats_table.html.twig" %}
+                    {% else %}
+                        <h1>AUCUNE STATISTIQUE DISPONIBLE <i class="fa fa-angry text-danger"></i></h1>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="list-group-item">
+                <h5 class="text-center"><small>Autres Classes</small></h5>
+                <hr style="width: 50%;height: 5px;background-color: rgb(73, 11, 243)">
+                <div class="scrollBar" style="max-height: 700px;">
+                    <ul class="list-unstyled">
+                        {% for cl in classes %}
+                            {% if cl.id != classe.id %}
+                                <li class="list-link">
+                                    <a href="{{ path('statistiques_classe', {'slugAnnee': app.session.get('annee').slug, 'slugClasse': cl.slug}) }}">{{ cl.nom }}</a>
+                                </li>
+                                <li class="list-seperator"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    
+{% endblock %}

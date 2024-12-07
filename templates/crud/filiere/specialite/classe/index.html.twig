@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{"GESTION DES CLASSES"}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES CLASSES" }} {% endblock %}
+
+{% block contentTitle %}
+    {% if specialite is defined %}
+        {{ "Liste des classes de la spécialité " ~ specialite.name }}
+    {% elseif filiere is defined %}
+        {{ "Liste des classe de la filière " ~ filiere.name }}
+    {% else %}
+        {{ "Toutes les classes" }}
+    {% endif %}
+{% endblock %}
+
+{% block footerContent %}
+    {% if filieres is defined %}
+        <div class="input-group-prepend">
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
+                {{ "Ajouter une nouvelle classe" }}
+            </button>
+            <ul class="dropdown-menu">
+                {% for fil in filieres %}
+                    <li class="dropdown-item">
+                        <div class="dropright">
+                            <a href="#" class="dropdown-toggle lien-sous-menu" data-toggle="dropdown"> {{ fil.name }}</a>
+                            <ul class="dropdown-menu">
+                                {% for s in fil.specialites %}
+                                    <li class="dropdown-item"><a href="{{ path('creer_classe', {'filiere_slug': fil.slug, 'specialite_slug': s.slug}) }}">{{ s.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                {% endfor %}
+                
+            </ul>
+        </div>
+    {% elseif specialite is defined %}
+        <a class="btn btn-xs btn-primary" href="{{ path('creer_classe', {'filiere_slug': specialite.filiere.slug, 'specialite_slug': specialite.slug}) }}">{{ "Ajouter une classe nouvelle classe dans la spécialité " ~ specialite.code }}</a>
+    {% elseif filiere is defined %}
+        <div class="input-group-prepend">
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
+                {{ "Ajouter une nouvelle classe" }}
+            </button>
+            <ul class="dropdown-menu">
+            {% for s in filiere.specialites %}
+                <li class="dropdown-item"><a href="{{ path('creer_classe', {'filiere_slug': s.filiere.slug, 'specialite_slug': s.slug}) }}">{{ s.name }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    {% if specialite is defined %}
+        <li class="breadcrumb-item"><a href="{{ path('all_classes') }}">{{ "Classes" }}</a></li>
+        <li class="active breadcrumb-item">{{ specialite.code }}</li>
+    {% elseif filiere is defined %}
+        <li class="breadcrumb-item"><a href="{{ path('all_classes') }}">{{ "Classes" }}</a></li>
+        <li class="active breadcrumb-item">{{ filiere.code }}</li>
+    {% else %}
+        <li class="active breadcrumb-item">{{ "Classes" }}</li>
+    {% endif %}
+{% endblock %}
+
+{% block page_content %}
+    <table class="table table-bordered" id="example1">
+        <thead>
+            <tr>
+                <th>{{ "Nom de la classe" }}</th>
+                <th class="text-center">{{ "Code" }}</th>
+                <th>{{ "Spécialité" }}</th>
+                <th>{{ "Filière" }}</th>
+                <th class="text-center">{{ "Formation" }}</th>
+                <th class="text-center">{{ "Actions" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classe in classes %}
+            <tr>
+                <td>
+                    {% if isForNoteController is defined %}
+                        <a title="{{ "Cliquez pour afficher la liste des matières" }}" href="{{ path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': 1, 'slugClasse': classe.slug}) }}">{{ classe.nom }}</a>
+                    {% else %}
+                        {{ classe.nom }}
+                    {% endif %}
+                </td>
+                <td class="text-center">{{ classe.code }}</td>
+                <td>{{ classe.specialite.name ~ ' (' ~ classe.specialite.code ~ ')' }}</td>
+                <td>{{ classe.specialite.filiere.name ~ ' (' ~ classe.specialite.filiere.code ~ ')' }}</td>
+                <td class="text-center">{{ classe.formation.code }}</td>
+                <td class="text-center">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                            {{ "Action" }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-item">
+                                <i class="fa fa-pencil-alt"></i>
+                                <a href="{{ path('edit_classe', {'filiere_slug': classe.specialite.filiere.slug, 'specialite_slug': classe.specialite.slug, 'slug': classe.slug}) }}">
+                                    {{"Modifier"}}
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-graduation-cap"></i>
+                                <a href="{{ path('etudiants', {'slug': app.session.get('annee').slug}) ~ "?formation=" ~ classe.formation.slug ~ "&filiere=" ~ classe.specialite.filiere.slug ~ "&specialite=" ~ classe.specialite.slug ~ "&classe=" ~ classe.slug }}">
+                                    {{"Liste des étudiants"}}
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-fill-drip"></i> 
+                                <a href="{{ path('PA_classe', {'annee_slug': annee.slug, 'slug': classe.slug}) }}">
+                                    Programme academique
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-calendar"></i> 
+                                <a href="{{ path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': 1, 'slugClasse': classe.slug}) }}">
+                                    Liste des EC
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-file-invoice"></i> 
+                                <a class="btn-ajax-action" href="{{ path('contrat_generer_contrats_classe', {'slug': annee.slug, 'slug_classe': classe.slug}) }}">
+                                    {{"Générer les contrats académiques des étudiants de cette classe"}}
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-list-alt"></i>
+                                <a href="{{ path('pa_liste_matieres_classe', {'slug': annee.slug, 'page': 1, 'slugClasse': classe.slug}) }}">
+                                    {{ "Saisir les notes" }}
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-list-alt"></i>
+                                <a href="{{ path('note_releves_note_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': 1}) }}">
+                                    {{ "Afficher les releves de notes" }}
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <div class="input-group-prepend">
+                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle" title="Cliquez pour afficher les options">
+                                        Afficher les PV
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        {% for exam in examens %}
+                                            {% if exam.code|upper != "CC" and exam.code|upper != "TP" and exam.code|upper != "TPE" %}
+                                            <li class="dropdown-item">
+                                                <i class="fa fa-th-list"></i>
+                                                <a href="{{ path('pv_show_pv_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'code': exam.code, 'page': 1}) }}">
+                                                   {{ exam.intitule }}
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-th-list"></i>
+                                            <a href="{{ path('pv_show_pv_definitif_classe', {'slugAnnee': annee.slug, 'slugClasse': classe.slug}) }}">
+                                                Definitif
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

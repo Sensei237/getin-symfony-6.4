@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Procès Verbal {{ ec.code }} - {{ classe.code }}
+    {% if semestre is defined and semestre is not null and semestre is not empty %}
+        <small>Semestre {{ semstre }}</small>
+    {% endif %}
+{% endblock %}
+
+{% block pageTitle %}
+    Procès Verbaux classe de {{ classe.code }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('p_v', {'slug': annee.slug}) }}">pv</a></li>
+    <li class="breadcrumb-item active">{{ classe.code }}</li>
+    <li class="breadcrumb-item active">{{ ec.code }}</li>
+{% endblock %}
+
+{% block contentTitle %}
+    PV de {{ ec.intitule }}
+{% endblock %}
+
+{% block page_content %}
+    {% if exam is defined and exam is not null %}
+
+    <div class="input-group-prepend float-right">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-secondary btn-flat" title="Cliquez pour afficher les options">
+            Exporter les fichiers
+        </a>
+        <ul class="dropdown-menu">
+            <li class="dropdown-item">
+                <i class="fa fa-file-pdf text-danger"></i>
+                <a target="_blank" class="text-danger" href="{{ path('pv_telecharger_ec', {'format': 'pdf', 'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug, 'slugModule': ecm.module.slug, 'idEcModule': ecm.id}) }}">télécharger le pdf</a>
+            </li>
+            <li class="dropdown-item">
+                <i class="fa fa-file-pdf text-danger"></i>
+                <a target="_blank" class="text-danger" href="{{ path('pv_telecharger_classe', {'format': 'pdf', 'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug}) }}">télécharger tous (pdf)</a>
+            </li>
+            {% if exam.type|upper != 'R' %}
+                <li class="dropdown-item">
+                    <i class="fa fa-file-excel text-success"></i>
+                    <a target="_blank" class="text-success" href="{{ path('pv_telecharger_classe', {'format': 'xls', 'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug, 'semestre': 1}) }}">exporter sur excel (semestre 1)</a>
+                </li>
+                <li class="dropdown-item">
+                    <i class="fa fa-file-excel text-success"></i>
+                    <a target="_blank" class="text-success" href="{{ path('pv_telecharger_classe', {'format': 'xls', 'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug, 'semestre': 2}) }}">exporter sur excel (semestre 2)</a>
+                </li>
+            {% endif %}
+            
+        </ul>
+    </div>
+    {# <a href="{{ path('pv_telecharger_classe', {'format': 'xls', 'slugAnnee': annee.slug, 'slugExamen': exam.slug, 'slugClasse': classe.slug}) }}" class="btn btn-success"><i class="fa fa-file-excel"></i> exporter sur excel</a> #}
+    {% else %}
+        {% if classe is defined and classe is not null %}
+            <div class="input-group-prepend float-right">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-outline-secondary btn-flat" title="Cliquez pour afficher les options">
+                    Exporter les fichiers
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item">
+                        <i class="fa fa-file-excel text-success"></i>
+                        <a target="_blank" href="{{ path('pv_telecharger_classe_finale', {'format': 'xls', 'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': 1}) }}" class="text-success">Synthèse Semestre 1</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <i class="fa fa-file-excel text-success"></i>
+                        <a target="_blank" href="{{ path('pv_telecharger_classe_finale', {'format': 'xls', 'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'semestre': 2}) }}" class="text-success">Synthèse Semestre 2</a>
+                    </li>
+                    <li class="dropdown-item">
+                        <i class="fa fa-file-excel text-success"></i>
+                        <a target="_blank" href="{{ path('pv_telecharger_classe_finale', {'format': 'xls', 'slugAnnee': annee.slug, 'slugClasse': classe.slug}) }}" class="text-success">Synthèse Finale</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <br><br><br>
+
+    <div class="alert alert-info">
+        <p>
+            Intitulé de l'EC: {{ ec.intitule }}
+        </p>
+        <p>
+            Code de l'EC : {{ ec.code }}
+        </p>
+        <p>
+            Examen : {{ exam is defined and exam is not null ? exam.intitule : "Synthèse finale" }}
+        </p>
+        <p>
+            Année académique : {{ annee.denomination }}
+        </p>
+        <p>
+            Classe : {{ classe.nom }} - {{ classe.code }}
+        </p>
+        {% if ecm is defined and ecm is not null %}
+            <p>
+                Crédit : {{ ecm.credit }}
+            </p>
+            <p>
+                Semestre : {{ ecm.semestre }}
+            </p>
+        {% endif %}
+        
+    </div>
+    <div style="overflow: auto;height:700px;" class="scrollBar">
+        <table class="table table-hover table-bordered">
+            {% include "pv/pv_header.html.twig" %}
+            
+            {% include "pv/pv_body.html.twig" %}
+        </table>
+    </div>
+    {% if pages is defined and pages is not empty  %}
+        <br>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                {% set params = {'slugAnnee': annee.slug, 'slugClasse': classe.slug, 'page': currentPage - 1} %}
+                {% if exam is defined and exam is not null %}
+                    {% set params = params|merge({'code': exam.code}) %}
+                {% endif %}
+                {% set ctrlerName = exam is defined and exam is not null ? 'pv_show_pv_classe' : 'pv_show_pv_definitif_classe' %}
+                <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path(ctrlerName, params) }}" tabindex="-1">{{"prev"}}</a>
+                </li>
+                {% set pi = 0 %}
+                {% for p in pages %}
+                    {% set pi = pi + 1 %}
+                    {% set params = params|merge({'page': pi}) %}
+                    <li class="page-item {{ currentPage == pi ? 'active' : '' }}">
+                        <a title="PV de {{ p }}" class="page-link" href="{{ path(ctrlerName, params)}}">{{ pi }}</a class="page-link">
+                    </li>
+                {% endfor %}
+                {% set params = params|merge({'page': currentPage + 1}) %}
+                <li class="page-item {{ nbPages == currentPage ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path(ctrlerName, params) }}">{{"next"}}</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,160 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="" class="brand-link">
+        <img src="{{ absolute_url(asset('dist/img/logo_getin_mini.png')) }}"
+            alt="logo"
+            class="brand-imageelevation-3"
+            style="opacity: .8;height:30px;width:70%;min-width:180px;max-width:200px;">
+        <!-- <span class="brand-text font-weight-light">GETIN 2.0</span> -->
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                    <a href="{{ path('home') }}" class="nav-link {{ li is defined and li == 'home' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            Dashboard
+                        </p>
+                    </a>
+                </li>
+                {% if is_granted('ROLE_STUDENT_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('etudiants', {'slug': app.session.get('annee').slug, 'page': '1'}) }}" class="nav-link {{ li is defined and li == 'et' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>{{ "Gestion des étudiants" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if is_granted('ROLE_EMPLOYE_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path("employe") }}" class="nav-link {{ li is defined and li == 'pers' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>{{ "Gestion du personnel" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                    
+                {% if is_granted('ROLE_PAIEMENT_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path("paiement") }}" class="nav-link {{ li is defined and li == 'paie' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-euro-sign"></i>
+                            <p>{{ "Gestion des paiements" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if is_granted('ROLE_SAISIE_NOTES') %}
+                    {% set urlNotes = path('note') %}
+                    {% if not is_granted('ROLE_NOTE_MANAGER') %}
+                        {% set urlNotes = path('security_user_list_matiere', {'id': app.user.id, 'slugAnnee': app.session.get('annee').slug}) %}
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="{{ urlNotes }}" class="nav-link {{ li is defined and li == 'note' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-edit"></i>
+                            <p>{{ "Gestion des notes" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_REQUEST_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('request', {'slugAnnee': app.session.get('annee').slug}) }}" class="nav-link {{ li is defined and li == 'req' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-user-edit"></i>
+                            <p>{{ "Gestion des requêtes" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_CLASSES_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('all_classes') }}" class="nav-link {{ li is defined and li == 'cl' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-bookmark"></i>
+                            <p>{{ "Gestion des classes" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_EC_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('pa_liste_matieres', {'slug': app.session.get('annee').slug, 'page': 1}) }}" class="nav-link {{ li is defined and li == 'ec' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>{{ "Gestion des EC" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_EXAMEN_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('examen') }}" class="nav-link {{ li is defined and li == 'exam' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-star"></i>
+                            <p>{{ "Gestion des examens" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_PROGRAMACADEMIQUE_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('programme_academique', {'slug': app.session.get('annee').slug}) }}" class="nav-link {{ li is defined and li == 'pa' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-map-marked"></i>
+                            <p>{{ "Gestion des programmes" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if is_granted('ROLE_NOTE_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('statistiques', {'slugAnnee': app.session.get('annee').slug}) }}" class="nav-link {{ li is defined and li == 'stats' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <p>{{ "Statistiques" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_USER_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('security_home') }}" class="nav-link {{ li is defined and li == 'user' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>{{ "Gestion des utilisateurs" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_CONFIG_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('configuration', {'slugAnnee': app.session.get('annee').slug}) }}" class="nav-link {{ li is defined and li == 'config' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>{{ "Configuration" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_CREATION_MANAGER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('creation') }}" class="nav-link {{ li is defined and li == 'crud' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-sitemap"></i>
+                            <p>{{ "Création" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% if is_granted('ROLE_SUPER_USER') %}
+                    <li class="nav-item">
+                        <a href="{{ path('migration') }}" class="nav-link {{ li is defined and li == 'mig' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-paw"></i>
+                            <p>{{ "Gestion des migrations" }}</p>
+                        </a>
+                    </li>
+                {% endif %}
+                
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

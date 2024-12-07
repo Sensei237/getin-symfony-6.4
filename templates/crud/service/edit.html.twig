@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block title %} {{ "GESTION DES SERVICES" }} {% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES SERVICES" }} {% endblock %}
+
+{% block contentTitle %} {{ editMode ? "Modfier le service" : "Créer un nouveau service" }} {% endblock %}
+
+{% block footerContent %}
+    
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('show_services') }}">{{"Service"}}</a></li>
+    <li class="breadcrumb-item active">{{ editMode ? "modifier" : "créer" }}</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-7">
+            {{ form_start(form) }}
+                {{ form_row(form) }}
+                <button class="btn btn-primary" type="submit">{{ btn_title }}</button>
+            {{ form_end(form) }}
+        </div>
+        <div class="col-5">
+            <h4>{{ "Autres Services" }}</h4>
+            <ul>
+                {% for serv in services %}
+                    {% if editMode and serv.id != service.id %}
+                        <li><a href="{{ path('edit_service', {'slug': serv.slug}) }}" title="{{ "Modifier" }}">{{ serv.nom }}</a></li>
+                    {% elseif not editMode %}
+                        <li><a href="{{ path('edit_service', {'slug': serv.slug}) }}" title="{{ "Modifier" }}">{{ serv.nom }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{"GESTION DES SPECIALITES"}}{% endblock %}
+
+{% block pageTitle %} {{ "GESTION DES SPECIALITES" }} {% endblock %}
+
+{% block contentTitle %} 
+    {{ filiere is null ? "Toutes les filières" : "Liste des spécialités ou options de la filière " ~ filiere.name}}
+{% endblock %}
+
+{% block footerContent %}
+    {% if filiere is null %}
+        <div class="input-group-prepend">
+            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+                {{"Ajouter une nouvelle spécialité"}}
+            </button>
+            <ul class="dropdown-menu">
+                {% for fil in filieres %}
+                    <li class="dropdown-item">
+                        <a href="{{ path('creer_specialite', {'slug': fil.slug}) }}">{{ fil.name }}</a>
+                    </li>
+                {% endfor %}
+                                                                            
+            </ul>
+        </div>
+    {% else %}
+        <a class="btn btn-sm btn-primary" href="{{ path('creer_specialite', {'slug': filiere.slug}) }}">{{ "Ajouter une nouvelle spécialité dans la filière " ~ filiere.code }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item"><a href="{{ path('creation') }}">{{"Création"}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('filieres_home') }}">{{ "filières" }}</a></li>
+    {% if filiere is null %}
+        <li class="breadcrumb-item active">{{ "toutes" }}</li>
+    {% else %}
+        <li class="breadcrumb-item"><a href="{{ path('show_all_specialites') }}">{{ "spécialités" }}</a></li>
+        <li class="breadcrumb-item active">{{ filiere.name }}</li>
+    {% endif %}
+    
+{% endblock %}
+
+{% block page_content %}
+    <div class="input-group-prepend float-right">
+        <button type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
+            {{"Filtrer par filière"}}
+        </button>
+        <ul class="dropdown-menu">
+            <li class="dropdown-item"><a href="{{ path("show_all_specialites") }}">{{ "Toutes les spécialités" }}</a></li>
+            {% for fil in filieres %}
+                <li class="dropdown-item">
+                    <a href="{{ path('show_specialites', {'slug': fil.slug}) }}">{{ fil.name }}</a>
+                </li>
+            {% endfor %}
+                                                                        
+        </ul>
+    </div>
+    <br><br>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ "Nom spécialité" }}</th>
+                <th>{{ "Code spécialité" }}</th>
+                <th>{{ "Nom filière" }}</th>
+                <th>{{ "Action" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set i = 1 %}
+            {% for specialite in specialites %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ specialite.name }}</td>
+                    <td>{{ specialite.code }}</td>
+                    <td>{{ specialite.filiere.name ~ "( " ~ specialite.filiere.code ~ ")" }}</td>
+                    <td>
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-toggle="dropdown">
+                                {{"Action"}}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item"><a href="{{ path('edit_specialite', {'slug': specialite.slug}) }}">{{"Modifier"}}</a></li>
+                                <li class="dropdown-item"><a href="{{ path('classes_specialite', {'specialite_slug': specialite.slug, 'filiere_slug': specialite.filiere.slug}) }}">{{"Liste de classe"}}</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li class="dropdown-item"><a href="">{{"Liste des étudiants"}}</a></li>
+                                                                                                
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% set i = i+1 %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

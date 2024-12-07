@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{"GESTION DU PERSONNEL "}}{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DU PERSONNEL" }} 
+{% endblock %}
+
+{% block contentTitle %}
+    Tout le personnel
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">personnel</li>
+{% endblock %}
+
+{% block page_content %}
+    <div class="">
+        <a href="{{ path('employe_edit') }}" class="btn btn-outline-primary">Ajouter nouveau personnel</a>
+    </div>
+    <br><br>
+    <table id="example1" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th class="text-center">Date nais.</th>
+                <th class="text-center">Sexe</th>
+                <th class="text-center">Téléphone</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Service</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %}
+            {% for e in employes %}
+                {% if e.isVisible %}
+                    <tr>
+                        {% set i = i + 1 %}
+                        <td class="text-center">{{ i }}</td>
+                        <td>
+                            <a href="{{ path('employe_profile', {'reference': e.reference}) }}">
+                                {{ e.nom }}
+                            </a>
+                        </td>
+                        <td>{{ e.prenom }}</td>
+                        <td class="text-center">{{ e.dateDeNaissance|date("d/m/Y") }}</td>
+                        <td class="text-center">{{ e.sexe }}</td>
+                        <td class="text-center">{{ e.telephone }}</td>
+                        <td class="text-center">{{ e.adresseEmail }}</td>
+                        <td class="text-center">{{ e.service ? e.service.nom : '' }}</td>
+                        <td class="text-center">
+                            <a href="{{ path('employe_profile', {'reference': e.reference}) }}" title="Afficher toutes les informations" class="btn btn-outline-primary btn-flat btn-xs"><i class="fa fa-eye"></i></a>
+                            <a href="{{ path('employe_modifer', {'reference': e.reference}) }}" title="Modifier les informations" class="btn btn-outline-warning btn-flat btn-xs"><i class="fa fa-edit"></i></a>
+                            <a href="{{ path('employe_delete', {'reference': e.reference}) }}" title="Supprimer" class="btn-confirm-ajax-action btn btn-outline-danger btn-flat btn-xs">
+                                <i class="fa fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+                
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "PAIEMENTS " }}{% endblock %}
+
+{% block pageTitle %} 
+    {{ "GESTION DES PAIEMENTS" }}
+{% endblock %}
+
+{% block navSearchFormInputValue %}{{ searchText }}{% endblock %}
+{% block navSearchFormMethod %} {{ "GET" }} {% endblock %}
+{% block navSearchFormAction %} {{ path('paiement_etudiants_search', {'anneeSlug': annee.slug}) }} {% endblock %}
+
+{% block contentTitle %}
+    {{ "Liste des paiements" }}
+{% endblock %}
+
+{% block fil_ariane %}
+    <li class="breadcrumb-item active">{{ "paiements" }}</li>
+{% endblock %}
+
+{% block footerContent %}
+    <a href="{{ path("paiement_add") }}" class="btn btn-outline-primary">Ajouter un nouveau type de paiement</a>
+{% endblock %}
+
+{% block page_content %}
+    {% if typePaiements is empty %}
+        <div class="alert alert-warning alert-dismissible">
+            <button class="close" type="button" aria-hidden="true" data-dismiss="">×</button>
+            <h5>
+                <i class="icon fas fa-exclamation-triangle"></i>
+                {{ "Attention" }}
+            </h5>
+            <p>AUCUN TYPE DE PAIMENT TROUVE ! <i class="fa fa-angry"></i></p>
+        </div>
+    {% else %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Dénomination</th>
+                    <th>Nombre de classes concernées</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set i = 0 %}
+                {% for t in typePaiements %}
+                    <tr>
+                        {% set i = i + 1 %}
+                        <td>{{ i }}</td>
+                        <td>
+                            <a href="{{ path("paiement_classes_concernees", {'slugTP': t.slug}) }}">
+                                {{ t.denomination }}
+                            </a>
+                            
+                        </td>
+                        <td>{{ t.paiementClasses|length }}</td>
+                        <td>
+                            <a href="{{ path('paiement_edit', {'slug': t.slug}) }}" class="btn btn-outline-warning btn-xs"><i class="fa fa-pencil-alt"></i></a>
+                            {% set url = path('paiement_delete_tp', {'slug': t.slug}) %}
+                            {% if is_granted('ROLE_SUPER_USER') %}
+                                {% set url = path('paiement_delete_tp', {'slug': t.slug, 'strict': 'yes'}) %}
+                            {% endif %}
+                            <a href="{{ url }}" class="btn btn-outline-danger btn-confirm-ajax-action btn-xs"><i class="fa fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    
+{% endblock %}

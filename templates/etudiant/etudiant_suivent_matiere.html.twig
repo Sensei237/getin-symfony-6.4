@@ -1,0 +1,198 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{"LISTE DES ETUDIANTS QUI SUIVENT LA MATIERE " ~ ec.intitule ~ "(" ~ ec.code ~ ")"}}
+{% endblock %}
+
+{% block pageTitle %} 
+    {{"LISTE DES ETUDIANTS QUI SUIVENT LA MATIERE " ~ ec.intitule ~ "(" ~ ec.code ~ ")"}}
+{% endblock %}
+
+{% block fil_ariane %}
+
+{% endblock %}
+
+{% block contentTitle %}
+{{"Liste des étudiants qui suivent la matière " ~ ec.intitule ~ "(" ~ ec.code ~ ") pour l'année académique " ~ annee.denomination}}
+{% endblock %}
+
+{% block navSearchFormMethod %} {{ "GET" }} {% endblock %}
+{% block navSearchFormAction %} {{ path('etudiants', {'slug': annee.slug}) }} {% endblock %}
+
+{% block footerContent %}
+    {% if contrats is defined and contrats is not empty %}
+        {% set params = {'slug': ec.slug, 'slug_annee': annee.slug} %}
+        {% if classe is defined and classe is not null %}
+            {% set params = params|merge({'slugClasse': classe.slug}) %}
+        {% endif %}
+        {% set params2 = params|merge({'statut': statut}) %}
+        {% set downloadUrl =  path('etudiant_suivent_matiere_pdf', params2) %}
+        {% set params = params|merge({'type': 'releve-notes'}) %}
+        {% set downloadUrl2 =  path('etudiant_suivent_matiere_pdf', params) %}
+        {% set params = params|merge({'anonymat': true}) %}
+        {% set downloadUrl3 =  path('etudiant_suivent_matiere_pdf', params) %}
+        
+        <a target="_blank" href="{{ downloadUrl }}" class="btn btn-outline-secondary">{{ "Télecharger le pdf" }} <i class="fa fa-download"></i></a>
+        {% if statut is not defined or statut is empty or statut is null or statut == '' %}
+            <a target="_blank" href="{{ downloadUrl2 }}" class="btn btn-outline-secondary">{{ "Télecharger pour releve des notes" }} <i class="fa fa-download"></i></a>
+            {% if examens is defined and examens is not empty %}
+            <!-- <div class="input-group-prepend"> -->
+                <button type="button" class="btn btn-flat btn-outline-primary dropdown-toggle" data-toggle="dropdown">
+                    Liste anonymée
+                </button>
+                <ul class="dropdown-menu">
+                    {% for exam in examens %}
+                        {% if exam.type|upper != 'C' %}
+                        <li class="dropdown-item">
+                            <i class="fa fa-download"></i>
+                            <a target="_blank" href="{{ downloadUrl3 }}&session={{ exam.slug }}">{{ exam.intitule }} (Liste pour releve de notes)</a>
+                        </li>
+                        <li class="dropdown-item">
+                            <i class="fa fa-download"></i>
+                            <a target="_blank" href="{{ downloadUrl3 }}&session={{ exam.slug }}&withNames=yes">{{ exam.intitule }} (Liste avec les noms)</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            <!-- </div> -->
+            {% endif %}
+        {% endif %}
+    {% endif %}
+        
+{% endblock %}
+
+{% block page_content %}
+    {% if classe is defined and classe is not null %}
+        <div class="alert alert-info">
+            {{ ("Uniquement les étudiants de la classe " ~ classe.nom ~ " (" ~ classe.code ~ ")"|upper) }}
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="form-group">
+                <label>Filtrer</label>
+                {% set url = path('etudiant_suivent_matiere', {'slug': ec.slug, 'slug_annee': annee.slug, 'page': 1}) %}
+                {% if classe is defined and classe is not null %}
+                    {% set url = path('etudiant_suivent_matiere_classe', {'slug': ec.slug, 'slug_annee': annee.slug, 'page': 1, 'slugClasse': classe.slug}) %}
+                {% endif %}
+                <select id="filtreEtudiantStatus" class="select2 form-control form-control-feedback">
+                    <option {{ statut is defined and (statut == '' or statut is null ) ? 'selected' : '' }} value="{{ url }}">TOUS</option>
+                    <option {{ statut is defined and (statut == 'VSN' ) ? 'selected' : '' }} value="{{ url }}?statut=VSN">étudiants ayant validé en session normal</option>
+                    <option {{ statut is defined and (statut == 'VSR' ) ? 'selected' : '' }} value="{{ url }}?statut=VSR">étudiants ayant validé au rattrappage</option>
+                    <option {{ statut is defined and (statut == 'DEL' ) ? 'selected' : '' }} value="{{ url }}?statut=DEL">étudiants ayant été délibérés</option>
+                    <option {{ statut is defined and (statut == 'VDEL' ) ? 'selected' : '' }} value="{{ url }}?statut=VDEL">étudiants ayant validé après les délibérations</option>
+                    <option {{ statut is defined and (statut == 'PRAT' ) ? 'selected' : '' }} value="{{ url }}?statut=PRAT">étudiants au rattrappage</option>
+                    <option {{ statut is defined and (statut == 'NCC' ) ? 'selected' : '' }} value="{{ url }}?statut=NCC">étudiants sans notes de CC</option>
+                    <option {{ statut is defined and (statut == 'NNSN' ) ? 'selected' : '' }} value="{{ url }}?statut=NNSN">étudiants sans notes de session normale</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    {% if contrats is defined and contrats is not empty %}
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ "Nom et prenom" }}</th>
+                    <th>{{ "Matricule" }}</th>
+                    <th>{{ "Date de naissance" }}</th>
+                    <th>{{ "Classe" }}</th>
+                    <th>{{ "Spécialité" }}</th>
+                    <th>{{ "Filière" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in contrats %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>
+                            <div class="input-group-prepend">
+                                <div class="dropup actions-etudiant">
+                                    <a href="{{ path('etudiant_profile_etudiant', {'matricule': c.etudiantInscris.etudiant.matricule, 'slug': c.etudiantInscris.anneeAcademique.slug}) }}" title="Profil">
+                                        {{ (c.etudiantInscris.etudiant.nomComplet)|upper }}
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item-title">{{ c.etudiantInscris.etudiant.nom|upper }}</li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-user"></i>
+                                            <a href="{{ path('etudiant_profile_etudiant', {'matricule': c.etudiantInscris.etudiant.matricule, 'slug': c.etudiantInscris.anneeAcademique.slug}) }}">{{ "Toutes les informations" }}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-list-alt"></i>
+                                            <a href="{{ path('contrat_academique_afficher', {'matricule': c.etudiantInscris.etudiant.matricule, 'slug': annee.slug}) }}">{{ "Contrats academiques" }} <i class="badge badge-info">{{ c.etudiantInscris.contrats|length ~ "matières" }}</i></a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-graduation-cap"></i>
+                                            <a href="">{{ "Gestion des notes" }}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-file-image"></i>
+                                            <a href="">{{ "Valider les paiements" }}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-edit"></i>
+                                            <a href="{{ path('etudiant_edit_profile_etudiant', {'slug': annee.slug, 'matricule': c.etudiantInscris.etudiant.matricule}) }}">{{ "Modifier les informations" }}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ c.etudiantInscris.etudiant.matricule|upper }}</td>
+                        <td>{{ c.etudiantInscris.etudiant.dateDeNaissance|date("d/m/Y") }}</td>
+                        <td>
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ c.etudiantInscris.classe.formation.slug ~ "&filiere=" ~ c.etudiantInscris.classe.specialite.filiere.slug ~ "&specialite=" ~ c.etudiantInscris.classe.specialite.slug ~ "&classe=" ~ c.etudiantInscris.classe.slug }}" title="{{"Afficher la liste des étudiants de la classe"}}">
+                                {{ c.etudiantInscris.classe.code }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ c.etudiantInscris.classe.formation.slug ~ "&filiere=" ~ c.etudiantInscris.classe.specialite.filiere.slug ~ "&specialite=" ~ c.etudiantInscris.classe.specialite.slug}}" title="{{"Afficher la liste des étudiants la spécialité"}}">
+                                {{ c.etudiantInscris.classe.specialite.code }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ path('etudiants', {'slug': annee.slug}) ~ "?formation=" ~ c.etudiantInscris.classe.formation.slug ~ "&filiere=" ~ c.etudiantInscris.classe.specialite.filiere.slug }}" title="{{"Afficher la liste des étudiants de la filière"}}">
+                                {{ c.etudiantInscris.classe.specialite.filiere.code }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% set i = i+1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if pages is defined and pages is not empty  %}
+            <br>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                        {% set prevUrl = classe is defined and classe is not null ? path('etudiant_suivent_matiere_classe', {'slug': ec.slug, 'page': (currentPage - 1), 'slug_annee': annee.slug, 'slugClasse': classe.slug}) : path('etudiant_suivent_matiere', {'slug': ec.slug, 'page': (currentPage - 1), 'slug_annee': annee.slug}) %}
+                        <a class="page-link" href="{{ prevUrl }}?statut={{ statut }}" tabindex="-1">{{"Prev"}}</a>
+                    </li>
+                    {% for p in pages %}
+                        {% set pageUrl = classe is defined and classe is not null ? path('etudiant_suivent_matiere_classe', {'slug': ec.slug, 'page': p, 'slug_annee': annee.slug, 'slugClasse': classe.slug}) : path('etudiant_suivent_matiere', {'slug': ec.slug, 'page': p, 'slug_annee': annee.slug}) %}
+                        <li class="page-item {{ currentPage == p ? 'active' : '' }}">
+                            <a class="page-link" href="{{ pageUrl }}?statut={{ statut }}">{{ p }}</a class="page-link">
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ nbPages == currentPage ? 'disabled' : '' }}">
+                        {% set nextUrl = classe is defined and classe is not null ? path('etudiant_suivent_matiere_classe', {'slug': ec.slug, 'page': (currentPage + 1), 'slug_annee': annee.slug, 'slugClasse': classe.slug}) : path('etudiant_suivent_matiere', {'slug': ec.slug, 'page': (currentPage + 1), 'slug_annee': annee.slug}) %}
+                        <a class="page-link" href="{{ nextUrl }}?statut={{ statut }}">{{"Next"}}</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <h3 class="text-center">No data found <i class="fa fa-angry text-danger"></i></h3>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('select#filtreEtudiantStatus').on('change', function(){
+            window.location.href = $(this).val();
+        });
+    </script>
+{% endblock %}
