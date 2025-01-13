@@ -193,9 +193,9 @@ class AnneeAcademique
                 'logo' => $this->getConfiguration()->getLogo(),
                 'ville' => $this->getConfiguration()->getVille(),
                 'logoUniversity' => $this->getConfiguration()->getLogoUniversity(),
-                'logoEcoleBase64' => $this->getConfiguration()->getLogoEcoleBase64(),
-                'logoUniversityBase64' => $this->getConfiguration()->getLogoUniversityBase64(),
-                'filigrane' => $this->getConfiguration()->getFiligrane(),
+                'logoEcoleBase64' => null, //$this->getConfiguration()->getLogoEcoleBase64(),
+                'logoUniversityBase64' => null, // $this->getConfiguration()->getLogoUniversityBase64(),
+                'filigrane' => null //$this->getConfiguration()->getFiligrane(),
             ]
         ];
     }

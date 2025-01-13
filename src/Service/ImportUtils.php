@@ -65,6 +65,7 @@ class ImportUtils
         if ($type == 'personnel' || $type == 'services' || $type == 'classes' || $type == 'filieres' || $type == 'specialites') {
             $flashAlert = $this->import($worksheetData, $reader, $inputFileName, $entityManager, $entityManager, $type);
             $entityManager->flush();
+            $entityManager->clear();
         }elseif ($type == 'quitus') {
             $flashAlert = $this->importerQuitus($worksheetData, $annee, $reader, $inputFileName, $entityManager, $entityManager, $tp);
         }
@@ -573,6 +574,8 @@ class ImportUtils
                     $noteCC = $sheet->getCell('C'.$i)->getValue();
                     $noteSN = $sheet->getCell('D'.$i)->getValue();
                     $noteSR = $sheet->getCell('E'.$i)->getValue();
+                    $noteTP = $sheet->getCell('F'.$i)->getValue();
+                    $noteTPE = $sheet->getCell('G'.$i)->getValue();
                     // $c->setNoteCC($noteCC)->setNoteSN($noteSN)->setNoteSR($noteSR);
                     if (!empty($noteCC) && is_numeric($noteCC) && $noteCC <= 20 && $noteCC >= 0) {
                         $c->setNoteCC($noteCC);
@@ -582,6 +585,12 @@ class ImportUtils
                     }
                     if (!empty($noteSR) && is_numeric($noteSR) && $noteSR <= 20 && $noteSR >= 0) {
                         $c->setNoteSR($noteSR);
+                    }
+                    if (!empty($noteTP) && is_numeric($noteTP) && $noteTP <= 20 && $noteTP >= 0) {
+                        $c->setNoteTP($noteTP);
+                    }
+                    if (!empty($noteTPE) && is_numeric($noteTPE) && $noteTPE <= 20 && $noteTPE >= 0) {
+                        $c->setNoteTPE($noteSR);
                     }
                     $existe = true;
                     unset($contrats[$key]);

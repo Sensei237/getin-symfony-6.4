@@ -109,6 +109,18 @@
                                     {{"Liste des étudiants"}}
                                 </a>
                             </li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-file"></i>
+                                <a href="{{ path('app_document_scolarite_classe', {'anneeSlug': annee.slug, 'classeSlug': classe.slug, 'export': 'pdf'}) }}" target="_blank">
+                                    {{"Certificats de scolarité des étudiants"}}
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <i class="fa fa-file-archive"></i>
+                                <a href="{{ path('app_document_quitus_classe', {'anneeSlug': annee.slug, 'classeSlug': classe.slug, 'export': 'pdf'}) }}" target="_blank">
+                                    {{"Certificats de scolarité des étudiants"}}
+                                </a>
+                            </li>
                             <li class="dropdown-divider"></li>
                             <li class="dropdown-item">
                                 <i class="fa fa-fill-drip"></i> 

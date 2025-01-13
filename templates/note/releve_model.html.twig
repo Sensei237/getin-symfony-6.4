@@ -4,22 +4,24 @@
                 <div class="header-cmr">
                     <div class="inline-block block-fr">
                         <h3 class="text-uppercase">Republique du cameroun</h3>
-                        <span>paix - travail - Patrie</span>
+                        <span>Paix - Travail - Patrie</span>
                         <h4 class="text-uppercase">Ministere de l'enseignement superieur</h4>
-                        <h4 class="text-uppercase universite">Universite de douala</h4>
+                        <h4 class="text-uppercase universite">Université d'Ebolowa</h4>
+                        <h4 class="text-uppercase universite">Faculté des Sciences</h4>
                     </div>
                     <div class="inline-block block-en">
                         <h3 class="text-uppercase">Republic of Cameroon</h3>
-                        <span>peace - work - fatherland</span>
+                        <span>Peace - Work - Fatherland</span>
                         <h4 class="text-uppercase">Ministry of Higher Education</h4>
-                        <h4 class="text-uppercase universite">University of Douala</h4>
+                        <h4 class="text-uppercase universite">The University of Ebolowa</h4>
+                        <h4 class="text-uppercase universite">Faculty of Science</h4>
                     </div>
                     
                 </div>
 
                 <div class="header-school">
                     <div class="logo1 inline-block">
-                        <img src="{{ annee.configuration.logoUniversityBase64 }}" alt="">
+                        <img src="{{ logoUniversityBase64 }}" alt="">
                     </div>
                     <div class="inline-block school-info">
                         <h3>{{ annee['configuration']['nomEcole'] }}</h3>
@@ -35,7 +37,7 @@
                         {% endif %}
                     </div>
                     <div class="logo2 inline-block">
-                        <img src="{{ annee.configuration.logoEcoleBase64 }}" alt="">
+                        <img src="{{ logoEcoleBase64 }}" alt="">
                     </div>
                 </div>
 
@@ -87,7 +89,7 @@
                                 <em>Field of study</em>
                             </div>
                             <div class="inline-block vertical-middle text-uppercase">
-                                <strong>: <span class="font-size-16">{{ inscri['classe']['filiere'] }}</span></strong>
+                                <strong>: <span style="font-size: 14px;" class="font-size-16">{{ inscri['classe']['filiere'] }}</span></strong>
                             </div>
                         </div>
                         <div class="inline-block vertical-middle">
@@ -107,8 +109,8 @@
                                 <strong>Option</strong> <br>
                                 <em>Option</em>
                             </div>
-                            <div class="inline-block vertical-middle text-uppercase">
-                                <strong> : <span class="font-size-16">{{ inscri['classe']['specialite'] }}</span></strong>
+                            <div class="inline-block vertical-middle text-uppercase" style="width: 70%;">
+                                <strong> : <span style="font-size: 14px;" class="font-size-16">{{ inscri['classe']['specialite'] }}</span></strong>
                             </div>
                         </div>
                         <div class="inline-block vertical-middle">
@@ -189,16 +191,16 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 16%;">Moyenne</td>
-                    <td style="width: 16%;">Note</td>
+                    <td style="width: 16%;">Moyenne/20</td>
+                    <td style="width: 16%;">Note/4</td>
                     <td style="width: 16%;">Grade</td>
                     <td style="width: 16%;">Crédit</td>
                     <td style="width: 16%;">Mention</td>
                     <td style="width: 16%;">Décision</td>
                 </tr>
                 <tr>
-                    <td><strong>{{ final['moyenne'] }} / 20</strong></td>
-                    <td><strong>{{ final['noteSur4'] }} / 4</strong></td>
+                    <td><strong>{{ final['moyenne'] }}</strong></td>
+                    <td><strong>{{ final['noteSur4'] }}</strong></td>
                     <td><strong>{{ final['grade'] }}</strong></td>
                     <td><strong>{{ final['credit'] }}</strong></td>
                     <td><strong>{{ final['mention'] }}</strong></td>
@@ -227,9 +229,9 @@
                     </td>
                 </tr>
             </table>
-            {% if annee is not null and annee.configuration is not null and annee.configuration.filigrane is not null %}
+            {% if filigraneBase64 is defined and filigraneBase64 is not null %}
                 <div style="position: absolute;width:100%;height:100%;top:0px;">
-                    <img style="opacity: 0.5;width:100%;height:290mm;" src="{{ annee.configuration.filigrane }}" alt="" srcset="">
+                    <img style="opacity: 0.5;width:100%;height:290mm;" src="{{ filigraneBase64 }}" alt="" srcset="">
                 </div>
             {% endif %}
             {% if inPDF %}
@@ -240,7 +242,7 @@
                         <b>GRA</b> : Grade; 
                         <b>CRE</b> : Crédit; 
                         <b>DEC</b> : Décision (<i>V</i>=Validé, <i>NV</i>=Non Validé, <i>VC</i>=Validé par Compensation); 
-                        <b>TRA</b> : Transférable (<i>O</i>=OUI, <i>N</i>=NON); 
+                        <br><b>TRA</b> : Transférable (<i>O</i>=OUI, <i>N</i>=NON); 
                         <b>SES</b> : Session (<i>N</i>=Normale, <i>R</i>=Rattrapage)
                         <b>A.V</b> : Année de Validation <br>
                         <b><u>NB</u></b> : <i>Il n'est délivré qu'un seul relevé de notes. Il appartient 

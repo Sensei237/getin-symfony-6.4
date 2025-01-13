@@ -122,6 +122,9 @@ class ReleveNoteUtils
             'annee' => $annee->getAsArray(),
             'semestre' => $semestre,
             'inPDF' => $inPDF,
+            'logoUniversityBase64' => $annee->getConfiguration()->getLogoUniversityBase64(),
+            'logoEcoleBase64' => $annee->getConfiguration()->getLogoEcoleBase64(),
+            'filigraneBase64' => $annee->getConfiguration()->getFiligrane(),
         ]);
         if (!$inPDF) {
             return $html;
@@ -292,6 +295,7 @@ class ReleveNoteUtils
                     }
 
                     $this->objectManager->flush();
+                    // $this->objectManager->clear();
                 }
             }
         }else {
@@ -300,6 +304,7 @@ class ReleveNoteUtils
             $sessionValidation = null;
         }
         $this->objectManager->flush();
+        // $this->objectManager->clear();
 
         $contratActualises = [];
         foreach ($contratsByModuleItem['contrats'] as $contrat) {
@@ -430,17 +435,21 @@ class ReleveNoteUtils
             $i++;
         }
         $manager->flush();
+        // $manager->clear();
 
         $results = $this->calculerNotesModule($etudiants, $annee, $semestre);
         $manager->flush();
+        // $manager->clear();
         // on met jour les notes annuelles
         $this->calculerNotesModule($etudiants, $annee, null);
         $manager->flush();
+        // $manager->clear();
         
         $this->editSynthesesModulaires($results['synthesesModulaires'], $manager, $doctrine);
 
         $this->verifierIfADD($etudiants, $annee);
         $manager->flush();
+        // $manager->clear();
     }
 
     /**
@@ -559,6 +568,7 @@ class ReleveNoteUtils
 
         if ($cmp%10 == 0) {
             $manager->flush();
+            // $manager->clear();
         }
     }
 

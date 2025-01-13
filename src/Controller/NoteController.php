@@ -222,6 +222,7 @@ class NoteController extends AbstractController
             if ($verificationResult['isValid']) {
                 $this->saveNotes($examen, $verificationResult['notes']);
                 $this->entityManagerInterface->flush();
+                // $this->entityManagerInterface->clear();
                 if ($request->isXmlHttpRequest()) {
                     return new Response(json_encode(['hasError'=>false, 'msg'=>'Les notes ont été enregistrées ! Vous pouvez quitter la page si vous le souhaiter ou continuer à les modifier', 'reloadWindow'=>false]), '200', ['Content-type'=>'appplication/json']);
                 }
@@ -308,6 +309,7 @@ class NoteController extends AbstractController
             if ($verificationResult['isValid']) {
                 $this->saveNotes($examen, $verificationResult['notes']);
                 $this->entityManagerInterface->flush();
+                // $this->entityManagerInterface->clear();
                 $this->addFlash('success', "Les notes ont été enregistrées !");
                 return $this->redirectToRoute('note_show_notes_etudiant_examen', [
                     'matricule' => $etudiant->getMatricule(),
@@ -537,6 +539,7 @@ class NoteController extends AbstractController
             if (!$result['hasError']) {
                 
                 $this->entityManagerInterface->flush();
+                // $this->entityManagerInterface->clear();
             }
 
             if ($request->isXmlHttpRequest()) {
@@ -736,7 +739,7 @@ class NoteController extends AbstractController
 
         $semestre = $request->get('semestre');
 
-        if ($inscris && $request->get('file') && $request->get('file')=='pdf') {
+        if ($inscris && $request->get('file') && $request->get('file') == 'pdf') {
             $result = $rn->genererReleves($inscris, $annee, true, 'releves.html.twig', $semestre);
             return $this->file($result['temp_file'], $result['fileName'], ResponseHeaderBag::DISPOSITION_INLINE);
         }
@@ -745,7 +748,6 @@ class NoteController extends AbstractController
         if ($etudiant) {
             $filePath = 'etudiant/profil/releve.html.twig';
         }
-
         return $this->render($filePath, [
             'releves' => $rn->genererReleves($inscris, $annee, false, 'releves.html.twig', $semestre),
             'li' => $this->link,
@@ -755,6 +757,8 @@ class NoteController extends AbstractController
             'semestre' => $semestre,
             'etudiant' => $etudiant,
             'inscription' => $inscri,
+            'logoUniversityBase64' => $annee->getConfiguration()->getLogoUniversityBase64(),
+            'logoEcoleBase64' => $annee->getConfiguration()->getLogoEcoleBase64(),
             'pages' => $pages,
             'currentPage' => $page,
             'nbPages' => $nbPages,
@@ -802,6 +806,7 @@ class NoteController extends AbstractController
                     break;
             }
             $this->entityManagerInterface->flush();
+            // $this->entityManagerInterface->clear();
         }
 
         return new Response(json_encode(['hasError'=>$hasError]));

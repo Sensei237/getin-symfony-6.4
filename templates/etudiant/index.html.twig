@@ -114,9 +114,10 @@
 {% endblock %}
 
 {% block page_content %}
-    <a href="{{ path('contrat_generer_tous', {'slug': annee.slug}) }}" class="btn btn-outline-danger btn-ajax-action">{{ "Générer les contrats académiques" }}</a>
-    <a href="{{ path('etudant_list', {'slugAnnee': annee.slug}) }}" class="btn btn-outline-secondary btn-flat">Télécharger les listes</a>
-    <br><br>
+    <div class="mb-3 text-right">
+        <a data-confirm-message="Vous êtes sur le point de générer les contrats académiques de tous les étudiants. cette opération peut prendre du temps en fonction du nombre d'étudiants inscrits.\nSouhaitez-vous poursuivre ?" href="{{ path('contrat_generer_tous', {'slug': annee.slug}) }}" class="btn btn-outline-danger no-loader btn-confirm-ajax-action">{{ "Générer les contrats académiques" }}</a>
+        <a href="{{ path('etudant_list', {'slugAnnee': annee.slug}) }}" class="btn btn-outline-secondary btn-flat">Télécharger les listes</a>
+    </div>
 
     <form id="filtre-etudiants" action="{{ path('etudiants', {'slug': annee.slug}) }}" method="GET">
         <div class="row">
@@ -230,6 +231,20 @@
                                             <i class="fa fa-file-image"></i>
                                             <a href="{{ path("paiement_etat_etudiant", {'slug': annee.slug, 'matricule': i.etudiant.matricule}) }}">{{ "Valider les paiements" }}</a>
                                         </li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-file-image"></i>
+                                            <a href="{{ path('app_document_scolarite_etudiant', {'anneeSlug': annee.slug, 'classeSlug': i.classe.slug, 'matricule': i.etudiant.matricule}) }}">
+                                                Certificat de scolarité
+                                            </a>
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <i class="fa fa-file-upload"></i>
+                                            <a href="{{ path('app_document_quitus_etudiants', {'anneeSlug': annee.slug, 'classeSlug': i.classe.slug, 'matricule': i.etudiant.matricule}) }}">
+                                                Quitus de paiement
+                                            </a>
+                                        </li>
+
                                         <li class="divider"></li>
                                         <li class="dropdown-item">
                                             <i class="fa fa-edit"></i>

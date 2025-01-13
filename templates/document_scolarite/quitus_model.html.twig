@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .line{
+            border: 2px #222 dashed;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        img{
+            width: 100%;
+        }
+        table{
+            border: none;
+        }
+        .page {
+            max-width: 210mm;
+            width: auto;
+            margin-bottom: 50px;
+            position: relative;
+            page-break-after: auto !important;
+            margin-left: auto;
+            margin-right: auto;
+            text-transform: uppercase;
+        }
+        .page{
+            padding: 10px auto;
+        }
+        
+        @page{
+            margin: 10px 30px 10px 30px !important;
+        }
+        .header{
+            text-align: center;
+            font-weight: 900;
+            font-size: 12px;
+        }
+        .header h1{
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .header h2 {
+            font-size: 10px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .header h2, .header h1, .header p{
+            margin: 0px;
+        }
+        .header p{
+            text-transform: none;
+        }
+        .coupons div{
+            display: inline-block;
+            width: auto;
+            text-transform: none;
+        }
+        .quitus-content td{
+            vertical-align: top;
+        }
+        .quitus-content {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        {% include "document_scolarite/quitus_item.html.twig" with {couponType: 'Coupon Etudiant'} %}
+        <hr class="line">
+        {% include "document_scolarite/quitus_item.html.twig" with {couponType: 'Coupon DAF'} %}
+        <hr class="line">
+        {% include "document_scolarite/quitus_item.html.twig" with {couponType: 'Coupon Scolarité'} %}
+        <hr class="line">
+        {% include "document_scolarite/quitus_item.html.twig" with {couponType: 'Coupon Banque'} %}
+    </div>
+</body>
+</html>

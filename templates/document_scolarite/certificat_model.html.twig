@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .page {
+            max-width: 210mm;
+            width: auto;
+            margin-bottom: 50px;
+            position: relative;
+            page-break-after: auto !important;
+            margin-left: auto;
+            margin-right: auto;
+            text-transform: uppercase;
+        }
+        .page{
+            padding: 10px auto;
+        }
+        
+        @page{
+            margin: 10px 50px 30px 50px !important;
+        }
+        .head, .head h5, .head h2, .head h3, .head h4, .head h1, .head h6 {
+            font-weight: 900;
+        }
+        .head table {
+            border: none;
+        }
+        .head table td h3{
+            font-size: 16px;
+            margin: 0px;
+        }
+        .head table td h4{
+            font-size: 12px;
+            margin: 0px;
+        }
+        .head table td h5{
+            font-size: 12px;
+            margin: 0px;
+        }
+        .head table {
+            text-align: center;
+        }
+        .head table img{
+            width: 100px;
+            height: 100px;
+            margin-bottom: 5px;
+        }
+        .title {
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .title h1 {
+            font-size: 30px;
+            font-weight: 900;
+            margin: 0px;
+        }
+        .title h2 {
+            font-size: 25px;
+            font-style: italic;
+            margin: 0px;
+        }
+        .content {
+            text-transform: none !important;
+            font-size: 17px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .content p{
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="head">
+            <table>
+                <tbody>
+                    <tr style="vertical-align: top;">
+                        <td style="width: 40%;">
+                            <h3>république du cameroun</h3>
+                            <h4>paix - travail - patrie</h4>
+                            <h5>********</h5>
+                            <h3>Ministère de l'enseignement supérieur</h3>
+                            <h5>********</h5>
+                            <h3>Université d'ebolowa</h3>
+                            <h5>********</h5>
+                            <h3>Faculté des sciences</h3>
+                            <h5>********</h5>
+                            <p>
+                                BP: {{ annee.configuration.boitePostale }}
+                                <br>
+                                TEL: {{ annee.configuration.telephone }}
+                            </p>
+                            <p>
+                                N<sup><u>o</u></sup> ............................ UEB/R/DFS
+                            </p>
+                        </td>
+                        <td>
+                            <div>
+                                <img src="{{ annee.configuration.logoUniversityBase64 }}" alt="">
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <img src="{{ annee.configuration.logoEcoleBase64 }}" alt="">
+                            </div>
+                        </td>
+                        <td style="width: 40%;">
+                            <h3>republic of cameroon</h3>
+                            <h4>peace - work - fatherland</h4>
+                            <h5>********</h5>
+                            <h3>Ministry of higher education</h3>
+                            <h5>********</h5>
+                            <h3>the university of ebolowa</h3>
+                            <h5>********</h5>
+                            <h3>Faculty of science</h3>
+                            <h5>********</h5>
+                            <p>
+                                PO.BOX: {{ annee.configuration.boitePostale }}
+                                <br>
+                                TEL: {{ annee.configuration.telephone }}
+                            </p>
+                            <p>
+                                Ebolowa le : _____/____/____
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+        <div class="title">
+            <div style="background-color: #ccc;height: 100px; padding-top: 20px;border-radius: 10px;">
+                <h1>Certificat de scolarité</h1>
+                <h2>certificate of enrolment</h2>
+            </div>
+        </div>
+        <div class="content">
+            <p>
+                Le doyen de la Faculté des Sciences de l'Université d'Ebolowa soussigné, certifie
+                <br>
+                <i>The unsigned Dean of the Faculty of Science of the University of Ebolowa, certified that</i>
+            </p>
+            <p>
+                <span>M/Mme: <strong>{{ inscription.etudiant.nomComplet }}</strong> <br></span>
+                <i>Mr/Mrs</i>
+            </p>
+            <p>
+                <span>Né(e) le: <strong>{{ inscription.etudiant.dateDeNaissance|date("d/m/Y") }}</strong></span>
+                <span style="margin-left: 200px;">à: <strong>{{ inscription.etudiant.lieuDeNaissance }}</strong></span> <br>
+                <i>Born on</i> <i style="margin-left: 290px;">At</i>
+            </p>
+            <p>
+                Est effectivement inscrit(e) à la Faculté des sciences <br>
+                <i>Is registered at the faculty of science</i>
+            </p>
+            <p>
+                <span>Sous le matricule: <strong>{{ inscription.etudiant.matricule }}</strong></span>
+                <span style="margin-left: 150px;">Année Académique: <strong>{{ annee.denomination }}</strong></span> <br>
+                <i>Registration numbers</i>
+                <i style="margin-left: 220px;">Academic Year</i>
+            </p>
+            <p>
+                <span>Cycle: <strong>{{ inscription.classe.niveau <= 3 ? 'Licence' : inscription.classe.niveau <= 5 ? 'Master' : 'Doctorat' }}</strong></span>
+                <span style="margin-left: 265px;">Niveau: <strong>{{ inscription.classe.niveau }}</strong></span> <br>
+                <i>Cycle</i>
+                <i style="margin-left: 330px;">Level</i>
+            </p>
+            <p>
+                <span>Spécialité : <strong>{{ inscription.classe.specialite.name }}</strong></span><br>
+                <i>Speciality</i>
+            </p>
+            <p>
+                <span>Département : <strong>{{ inscription.classe.specialite.filiere.name }}</strong></span><br>
+                <i>Department</i>
+            </p>
+            <div style="text-align: right; margin-top: 40px;">
+                <p>
+                    <strong>LE DOYEN</strong>
+                    <br>
+                    <i>THE DEAN</i>
+                </p>
+            </div>
+            
+        </div>
+        <div style="position: absolute; bottom: -50px;">
+            <span style="font-size: 12px;">
+                
+            </span>
+        </div>
+    </div>
+</body>
+</html>

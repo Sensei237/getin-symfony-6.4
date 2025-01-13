@@ -465,7 +465,7 @@
                 }
             });
 
-            $('a.dropdown-toggle, a.btn-save-request, #first-next, #second-prev, #second-next, #first-prev, #last-prev, #tirth-prev, #tirth-next, #confirmation-btn').addClass('no-loader');
+            $('.dropdown-toggle, .btn-ajax-action, .btn-confirm-ajax-action, .btn-save-request, #first-next, #second-prev, #second-next, #first-prev, #last-prev, #tirth-prev, #tirth-next, #confirmation-btn').addClass('no-loader');
 
             $('a').each(function(){
                 $(this).on('click', function(){
@@ -485,7 +485,11 @@
             $('.btn-confirm-ajax-action').on("click", function(e){
                 e.preventDefault();
                 let $btn = $(this);
-                if (confirm("Attention !!! cette action est irreversible, vous ne pourrez donc plus faire un retour en arrière si vous continuez. \n Etes-vous sure de vouloir poursuivre cette opération ?")) {
+                let msg = $btn.data('confirm-message')
+                if (msg == '' || msg == null || msg == undefined) {
+                    msg = "Attention !!! cette action est irreversible, vous ne pourrez donc plus faire un retour en arrière si vous continuez. \n Etes-vous sure de vouloir poursuivre cette opération ?";
+                }
+                if (confirm(msg)) {
                     $.ajax({
                         url: $btn.attr("href"),
                         dataType: "JSON",
@@ -506,11 +510,14 @@
                             }
                         }
                     })
+                }else {
+                    showLoader(false)
                 }
             })
             
             $('.btn-ajax-action').on("click", function(e){
                 e.preventDefault();
+                //if (confirm("Vous allez generer les contrats academiques pour tous les etudiants. Souhaitez-vous poursuivre cette operation ?")) {
                 let $elt = $(this);
                 $.ajax({
                     url: $elt.attr("href"),
@@ -540,6 +547,7 @@
                         toastr.error($ajaxErrorMsg);
                     }
                 })
+                // }
             })
 
             // Lorsqu'un formulaire est envoye en ajax avec les données

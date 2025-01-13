@@ -1235,4 +1235,24 @@ class ExportUtils
 
         return $val;
     }
+
+    public function getDocumentsScolairePdf(Array $data, string $fileName, string $format='A4', string $orientation='portrait')
+    {
+        $pdfOptions = new Options();
+        $pdfOptions->setDefaultFont('Arial');
+        $pdfOptions->setIsRemoteEnabled(true);
+        $dompdf = new Dompdf($pdfOptions);
+        $html = $this->twig->render('document_scolarite/documents.html.twig', $data);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper($format, $orientation);
+        $dompdf->render();
+        $fileName = $fileName;
+        $output = $dompdf->output();
+        // file_put_contents($fileName, $output);
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        // die($fileName);
+        file_put_contents($temp_file, $output);
+
+        return ['temp_file' => $temp_file, 'fileName' => $fileName];
+    }
 }

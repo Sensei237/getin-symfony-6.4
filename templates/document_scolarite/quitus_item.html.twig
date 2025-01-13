@@ -1,0 +1,95 @@
+<div>
+    <div class="header">
+        <table>
+            <tbody>
+                <tr>
+                    <td style="width: 80px; text-align: center;">
+                        <img style="width: 60px;" src="{{ annee.configuration.logoUniversityBase64 }}" alt="">
+                    </td>
+                    <td style="width: 510px;">
+                        <div style="border: solid 2px rgb(128, 128, 228);border-radius: 10px">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 350px;">
+                                            <div style="text-align: center;">
+                                                <h1>Université d'Ebolowa</h1>
+                                                <h2><i>The University of Ebolowa</i></h2>
+                                                <h1>Faculté des Sciences</h1>
+                                                <h2><i>Faculty of Science</i></h2>
+                                                <p>
+                                                    <span>Tel : {{ annee.configuration.telephone }}</span>
+                                                    <span>Email : {{ annee.configuration.email }}</span>
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="height: 70px; width: 100px; background-color: #ccc">
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td style="width: 80px; text-align: center;">
+                        <img style="width: 60px;" src="{{ annee.configuration.logoEcoleBase64 }}" alt="">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="coupons" style="margin-top: 10px;">
+        <div style="border: solid 1px; font-size: 14px;padding: 2px 5px;"><strong>{{ couponType|default('Coupon Etudiant') }}</strong></div>
+        <div style="margin-left: 20px;">Matricule: <strong>{{ inscription.etudiant.matricule }}</strong></div>
+        <div style="float: right;">Année Académique: <strong>{{ annee.denomination }}</strong></div>
+    </div>
+    <div class="quitus-content"  style="text-transform: none;">
+        <table>
+            <tbody>
+                <tr>
+                    <td colspan="3">Nom(s) : <strong style="text-transform: capitalize;">{{ inscription.etudiant.nomComplet }}</strong></td>
+                </tr>
+                <tr>
+                    <td>
+                        Né(e) le : <strong>{{ inscription.etudiant.dateDeNaissance|date("d/m/Y") }}</strong>
+                        à : <strong>{{ inscription.etudiant.lieuDeNaissance }}</strong>
+                    </td>
+                    <td colspan="2">Département : <strong>{{ inscription.classe.specialite.filiere.name }}</strong></td>
+                </tr>
+                <tr>
+                    <td>
+                        Sexe : <strong style="margin-right: 20px;">{{ inscription.etudiant.sexe }}</strong>
+                        Nationalité : <strong>{{ inscription.etudiant.nationalite|default('Camerounaise') }}</strong>
+                    </td>
+                    <td>
+                        Cycle/Niveau/Parcours : 
+                        <strong>
+                            {{ inscription.classe.niveau <= 3 ? 'L' : inscription.classe.niveau <= 5 ? 'M' : 'D' }}{{ inscription.classe.niveau }}{{ inscription.classe.specialite.code }}
+                        </strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Montant : <strong>____________________ FCFA</strong>
+                    </td>
+                    <td style="padding-left: 20px;">
+                        <div style="width: 15px; height: 15px; border: solid 1px #000;display: inline-block;"></div>
+                        <strong>Tranche 1</strong>
+                    </td>
+                    <td>
+                        <div style="width: 15px; height: 15px; border: solid 1px #000;display: inline-block;"></div>
+                        <strong>Tranche 2</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="font-size: 14px;margin-top: 5px;">
+            <span>
+                SGC Cameroun, Numéro de compte bancaire <strong>10003 03400 2234130379656</strong> 
+            </span>
+            <span>Date de paiement : <strong>______/______/_____</strong></span>
+        </div>
+    </div>
+</div>

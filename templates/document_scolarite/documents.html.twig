@@ -1,0 +1,8 @@
+
+{% for inscription in etudiants %}
+    {% if isForCertificatsScolarites is defined %}
+        {% include "document_scolarite/certificat_model.html.twig" %}
+    {% elseif isForQuitusPaiement is defined %}
+        {% include "document_scolarite/quitus_model.html.twig" %}
+    {% endif %}
+{% endfor %}

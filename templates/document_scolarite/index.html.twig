@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ pageTitle }}
+{% endblock %}
+
+{% block pageTitle %} 
+    {{ pageTitle }} 
+{% endblock %}
+
+{% block page_content %}
+    <div class="mb-5 text-right">
+        <a href="?export=pdf" class="btn btn-outline-primary">Exporter en pdf</a>
+    </div>
+    {% include "document_scolarite/documents.html.twig" %}
+    <div class="mt-5 text-right">
+        <a href="?export=pdf" class="btn btn-outline-primary">Exporter en pdf</a>
+    </div>
+{% endblock %}

@@ -792,7 +792,7 @@ class Etudiant
             'dateDeNaissance' => date_format($this->getDateDeNaissance(), 'd/m/Y'),
             'lieuDeNaissance' => $this->getLieuDeNaissance(),
             'sexe' => $this->getSexe(),
-            'photoBase64' => $this->getPhotoBase64(),
+            'photoBase64' => null, // $this->getPhotoBase64(),
             'matricule' => $this->getMatricule(),
             'nom' => $this->getNom(),
             'prenom' => $this->getPrenom(),
