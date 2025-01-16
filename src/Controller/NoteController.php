@@ -740,7 +740,8 @@ class NoteController extends AbstractController
         $semestre = $request->get('semestre');
 
         if ($inscris && $request->get('file') && $request->get('file') == 'pdf') {
-            $result = $rn->genererReleves($inscris, $annee, true, 'releves.html.twig', $semestre);
+            $filename = $etudiant ? time()."_releve_note_".strtolower($classe->getCode())."_".$etudiant->getMatricule().".pdf" : time()."_releve_note_".strtolower($classe->getCode()).".pdf";
+            $result = $rn->genererReleves($inscris, $annee, true, 'releves.html.twig', $semestre, $filename);
             return $this->file($result['temp_file'], $result['fileName'], ResponseHeaderBag::DISPOSITION_INLINE);
         }
 

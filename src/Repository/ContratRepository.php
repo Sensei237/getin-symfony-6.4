@@ -98,6 +98,28 @@ class ContratRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * Cette fonction permet de recuperer tous les contrats academiques d'une classe pour une année donnée
+     */
+    public function findContratsClasse(AnneeAcademique $annee, Classe $classe, $maxResult=null, $start=null)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.etudiantInscris', 'ei')
+            ->join('ei.etudiant', 'et')
+            ->join('c.ecModule', 'ecm')
+            ->join('ei.classe', 'cl')
+            ->andWhere('ei.anneeAcademique = :annee')
+            ->andWhere(' ei.classe = :classe')
+            ->setParameter('annee', $annee)
+            ->setParameter('classe', $classe)
+            ->orderBy('et.nom', 'ASC')
+            ->setMaxResults($maxResult)
+            ->setFirstResult($start)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findContratsClasseForECWidthAnonymats(AnneeAcademique $annee, EC $ec, Classe $classe, Examen $ex, $maxResult=null, $start=null)
     {
         return $this->createQueryBuilder('c')

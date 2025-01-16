@@ -17,6 +17,7 @@ use App\Entity\AnneeAcademique;
 use App\Form\UploadProgramType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -216,13 +217,15 @@ class MigrationController extends AbstractController
      * @Route("/fixtures/notes/{slug}", name="examen_fixture_note")
      * @Route("/fixtures/notes/{slug}/{id}", name="examen_fixture_note_classe")
      */
+    #[ParamConverter("classe", options: ['mapping' => ['id' => 'id']])]
+    #[ParamConverter("annee", options: ['mapping' => ['slug' => 'slug']])]
     public function notesFixture(AnneeAcademique $annee, ?Classe $classe=null)
     {
         if ($annee->getIsArchived()) {
             $this->createAccessDeniedException("Année academique cloturee !");
         }
         if ($classe) {
-            
+            $contrats = $this->entityManagerInterface->getRepository(Contrat::class)->findContratsClasse($annee, $classe);
         }else {
             $contrats = $this->entityManagerInterface->getRepository(Contrat::class)->findAll();
         }

@@ -44,7 +44,7 @@ class ImportUtils
         $originalName = $_FILES['upload_program']['name']['fichier'];
         $parts = explode('.', $originalName);
         $extension = $parts[count($parts)-1];
-        if ($extension != 'xlsx') {
+        if (strtolower($extension) != 'xlsx') {
             throw new Exception("Vous devez selectionner un fichier excel avec l'extension .xlsx");
             
         }

@@ -113,7 +113,7 @@ class ReleveNoteUtils
         return $data;
     }
 
-    public function genererReleves(Array $inscris, AnneeAcademique $annee, $inPDF=false, $htmlFile='releves.html.twig', $semestre=null)
+    public function genererReleves(Array $inscris, AnneeAcademique $annee, $inPDF=false, $htmlFile='releves.html.twig', $semestre=null, ?string $filename=null)
     {
         // die(var_dump($inscris));
         // dump($this->getReleveFields($inscris, $semestre));die();
@@ -138,7 +138,7 @@ class ReleveNoteUtils
         $dompdf->setPaper('A4');
         $dompdf->render();
         
-        $fileName = "releves_de_notes_.pdf";
+        $fileName = $filename;
         $dompdf->stream($fileName);
         $output = $dompdf->output();
         // file_put_contents($fileName, $output);

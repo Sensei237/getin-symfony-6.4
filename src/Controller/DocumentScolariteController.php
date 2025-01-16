@@ -31,11 +31,12 @@ class DocumentScolariteController extends AbstractController
     #[ParamConverter("etudiant", options: ['mapping' => ['matricule' => 'matricule']])]
     public function certificat_scolarites(AnneeAcademique $anneeAcademique, Classe $classe, ?Etudiant $etudiant=null, Request $request, EtudiantInscrisRepository $etudiantInscrisRepository, ExportUtils $eu): Response
     {
+        set_time_limit(0);
         $etudiants = [];
         if ($etudiant) {
             $etudiants[] = $etudiantInscrisRepository->findOneBy(['etudiant' => $etudiant, 'anneeAcademique' => $anneeAcademique]);
         }else {
-            $etudiants = $etudiantInscrisRepository->findBy(['anneeAcademique' => $anneeAcademique]);
+            $etudiants = $etudiantInscrisRepository->findBy(['anneeAcademique' => $anneeAcademique, 'classe' => $classe]);
         }
 
         $data = [
@@ -49,7 +50,8 @@ class DocumentScolariteController extends AbstractController
 
         if (!empty($etudiants) && $request->get('export')) {
             // On genere le fichier pdf
-            $result = $eu->getDocumentsScolairePdf($data, time()."certificats_scolarites.pdf");
+            $filename = $etudiant ? time()."_certificats_scolarites_".$etudiant->getMatricule().".pdf" : time() ."_certificats_scolarites_" .strtolower($classe->getCode()).".pdf";
+            $result = $eu->getDocumentsScolairePdf($data, $filename);
             return $this->file($result['temp_file'], $result['fileName'], ResponseHeaderBag::DISPOSITION_ATTACHMENT);
         }
         
@@ -63,11 +65,12 @@ class DocumentScolariteController extends AbstractController
     #[ParamConverter("etudiant", options: ['mapping' => ['matricule' => 'matricule']])]
     public function quitus_paiement(AnneeAcademique $anneeAcademique, Classe $classe, ?Etudiant $etudiant=null, Request $request, ExportUtils $eu, EtudiantInscrisRepository $etudiantInscrisRepository): Response
     {
+        set_time_limit(0);
         $etudiants = [];
         if ($etudiant) {
             $etudiants[] = $etudiantInscrisRepository->findOneBy(['etudiant' => $etudiant, 'anneeAcademique' => $anneeAcademique]);
         }else {
-            $etudiants = $etudiantInscrisRepository->findBy(['anneeAcademique' => $anneeAcademique]);
+            $etudiants = $etudiantInscrisRepository->findBy(['anneeAcademique' => $anneeAcademique, 'classe' => $classe]);
         }
 
         $data = [
@@ -80,7 +83,8 @@ class DocumentScolariteController extends AbstractController
 
         if (!empty($etudiants) && $request->get('export')) {
             // On genere le fichier pdf
-            $result = $eu->getDocumentsScolairePdf($data, time()."certificats_scolarites.pdf");
+            $filename = $etudiant ? time()."_quitus_paiement_".$etudiant->getMatricule().".pdf" : time() ."_quitus_paiement_" .strtolower($classe->getCode()).".pdf";
+            $result = $eu->getDocumentsScolairePdf($data, $filename);
             return $this->file($result['temp_file'], $result['fileName'], ResponseHeaderBag::DISPOSITION_ATTACHMENT);
         }
 

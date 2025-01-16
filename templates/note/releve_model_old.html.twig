@@ -127,19 +127,20 @@
         </div>
     </header>
 
-    <table class="table table-liste-ec">
+    <table class="table table-bordered table-liste-ec">
         <thead>
-            <tr class="text-center" style="border-top: solid 1px #222; color: #000; font-weight: 900; background-color: rgb(175, 104, 241);border-bottom: solid 1px #222;">
-                <th class="th-ec-code" style="font-size: 14px !important;"><strong style="font-weight: 900;">Code UE</strong></th>
-                <th class="intitule" style="font-size: 14px !important;"><strong style="font-weight: 900;">Intitulé de l'unité d'enseignement</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Note/20</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Note/4</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Gra.</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Cre.</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Dec.</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Tra.</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">Ses.</strong></th>
-                <th style="font-size: 14px !important;"><strong style="font-weight: 900;">A.V</strong></th>
+            <tr class="text-center">
+                <th class="th-ue-code">Code UE</th>
+                <th class="th-ec-code">Code EC</th>
+                <th class="intitule">Intitulé</th>
+                <th style="font-size: 12px !important;">Note/20</th>
+                <th style="font-size: 12px !important;">Note/4</th>
+                <th style="font-size: 12px !important;">Gra.</th>
+                <th style="font-size: 12px !important;">Cre.</th>
+                <th style="font-size: 12px !important;">Dec.</th>
+                <th style="font-size: 12px !important;">Tra.</th>
+                <th style="font-size: 12px !important;">Ses.</th>
+                <th style="font-size: 12px !important;">A.V</th>
             </tr>
         </thead>
         <tbody>
@@ -148,17 +149,18 @@
                 {% set module = cm['module']['mod'] %}
                 {% set detailsModule = cm['module']['details'] %}
                 <tr class="font-bold module">
-                    {# <td class="text-center"><b class="font-bold">>>>></b></td> #}
+                    <td class="text-center vertical-middle" rowspan="{{ contrats|length + 1 }}">{{ module.code|upper }}</td>
+                    <td class="text-center"><b class="font-bold">>>>></b></td>
                     
-                    <td style="text-align: center;font-size: 15px !important;" colspan="10">{{ module['intitule']|upper }}</td>
-                    {# <td class="text-center">{{ detailsModule['noteSur20'] }}</td>
+                    <td>{{ module['intitule']|upper }}</td>
+                    <td class="text-center">{{ detailsModule['noteSur20'] }}</td>
                     <td class="text-center">{{ detailsModule['noteSur4'] }}</td>
                     <td class="text-center">{{ detailsModule['grade'] }}</td>
                     <td class="text-center">{{ detailsModule['creditModule'] }}</td>
                     <td class="text-center">{{ detailsModule['decision']|upper }}</td>
                     <td class="text-center"></td>
                     <td class="text-center">{{ detailsModule['sessionValidation']|upper }}</td>
-                    <td class="text-center td-annee-validation">{{ detailsModule['anneeValidation'] }}</td> #}
+                    <td class="text-center td-annee-validation">{{ detailsModule['anneeValidation'] }}</td>
                 </tr>
                 {% for c in contrats %}
                     <tr style="font-size: 14px !important;">
@@ -180,7 +182,7 @@
 
     <table class="table table2">
         <tr>
-            <td class="result-title" style="background-color: rgb(175, 104, 241);" colspan="6">
+            <td class="result-title" colspan="6">
                 {% if semestre is not defined or semestre is null %}
                     Résultat Annuel / Annual result
                 {% else %}
