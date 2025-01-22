@@ -21,6 +21,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -33,11 +34,13 @@ class ExportUtils
     private $twig;
     private $colsForStats = [];
     private $legende;
+    private $imagesDirectory;
 
-    public function __construct(Environment $twig)
+    public function __construct(Environment $twig, $imagesDirectory)
     {
         $this->twig = $twig;
         $this->legende = '';
+        $this->imagesDirectory = $imagesDirectory;
     }
 
     /**
@@ -424,12 +427,19 @@ class ExportUtils
 
         $this->applyStylesInPVExcel($sheet, $nbColonnes, $nbLignes, $lastColName);
 
-        $intitule = $exam ? $exam->getIntitule() : "SYNTHESE FINALE";
-        $sheet->setCellValue('A1', "PROCES VERBAL...\n".$intitule."\n".$semestreTitle."\n".$annee->getDenominationSlash());
-        $sheet->getStyle('A1')->getAlignment()->setWrapText(true);
-        $sheet->getStyle('A1')->applyFromArray(['font' => ['bold' => true,'size' => 16],'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER,'vertical' => Alignment::VERTICAL_CENTER,]]);
+        $drawing = new Drawing();
+        $drawing->setPath($this->imagesDirectory . "/" . $annee->getConfiguration()->getLogo());
+        $drawing->setHeight(100);
+        $drawing->setCoordinates('D1');
+        $drawing->setWorksheet($sheet);
 
-        $sheet->setCellValue('D1', "FACULTE DES SCIENCES DE L'UNIVERSITE D'EBOLOWA\nDEPARTEMENT/FILIERE : ".$classe->getSpecialite()->getFiliere()->getName()."\nSPECILALITE/OPTION : ".$classe->getSpecialite()->getName()."\nNIVEAU : ".$classe->getLMDLevel()."\nLEGENDE : ".$this->legende);
+        $intitule = $exam ? $exam->getIntitule() : "SYNTHESE FINALE";
+        // $sheet->setCellValue('A1', "PROCES VERBAL...\n".$intitule."\n".$semestreTitle."\n".$annee->getDenominationSlash());
+        $sheet->setCellValue('A1', "DOMAINE DE L'ETABLISSEMENT: FACULTE DES SCIENCES\nMENTION: ".$classe->getSpecialite()->getFiliere()->getName()."\nPARCOURT: ".$classe->getSpecialite()->getName()."\nCYCLE: ".$classe->getCycle()."       SEMESTRE: ".$semestre."\nNIVEAU: ".$classe->getLMDLevel()."\nANNEE ACADEMIQUE: ".$annee->getDenominationSlash()."\nLISTE DES UNITES D'ENSEIGNEMENT\n".$this->legende);
+        $sheet->getStyle('A1')->getAlignment()->setWrapText(true);
+        $sheet->getStyle('A1')->applyFromArray(['font' => ['bold' => true,'size' => 12],'alignment' => ['horizontal' => Alignment::HORIZONTAL_JUSTIFY,'vertical' => Alignment::VERTICAL_CENTER,]]);
+
+        // $sheet->setCellValue('D1', "FACULTE DES SCIENCES DE L'UNIVERSITE D'EBOLOWA\nDEPARTEMENT/FILIERE : ".$classe->getSpecialite()->getFiliere()->getName()."\nSPECILALITE/OPTION : ".$classe->getSpecialite()->getName()."\nNIVEAU : ".$classe->getLMDLevel()."\nLEGENDE : ".$this->legende);
         $sheet->getStyle('D1')->getAlignment()->setWrapText(true);
         $sheet->getStyle('D1')->applyFromArray(['font' => ['bold' => true,'size' => 18],'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT,'vertical' => Alignment::VERTICAL_CENTER,]]);
 
@@ -642,7 +652,7 @@ class ExportUtils
                 $sheet->getStyle($cn1.':'.$cn2)->applyFromArray($styleArray);
                 $sheet->mergeCells($cn1.':'.$cn2);
 
-                $legende .= $ecm->getEc()->getCode() .' = '. $ecm->getEc()->getIntitule() .', ';
+                $legende .= $ecm->getEc()->getCode() .'          '. $ecm->getEc()->getIntitule() .'\n';
 
                 $ctrs = $contratRepository->findContratsClasseForEC($module->getAnneeAcademique(), $ecm->getEc(), $module->getClasse());
                 $ligne = $nbLignes + 5; // 5 represente les quatre premieres lignes du fichier (entetes) et la ligne des stats. nbLigne represente le nombre d'etudiant

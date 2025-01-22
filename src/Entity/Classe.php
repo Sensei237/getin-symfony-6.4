@@ -314,8 +314,22 @@ class Classe
                 return 'M2';
                 
             default:
-                return null;
+                return "DOCTORAT";
         }
+    }
+
+    public function getCycle(): ?string
+    {
+        $cycle = null;
+        if ($this->niveau > 0 && $this->niveau <= 3) {
+            $cycle = "LICENCE";
+        }elseif ($this->niveau > 3 && $this->niveau <= 5) {
+            $cycle = "MASTER";
+        }elseif ($this->niveau > 5) {
+            $cycle = "DOCTORAT";
+        }
+
+        return $cycle;
     }
 
     public function getAsArray()

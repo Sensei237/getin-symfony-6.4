@@ -302,6 +302,7 @@ class ReleveNoteUtils
             // Le module n'est pas validé
             $note = null;
             $sessionValidation = null;
+            $dec = "NV";
         }
         $this->objectManager->flush();
         // $this->objectManager->clear();
